@@ -205,15 +205,30 @@
             margin-bottom: 12px;
         }
 
+        /* Botón Comprar Ahora (Verde) */
+        .btn-buy-now {
+            width: 100%;
+            background-color: #22c55e;
+            color: #ffffff;
+            border: none;
+            padding: 9px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        /* Botón Agregar al Carrito */
         .btn-add {
             width: 100%;
             background-color: var(--accent-color);
             color: #121212;
             border: none;
-            padding: 10px;
+            padding: 9px;
             border-radius: 6px;
             font-weight: 700;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             cursor: pointer;
             text-transform: uppercase;
         }
@@ -488,12 +503,12 @@
             </form>
         </div>
     </div>
+
 <script>
         // CONFIGURACIÓN DE SUPABASE
         const SUPABASE_URL = "https://ywixgizcadytczxcbubg.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3aXhnaXpjYWR5dGN6eGNidWJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxMzkzNTIsImV4cCI6MjEwMzcxNTM1Mn0.ABIAb8426hAdnJw5nxvGhxorAL6s8RHvlhHkDsb06Ts"; // Asegúrate de pegar tu clave anon dentro de las comillas
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3aXhnaXpjYWR5dGN6eGNidWJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxMzkzNTIsImV4cCI6MjEwMzcxNTM1Mn0.ABIAb8426hAdnJw5nxvGhxorAL6s8RHvlhHkDsb06Ts";
 
-        // Usamos 'supabaseClient' para evitar el error de variable duplicada
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const numeroTelefono = "520000000000"; // Tu WhatsApp real
@@ -545,11 +560,20 @@
                     <div class="product-info">
                         <div class="product-title">${prod.nombre}</div>
                         <div class="product-price">$${prod.precio} MXN</div>
-                        <button class="btn-add" onclick="agregarAlCarrito('${prod.nombre}', ${prod.precio})">+ Agregar al carrito</button>
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                            <button class="btn-buy-now" onclick="comprarAhoraDirecto('${prod.nombre}', ${prod.precio})">⚡ Comprar ahora</button>
+                            <button class="btn-add" onclick="agregarAlCarrito('${prod.nombre}', ${prod.precio})">+ Agregar al carrito</button>
+                        </div>
                     </div>
                 `;
                 container.appendChild(card);
             });
+        }
+
+        // Comprar directamente por WhatsApp un solo producto
+        function comprarAhoraDirecto(nombre, precio) {
+            let mensaje = `Hola *El iguano*, me interesa comprar ahora mismo el siguiente producto:\n\n- ${nombre}: $${precio} MXN`;
+            window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
 
         function ejecutarBusqueda() {
