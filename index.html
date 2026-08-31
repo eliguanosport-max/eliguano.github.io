@@ -584,7 +584,7 @@
 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const numeroTelefono = "524961228531"; // Tu WhatsApp real
+        const numeroTelefono = "520000000000"; // Tu WhatsApp real
         const PALABRA_CLAVE_ADMIN = "admin123"; 
         const ADMIN_PASSWORD = "iguano2026";    
 
@@ -596,7 +596,29 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             cargarProductosDesdeSupabase();
+            verificarPedidoEnURL();
         });
+
+        // 1. Detección automática de enlaces con pedidos
+        function verificarPedidoEnURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const pedidoEncoded = urlParams.get('pedido');
+
+            if (pedidoEncoded) {
+                try {
+                    const itemsReconstruidos = JSON.parse(decodeURIComponent(pedidoEncoded));
+                    if (Array.isArray(itemsReconstruidos) && itemsReconstruidos.length > 0) {
+                        carrito = itemsReconstruidos;
+                        actualizarCarritoUI();
+                        setTimeout(() => {
+                            abrirCarrito();
+                        }, 500);
+                    }
+                } catch (e) {
+                    console.error("Error al decodificar el pedido de la URL:", e);
+                }
+            }
+        }
 
         async function cargarProductosDesdeSupabase() {
             const container = document.getElementById('catalog-container');
@@ -643,15 +665,17 @@
         }
 
         function comprarAhoraDirecto(nombre, precio, img) {
-            const codigoPedido = 'IGUANO-' + Math.floor(1000 + Math.random() * 9000);
+            const itemUnico = [{ nombre, precio, img, cantidad: 1 }];
+            const pedidoString = encodeURIComponent(JSON.stringify(itemUnico));
+            
+            // Crea enlace directo a la página web con el pedido
+            const urlBase = window.location.origin + window.location.pathname;
+            const linkPedido = `${urlBase}?pedido=${pedidoString}`;
+
             let mensaje = `Hola *El iguano*, me interesa comprar ahora mismo este producto:\n\n`;
-            mensaje += `🔖 *Pedido:* #${codigoPedido}\n`;
-            mensaje += `- *${nombre}*: $${precio} MXN\n`;
-            
-            if (img && !img.startsWith("data:image")) {
-                mensaje += `🖼️ *Ver foto:* ${img}\n`;
-            }
-            
+            mensaje += `- *${nombre}*: $${precio} MXN\n\n`;
+            mensaje += `🔗 *Ver pedido completo con fotos en la web:*\n${linkPedido}`;
+
             window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
 
@@ -760,20 +784,15 @@
                 return;
             }
 
-            const codigoPedido = 'IGUANO-' + Math.floor(1000 + Math.random() * 9000);
-            
-            let listaProductos = carrito.map(item => {
-                let linea = `- *${item.nombre}* x${item.cantidad}: $${item.precio * item.cantidad} MXN`;
-                if (item.img && !item.img.startsWith("data:image")) {
-                    linea += `\n  🖼️ Foto: ${item.img}`;
-                }
-                return linea;
-            }).join('\n');
+            const pedidoString = encodeURIComponent(JSON.stringify(carrito));
+            const urlBase = window.location.origin + window.location.pathname;
+            const linkPedido = `${urlBase}?pedido=${pedidoString}`;
 
+            let listaProductos = carrito.map(item => `- *${item.nombre}* x${item.cantidad}: $${item.precio * item.cantidad} MXN`).join('\n');
             let totalPrendas = carrito.reduce((sum, item) => sum + item.cantidad, 0);
             let totalDinero = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
             
-            let mensaje = `Hola *El iguano*, me gustaría realizar el siguiente pedido:\n\n📌 *Código de Pedido:* #${codigoPedido}\n\n${listaProductos}\n\n*Total de prendas:* ${totalPrendas}\n*Cuenta Total:* $${totalDinero} MXN`;
+            let mensaje = `Hola *El iguano*, me gustaría realizar el siguiente pedido desde la página web:\n\n${listaProductos}\n\n*Total de prendas:* ${totalPrendas}\n*Cuenta Total:* $${totalDinero} MXN\n\n🔗 *Ver este pedido con imágenes en la página:*\n${linkPedido}`;
             
             window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
