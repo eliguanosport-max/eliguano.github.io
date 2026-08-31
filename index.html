@@ -327,19 +327,41 @@
             margin-bottom: 15px;
         }
 
-        /* Diseño de Item de Carrito Mejorado */
+        /* Diseños de Items del Carrito con Imagen */
         .cart-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
+            padding: 10px 0;
             border-bottom: 1px solid var(--border-color);
+            gap: 12px;
+        }
+
+        .cart-item-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-grow: 1;
+        }
+
+        .cart-item-img {
+            width: 48px;
+            height: 48px;
+            object-fit: cover;
+            border-radius: 8px;
+            background-color: #252525;
+            border: 1px solid var(--border-color);
+        }
+
+        .cart-item-details {
+            display: flex;
+            flex-direction: column;
         }
 
         .cart-item-title {
             font-size: 0.9rem;
             font-weight: 600;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
 
         .cart-item-price {
@@ -535,7 +557,7 @@
         </div>
     </div>
 
-<script>
+    <script>
         // CONFIGURACIÓN DE SUPABASE
         const SUPABASE_URL = "https://ywixgizcadytczxcbubg.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3aXhnaXpjYWR5dGN6eGNidWJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxMzkzNTIsImV4cCI6MjEwMzcxNTM1Mn0.ABIAb8426hAdnJw5nxvGhxorAL6s8RHvlhHkDsb06Ts";
@@ -593,7 +615,7 @@
                         <div class="product-price">$${prod.precio} MXN</div>
                         <div style="display: flex; flex-direction: column; gap: 6px;">
                             <button class="btn-buy-now" onclick="comprarAhoraDirecto('${prod.nombre}', ${prod.precio})">⚡ Comprar ahora</button>
-                            <button class="btn-add" onclick="agregarAlCarrito('${prod.nombre}', ${prod.precio})">+ Agregar al carrito</button>
+                            <button class="btn-add" onclick="agregarAlCarrito('${prod.nombre}', ${prod.precio}, '${prod.img}')">+ Agregar al carrito</button>
                         </div>
                     </div>
                 `;
@@ -636,13 +658,13 @@
             ejecutarBusqueda();
         }
 
-        // Carrito con Cantidades
-        function agregarAlCarrito(nombre, precio) {
+        // Carrito con Imagen y Cantidades
+        function agregarAlCarrito(nombre, precio, img) {
             const existe = carrito.find(item => item.nombre === nombre);
             if (existe) {
                 existe.cantidad += 1;
             } else {
-                carrito.push({ nombre, precio, cantidad: 1 });
+                carrito.push({ nombre, precio, img, cantidad: 1 });
             }
             actualizarCarritoUI();
         }
@@ -677,9 +699,12 @@
                     const itemElement = document.createElement('div');
                     itemElement.className = 'cart-item';
                     itemElement.innerHTML = `
-                        <div>
-                            <div class="cart-item-title">${item.nombre}</div>
-                            <div class="cart-item-price">$${subtotal} MXN <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">($${item.precio} c/u)</span></div>
+                        <div class="cart-item-info">
+                            <img src="${item.img}" alt="${item.nombre}" class="cart-item-img">
+                            <div class="cart-item-details">
+                                <div class="cart-item-title">${item.nombre}</div>
+                                <div class="cart-item-price">$${subtotal} MXN <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">($${item.precio} c/u)</span></div>
+                            </div>
                         </div>
                         <div class="cart-controls">
                             <button class="btn-qty" onclick="cambiarCantidad(${index}, -1)">-</button>
