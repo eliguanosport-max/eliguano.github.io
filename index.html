@@ -45,6 +45,7 @@
             object-fit: contain;
             border-radius: 50%;
             transition: all 0.3s ease;
+            user-select: none;
         }
 
         .header-text {
@@ -86,17 +87,46 @@
             margin-top: 0;
         }
 
-        /* Categorías */
-        .categories {
+        /* Barra de Búsqueda */
+        .search-container {
+            padding: 12px 15px 5px 15px;
+            background-color: var(--bg-color);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-color);
+        }
+
+        /* Categorías y Botón Admin */
+        .categories-wrapper {
             display: flex;
-            gap: 10px;
-            padding: 15px;
-            overflow-x: auto;
+            align-items: center;
             background-color: var(--bg-color);
             border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 60px;
             z-index: 90;
+            padding: 10px 15px;
+            gap: 10px;
+        }
+
+        .categories {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            flex-grow: 1;
         }
 
         .category-btn {
@@ -117,6 +147,19 @@
             border-color: var(--accent-color);
         }
 
+        .btn-admin-add {
+            display: none;
+            background-color: #22c55e;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
         /* Catálogo */
         .catalog {
             display: grid;
@@ -133,6 +176,7 @@
             flex-direction: column;
             justify-content: space-between;
             border: 1px solid var(--border-color);
+            position: relative;
         }
 
         .product-img {
@@ -173,6 +217,22 @@
             text-transform: uppercase;
         }
 
+        .btn-delete-admin {
+            display: none;
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(239, 68, 68, 0.9);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 5;
+        }
+
         /* Barra Inferior del Carrito */
         .cart-bar {
             position: fixed;
@@ -192,8 +252,8 @@
             z-index: 101;
         }
 
-        /* Modal / Ventana Emergente del Carrito */
-        .cart-modal {
+        /* Modales (Carrito y Admin) */
+        .modal {
             display: none;
             position: fixed;
             top: 0;
@@ -206,23 +266,24 @@
             align-items: flex-end;
         }
 
-        .cart-modal.open {
+        .modal.open {
             display: flex;
         }
 
-        .cart-content {
+        .modal-content {
             background-color: #181818;
             width: 100%;
             max-width: 500px;
             border-radius: 20px 20px 0 0;
             padding: 20px;
-            max-height: 80vh;
+            max-height: 85vh;
             display: flex;
             flex-direction: column;
             border-top: 1px solid var(--border-color);
+            overflow-y: auto;
         }
 
-        .cart-header {
+        .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -231,12 +292,12 @@
             margin-bottom: 15px;
         }
 
-        .cart-header h2 {
+        .modal-header h2 {
             font-size: 1.2rem;
             color: var(--accent-color);
         }
 
-        .close-cart {
+        .close-modal {
             background: none;
             border: none;
             color: var(--text-muted);
@@ -302,11 +363,46 @@
             cursor: pointer;
             text-transform: uppercase;
         }
+
+        /* Formulario Administrador */
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
+
+        .btn-save-product {
+            width: 100%;
+            background-color: var(--accent-color);
+            color: #121212;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Encabezado con Animación -->
+    <!-- Encabezado -->
     <header id="main-header">
         <img src="Logo.jpeg" alt="El iguano Logo" class="brand-logo">
         <div class="header-text">
@@ -315,289 +411,25 @@
         </div>
     </header>
 
-    <!-- Categorías -->
-    <div class="categories">
-        <button class="category-btn active">Todas</button>
-        <button class="category-btn">Gorras</button>
-        <button class="category-btn">Ropa Deportiva</button>
-        <button class="category-btn">Ofertas</button>
+    <!-- Barra de Búsqueda -->
+    <div class="search-container">
+        <input type="text" id="search-input" class="search-input" placeholder="🔍 Buscar gorra, playera, hoodie..." oninput="ejecutarBusqueda()">
     </div>
 
-    <!-- Catálogo de 30 Productos -->
-    <main class="catalog">
-        <!-- Gorras (1-10) -->
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Gorra+Snapback+Negra" alt="Gorra" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Gorra Snapback Negra</div>
-                <div class="product-price">$350 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Gorra Snapback Negra', 350)">+ Agregar al carrito</button>
-            </div>
+    <!-- Barra de Categorías y Botón de Admin -->
+    <div class="categories-wrapper">
+        <div class="categories">
+            <button class="category-btn active" onclick="filtrarCategoria('Todas', this)">Todas</button>
+            <button class="category-btn" onclick="filtrarCategoria('Gorras', this)">Gorras</button>
+            <button class="category-btn" onclick="filtrarCategoria('Ropa Deportiva', this)">Ropa Deportiva</button>
+            <button class="category-btn" onclick="filtrarCategoria('Ofertas', this)">Ofertas</button>
         </div>
+        <button class="btn-admin-add" id="btn-admin-add" onclick="abrirModalAdmin()">➕ Agregar Producto</button>
+    </div>
 
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Gorra+Trucker+Blanca" alt="Gorra" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Gorra Trucker Marfil</div>
-                <div class="product-price">$320 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Gorra Trucker Marfil', 320)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Gorra+Dada+Hat" alt="Gorra" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Gorra Dad Hat Urbana</div>
-                <div class="product-price">$290 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Gorra Dad Hat Urbana', 290)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Gorra+Cerrada+Fit" alt="Gorra" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Gorra Flexfit Iguano</div>
-                <div class="product-price">$380 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Gorra Flexfit Iguano', 380)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Gorra+Camuflaje" alt="Gorra" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Gorra Camuflaje Street</div>
-                <div class="product-price">$360 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Gorra Camuflaje Street', 360)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Gorra+Visera+Plana" alt="Gorra" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Gorra Visera Plana Pro</div>
-                <div class="product-price">$370 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Gorra Visera Plana Pro', 370)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Gorra+Vintage" alt="Gorra" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Gorra Vintage Washed</div>
-                <div class="product-price">$340 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Gorra Vintage Washed', 340)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Gorra+Deportiva+Light" alt="Gorra" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Gorra Running Lightweight</div>
-                <div class="product-price">$300 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Gorra Running Lightweight', 300)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Gorra+Minimalist" alt="Gorra" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Gorra Minimalist Dark</div>
-                <div class="product-price">$330 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Gorra Minimalist Dark', 330)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Gorra+Edicion+Especial" alt="Gorra" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Gorra Edición Iguano Gold</div>
-                <div class="product-price">$420 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Gorra Edición Iguano Gold', 420)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <!-- Playeras (11-20) -->
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Playera+Fit+Negra" alt="Playera" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Playera Slim Fit Negra</div>
-                <div class="product-price">$280 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Playera Slim Fit Negra', 280)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Playera+Oversize" alt="Playera" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Playera Oversize Streetwear</div>
-                <div class="product-price">$320 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Playera Oversize Streetwear', 320)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Playera+DryFit" alt="Playera" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Playera DryFit Gym</div>
-                <div class="product-price">$290 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Playera DryFit Gym', 290)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Playera+Sin+Mangas" alt="Playera" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Playera Tank Top Entreno</div>
-                <div class="product-price">$250 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Playera Tank Top Entreno', 250)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Playera+Manga+Larga" alt="Playera" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Playera Manga Larga Compression</div>
-                <div class="product-price">$340 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Playera Manga Larga Compression', 340)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Playera+Grafica" alt="Playera" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Playera Gráfica Logo Iguano</div>
-                <div class="product-price">$310 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Playera Gráfica Logo Iguano', 310)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Playera+Marfil" alt="Playera" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Playera Basic Marfil</div>
-                <div class="product-price">$270 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Playera Basic Marfil', 270)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Top+Deportivo" alt="Top" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Top Deportivo High Impact</div>
-                <div class="product-price">$300 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Top Deportivo High Impact', 300)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Playera+Polo" alt="Playera" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Playera Polo Sport Negra</div>
-                <div class="product-price">$350 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Playera Polo Sport Negra', 350)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Playera+Reflectiva" alt="Playera" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Playera Night Run Reflectiva</div>
-                <div class="product-price">$330 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Playera Night Run Reflectiva', 330)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <!-- Hoodies y Sudaderas (21-25) -->
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Hoodie+Negra" alt="Hoodie" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Hoodie Oversize Negra</div>
-                <div class="product-price">$550 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Hoodie Oversize Negra', 550)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Sudadera+Zip" alt="Sudadera" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Sudadera Full Zip Sport</div>
-                <div class="product-price">$580 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Sudadera Full Zip Sport', 580)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Hoodie+Sin+Mangas" alt="Hoodie" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Hoodie sleeveless Gym</div>
-                <div class="product-price">$450 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Hoodie sleeveless Gym', 450)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Sudadera+Crewneck" alt="Sudadera" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Sudadera Crewneck Marfil</div>
-                <div class="product-price">$490 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Sudadera Crewneck Marfil', 490)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Chamarra+Rompevientos" alt="Chamarra" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Chamarra Rompevientos Dark</div>
-                <div class="product-price">$620 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Chamarra Rompevientos Dark', 620)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <!-- Pantalones y Shorts (26-30) -->
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Short+Deportivo" alt="Short" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Short Deportivo 2 en 1</div>
-                <div class="product-price">$320 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Short Deportivo 2 en 1', 320)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Jogger+Negro" alt="Jogger" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Jogger Slim Fit Negro</div>
-                <div class="product-price">$480 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Jogger Slim Fit Negro', 480)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Leggings+Fit" alt="Leggings" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Leggings Pro High Waist</div>
-                <div class="product-price">$420 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Leggings Pro High Waist', 420)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Short+Biker" alt="Short" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Short Biker Seamless</div>
-                <div class="product-price">$290 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Short Biker Seamless', 290)">+ Agregar al carrito</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Pants+Cargo" alt="Pants" class="product-img">
-            <div class="product-info">
-                <div class="product-title">Pants Cargo Streetwear</div>
-                <div class="product-price">$520 MXN</div>
-                <button class="btn-add" onclick="agregarAlCarrito('Pants Cargo Streetwear', 520)">+ Agregar al carrito</button>
-            </div>
-        </div>
+    <!-- Catálogo de Productos -->
+    <main class="catalog" id="catalog-container">
+        <!-- Productos cargados mediante JavaScript -->
     </main>
 
     <!-- Barra Flotante del Carrito -->
@@ -606,12 +438,12 @@
         <span id="cart-total-label">$0 MXN &rarr;</span>
     </div>
 
-    <!-- Ventana del Carrito -->
-    <div class="cart-modal" id="cart-modal">
-        <div class="cart-content">
-            <div class="cart-header">
+    <!-- Modal del Carrito -->
+    <div class="modal" id="cart-modal">
+        <div class="modal-content">
+            <div class="modal-header">
                 <h2>Tu Pedido</h2>
-                <button class="close-cart" onclick="cerrarCarrito()">&times;</button>
+                <button class="close-modal" onclick="cerrarCarrito()">&times;</button>
             </div>
             <div class="cart-items" id="cart-items-container">
                 <p style="color: var(--text-muted); text-align: center;">El carrito está vacío.</p>
@@ -626,12 +458,123 @@
         </div>
     </div>
 
+    <!-- Modal Agregar Producto (Solo Modo Admin) -->
+    <div class="modal" id="admin-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Nuevo Producto</h2>
+                <button class="close-modal" onclick="cerrarModalAdmin()">&times;</button>
+            </div>
+            <form id="form-nuevo-producto" onsubmit="guardarNuevoProducto(event)">
+                <div class="form-group">
+                    <label>Nombre del Producto:</label>
+                    <input type="text" id="prod-nombre" placeholder="Ej. Gorra Snapback Negra" required>
+                </div>
+                <div class="form-group">
+                    <label>Precio (MXN):</label>
+                    <input type="number" id="prod-precio" placeholder="350" required>
+                </div>
+                <div class="form-group">
+                    <label>Categoría:</label>
+                    <select id="prod-categoria">
+                        <option value="Gorras">Gorras</option>
+                        <option value="Ropa Deportiva">Ropa Deportiva</option>
+                        <option value="Ofertas">Ofertas</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Cargar Imagen desde tu Celular/PC:</label>
+                    <input type="file" id="prod-file" accept="image/*" onchange="convertirImagenADataURL(event)">
+                </div>
+                <div class="form-group">
+                    <label>O Enlace/Nombre de Imagen guardada:</label>
+                    <input type="text" id="prod-img-url" placeholder="ejemplo.jpg o URL">
+                </div>
+                <button type="submit" class="btn-save-product">Publicar Producto</button>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // NÚMERO DE WHATSAPP (Asegúrate de poner tu número real con el 52 adelante)
-        const numeroTelefono = "520000000000"; 
+        const numeroTelefono = "520000000000"; // Reemplaza con tu WhatsApp real
+        const PALABRA_CLAVE_ADMIN = "admin123"; // Escribe esto en la búsqueda para activar Admin
+        const ADMIN_PASSWORD = "iguano2026";    // Contraseña final del Administrador
 
+        let esAdmin = false;
         let carrito = [];
+        let categoriaActual = 'Todas';
 
+        let productos = JSON.parse(localStorage.getItem('iguano_productos')) || [
+            { id: 1, nombre: "Gorra Snapback Negra", precio: 350, categoria: "Gorras", img: "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Gorra+Snapback+Negra" },
+            { id: 2, nombre: "Gorra Trucker Marfil", precio: 320, categoria: "Gorras", img: "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Gorra+Trucker+Marfil" },
+            { id: 3, nombre: "Playera Slim Fit Negra", precio: 280, categoria: "Ropa Deportiva", img: "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Playera+Slim+Fit" },
+            { id: 4, nombre: "Hoodie Oversize Negra", precio: 550, categoria: "Ofertas", img: "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Hoodie+Oversize" }
+        ];
+
+        let imagenTemporalBase64 = "";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            renderizarCatalogo(productos);
+        });
+
+        function renderizarCatalogo(lista) {
+            const container = document.getElementById('catalog-container');
+            container.innerHTML = '';
+
+            if (lista.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">No se encontraron productos.</p>';
+                return;
+            }
+
+            lista.forEach(prod => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    ${esAdmin ? `<button class="btn-delete-admin" style="display:block;" onclick="eliminarProducto(${prod.id})">&times;</button>` : ''}
+                    <img src="${prod.img}" alt="${prod.nombre}" class="product-img">
+                    <div class="product-info">
+                        <div class="product-title">${prod.nombre}</div>
+                        <div class="product-price">$${prod.precio} MXN</div>
+                        <button class="btn-add" onclick="agregarAlCarrito('${prod.nombre}', ${prod.precio})">+ Agregar al carrito</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Búsqueda en tiempo real & Detección de Código Secreto
+        function ejecutarBusqueda() {
+            const query = document.getElementById('search-input').value.trim();
+
+            // Código secreto para activar Admin
+            if (query.toLowerCase() === PALABRA_CLAVE_ADMIN.toLowerCase()) {
+                document.getElementById('search-input').value = '';
+                activarModoAdmin();
+                return;
+            }
+
+            let filtrados = productos;
+
+            if (categoriaActual !== 'Todas') {
+                filtrados = filtrados.filter(p => p.categoria === categoriaActual);
+            }
+
+            if (query !== '') {
+                filtrados = filtrados.filter(p => p.nombre.toLowerCase().includes(query.toLowerCase()));
+            }
+
+            renderizarCatalogo(filtrados);
+        }
+
+        // Filtro por categorías
+        function filtrarCategoria(categoria, btn) {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            categoriaActual = categoria;
+            ejecutarBusqueda();
+        }
+
+        // Carrito
         function agregarAlCarrito(nombre, precio) {
             carrito.push({ nombre, precio });
             actualizarCarritoUI();
@@ -673,29 +616,83 @@
             }
         }
 
-        function abrirCarrito() {
-            document.getElementById('cart-modal').classList.add('open');
-        }
-
-        function cerrarCarrito() {
-            document.getElementById('cart-modal').classList.remove('open');
-        }
+        function abrirCarrito() { document.getElementById('cart-modal').classList.add('open'); }
+        function cerrarCarrito() { document.getElementById('cart-modal').classList.remove('open'); }
 
         function enviarPedidoWhatsApp() {
             if (carrito.length === 0) {
-                alert("Agrega al menos un producto al carrito antes de hacer el pedido.");
+                alert("Agrega al menos un producto al carrito antes de realizar el pedido.");
                 return;
             }
-
             let listaProductos = carrito.map(item => `- ${item.nombre}: $${item.precio} MXN`).join('\n');
             let total = carrito.reduce((sum, item) => sum + item.precio, 0);
-
             let mensaje = `Hola *El iguano*, me gustaría realizar el siguiente pedido desde la página web:\n\n${listaProductos}\n\n*Total a pagar:* $${total} MXN`;
-
             window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
 
-        // Script para ocultar texto al hacer scroll
+        // ACTIVAR MODO ADMIN DESDE LA BÚSQUEDA
+        function activarModoAdmin() {
+            const pass = prompt("Acceso Administrador 'El iguano'\nIngresa la contraseña:");
+            if (pass === ADMIN_PASSWORD) {
+                esAdmin = true;
+                alert("¡Modo Administrador activado!");
+                document.getElementById('btn-admin-add').style.display = "block";
+                renderizarCatalogo(productos);
+            } else if (pass !== null) {
+                alert("Contraseña incorrecta.");
+            }
+        }
+
+        function abrirModalAdmin() { document.getElementById('admin-modal').classList.add('open'); }
+        function cerrarModalAdmin() { document.getElementById('admin-modal').classList.remove('open'); }
+
+        function convertirImagenADataURL(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagenTemporalBase64 = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function guardarNuevoProducto(event) {
+            event.preventDefault();
+            const nombre = document.getElementById('prod-nombre').value;
+            const precio = parseFloat(document.getElementById('prod-precio').value);
+            const categoria = document.getElementById('prod-categoria').value;
+            const urlInput = document.getElementById('prod-img-url').value;
+
+            let imgFinal = imagenTemporalBase64 || urlInput || "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano";
+
+            const nuevoProd = {
+                id: Date.now(),
+                nombre,
+                precio,
+                categoria,
+                img: imgFinal
+            };
+
+            productos.push(nuevoProd);
+            localStorage.setItem('iguano_productos', JSON.stringify(productos));
+            renderizarCatalogo(productos);
+            
+            document.getElementById('form-nuevo-producto').reset();
+            imagenTemporalBase64 = "";
+            cerrarModalAdmin();
+            alert("¡Producto agregado exitosamente!");
+        }
+
+        function eliminarProducto(id) {
+            if (confirm("¿Estás seguro de eliminar este producto del catálogo?")) {
+                productos = productos.filter(p => p.id !== id);
+                localStorage.setItem('iguano_productos', JSON.stringify(productos));
+                renderizarCatalogo(productos);
+            }
+        }
+
+        // Animación Scroll Header
         window.addEventListener('scroll', function() {
             const header = document.getElementById('main-header');
             if (window.scrollY > 30) {
