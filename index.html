@@ -28,15 +28,16 @@
             padding-bottom: 90px;
         }
 
-        /* Header con Logo */
+        /* Header Dinámico */
         header {
             background-color: #181818;
-            padding: 20px;
+            padding: 20px 15px 15px 15px;
             text-align: center;
             border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
             z-index: 100;
+            transition: all 0.3s ease;
         }
 
         .brand-logo {
@@ -44,7 +45,15 @@
             height: 70px;
             object-fit: contain;
             border-radius: 50%;
-            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .header-text {
+            max-height: 100px;
+            opacity: 1;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-top: 8px;
         }
 
         header h1 {
@@ -63,6 +72,22 @@
             text-transform: uppercase;
         }
 
+        /* Estado contraído al hacer scroll */
+        header.scrolled {
+            padding: 8px 15px;
+        }
+
+        header.scrolled .brand-logo {
+            width: 42px;
+            height: 42px;
+        }
+
+        header.scrolled .header-text {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
+        }
+
         /* Categorías */
         .categories {
             display: flex;
@@ -71,6 +96,9 @@
             overflow-x: auto;
             background-color: var(--bg-color);
             border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 60px;
+            z-index: 90;
         }
 
         .category-btn {
@@ -172,11 +200,13 @@
 </head>
 <body>
 
-    <!-- Encabezado con Logo -->
-    <header>
+    <!-- Encabezado con Animación -->
+    <header id="main-header">
         <img src="Logo.jpeg" alt="El iguano Logo" class="brand-logo">
-        <h1>El iguano</h1>
-        <p>Caps & Sportswear</p>
+        <div class="header-text">
+            <h1>El iguano</h1>
+            <p>Caps & Sportswear</p>
+        </div>
     </header>
 
     <!-- Filtros de Categoría -->
@@ -187,7 +217,7 @@
         <button class="category-btn">Ofertas</button>
     </div>
 
-    <!-- Catálogo Muestra -->
+    <!-- Catálogo de Productos Muestra -->
     <main class="catalog">
         <div class="product-card">
             <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Gorra+Ejemplo" alt="Gorra" class="product-img">
@@ -215,7 +245,6 @@
     </a>
 
     <script>
-        // REEMPLAZA ESTE NÚMERO POR TU WHATSAPP REAL (Incluye el 52 de México)
         const numeroTelefono = "524961228531"; 
 
         function pedirProducto(nombreProducto) {
@@ -224,6 +253,16 @@
         }
 
         document.getElementById('whatsapp-link').href = `https://wa.me/${numeroTelefono}?text=${encodeURIComponent('Hola El iguano, me gustaría realizar una consulta sobre sus productos.')}`;
+
+        // Script para ocultar las letras al deslizar hacia abajo
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('main-header');
+            if (window.scrollY > 30) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
     </script>
 </body>
 </html>
