@@ -8,7 +8,7 @@
         :root {
             --bg-color: #121212;
             --card-bg: #1e1e1e;
-            --accent-color: #f5f5f0; /* Color marfil de la iguana */
+            --accent-color: #f5f5f0;
             --accent-hover: #e2e2dc;
             --text-main: #ffffff;
             --text-muted: #a0a0a0;
@@ -28,10 +28,10 @@
             padding-bottom: 90px;
         }
 
-        /* Header */
+        /* Header con Logo */
         header {
             background-color: #181818;
-            padding: 25px 20px;
+            padding: 20px;
             text-align: center;
             border-bottom: 1px solid var(--border-color);
             position: sticky;
@@ -39,8 +39,16 @@
             z-index: 100;
         }
 
+        .brand-logo {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            border-radius: 50%;
+            margin-bottom: 8px;
+        }
+
         header h1 {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             text-transform: uppercase;
             letter-spacing: 3px;
             color: var(--accent-color);
@@ -48,9 +56,9 @@
         }
 
         header p {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
-            margin-top: 5px;
+            margin-top: 4px;
             letter-spacing: 1px;
             text-transform: uppercase;
         }
@@ -164,8 +172,9 @@
 </head>
 <body>
 
-    <!-- Encabezado -->
+    <!-- Encabezado con Logo -->
     <header>
+        <img src="Logo.jpeg" alt="El iguano Logo" class="brand-logo">
         <h1>El iguano</h1>
         <p>Caps & Sportswear</p>
     </header>
@@ -178,7 +187,7 @@
         <button class="category-btn">Ofertas</button>
     </div>
 
-    <!-- Lista de Productos Muestra -->
+    <!-- Catálogo Muestra -->
     <main class="catalog">
         <div class="product-card">
             <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Gorra+Ejemplo" alt="Gorra" class="product-img">
@@ -199,14 +208,14 @@
         </div>
     </main>
 
-    <!-- Botón directo a WhatsApp -->
+    <!-- Botón Flotante -->
     <a href="#" id="whatsapp-link" class="cart-bar">
         <span>🛒 Catálogo completo</span>
         <span>WhatsApp &rarr;</span>
     </a>
 
     <script>
-        // Cambia este número por tu número de WhatsApp real (ej: 521234567890)
+        // REEMPLAZA ESTE NÚMERO POR TU WHATSAPP REAL (Incluye el 52 de México)
         const numeroTelefono = "524961228531"; 
 
         function pedirProducto(nombreProducto) {
