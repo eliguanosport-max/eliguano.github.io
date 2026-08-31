@@ -493,3 +493,396 @@
             border: none;
             padding: 12px;
             border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <header id="main-header">
+        <img src="Logo.jpeg" alt="El iguano Logo" class="brand-logo">
+        <div class="header-text">
+            <h1>El iguano</h1>
+            <p>Caps & Sportswear</p>
+        </div>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="search-input" class="search-input" placeholder="🔍 Buscar gorra, playera, hoodie..." oninput="ejecutarBusqueda()">
+    </div>
+
+    <div class="categories-wrapper">
+        <div class="categories">
+            <button class="category-btn active" onclick="filtrarCategoria('Todas', this)">Todas</button>
+            <button class="category-btn" onclick="filtrarCategoria('Gorras', this)">Gorras</button>
+            <button class="category-btn" onclick="filtrarCategoria('Ropa Deportiva', this)">Ropa Deportiva</button>
+            <button class="category-btn" onclick="filtrarCategoria('Ofertas', this)">Ofertas</button>
+        </div>
+        <button class="btn-admin-add" id="btn-admin-add" onclick="abrirModalAdmin()">➕ Agregar Producto</button>
+    </div>
+
+    <main class="catalog" id="catalog-container">
+        <p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">Cargando productos...</p>
+    </main>
+
+    <div class="cart-bar" onclick="abrirCarrito()">
+        <span id="cart-count-label">🛒 Carrito (0 prendas)</span>
+        <span id="cart-total-label">$0 MXN &rarr;</span>
+    </div>
+
+    <div class="modal" id="image-viewer-modal" style="align-items: center;" onclick="cerrarVisorImagen()">
+        <div style="position: relative; max-width: 90vw; max-height: 90vh; display: flex; justify-content: center; align-items: center;" onclick="event.stopPropagation()">
+            <button class="close-modal" onclick="cerrarVisorImagen()" style="position: absolute; top: -40px; right: 0; color: #fff; font-size: 2.5rem;">&times;</button>
+            <img id="image-viewer-img" src="" alt="Vista previa" style="max-width: 100%; max-height: 80vh; border-radius: 12px; object-fit: contain; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+        </div>
+    </div>
+
+    <div class="modal" id="cart-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Tu Pedido</h2>
+                <button class="close-modal" onclick="cerrarCarrito()">&times;</button>
+            </div>
+            <div class="cart-items" id="cart-items-container">
+                <p style="color: var(--text-muted); text-align: center;">El carrito está vacío.</p>
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <span>Cuenta Total:</span>
+                    <span id="modal-total-label">$0 MXN</span>
+                </div>
+                <button class="btn-send-whatsapp" onclick="enviarPedidoWhatsApp()">Enviar pedido por WhatsApp</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="admin-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Nuevo Producto</h2>
+                <button class="close-modal" onclick="cerrarModalAdmin()">&times;</button>
+            </div>
+            <form id="form-nuevo-producto" onsubmit="guardarNuevoProducto(event)">
+                <div class="form-group">
+                    <label>Nombre del Producto:</label>
+                    <input type="text" id="prod-nombre" placeholder="Ej. Gorra Snapback Negra" required>
+                </div>
+                <div class="form-group">
+                    <label>Precio (MXN):</label>
+                    <input type="number" id="prod-precio" placeholder="350" required>
+                </div>
+                <div class="form-group">
+                    <label>Categoría:</label>
+                    <select id="prod-categoria">
+                        <option value="Gorras">Gorras</option>
+                        <option value="Ropa Deportiva">Ropa Deportiva</option>
+                        <option value="Ofertas">Ofertas</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Cargar Imagen desde tu Celular/PC:</label>
+                    <input type="file" id="prod-file" accept="image/*" onchange="convertirImagenADataURL(event)">
+                </div>
+                <div class="form-group">
+                    <label>O Enlace de Google Drive / URL:</label>
+                    <input type="text" id="prod-img-url" placeholder="Pega el enlace aquí">
+                </div>
+                <button type="submit" class="btn-save-product" id="btn-save">Publicar Producto</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURACIÓN DE SUPABASE
+        const SUPABASE_URL = "https://ywixgizcadytczxcbubg.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3aXhnaXpjYWR5dGN6eGNidWJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxMzkzNTIsImV4cCI6MjEwMzcxNTM1Mn0.ABIAb8426hAdnJw5nxvGhxorAL6s8RHvlhHkDsb06Ts";
+
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const numeroTelefono = "524961228531"; // Tu WhatsApp real
+        const PALABRA_CLAVE_ADMIN = "admin123"; 
+        const ADMIN_PASSWORD = "iguano2026";    
+
+        let esAdmin = false;
+        let carrito = [];
+        let categoriaActual = 'Todas';
+        let productos = [];
+        let imagenTemporalBase64 = "";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            cargarProductosDesdeSupabase();
+        });
+
+        // Visor de Imagen Grande
+        function abrirVisorImagen(src) {
+            const modal = document.getElementById('image-viewer-modal');
+            const img = document.getElementById('image-viewer-img');
+            img.src = src;
+            modal.classList.add('open');
+        }
+
+        function cerrarVisorImagen() {
+            const modal = document.getElementById('image-viewer-modal');
+            modal.classList.remove('open');
+        }
+
+        // 1. OBTENER / MOSTRAR PRODUCTOS (SELECT)
+        async function cargarProductosDesdeSupabase() {
+            const container = document.getElementById('catalog-container');
+            container.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">Cargando catálogo...</p>';
+
+            const { data, error } = await supabaseClient.from('productos').select('*').order('id', { ascending: false });
+
+            if (error) {
+                console.error("Error al cargar productos:", error);
+                container.innerHTML = '<p style="color: #ef4444; text-align: center; grid-column: 1/-1;">Error al cargar la tienda. Revisa la consola o permisos.</p>';
+                return;
+            }
+
+            productos = data || [];
+            ejecutarBusqueda();
+        }
+
+        function renderizarCatalogo(lista) {
+            const container = document.getElementById('catalog-container');
+            container.innerHTML = '';
+
+            if (lista.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">No hay productos disponibles por ahora.</p>';
+                return;
+            }
+
+            lista.forEach(prod => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    ${esAdmin ? `<button class="btn-delete-admin" style="display:block;" onclick="eliminarProducto(${prod.id})">&times;</button>` : ''}
+                    <img src="${prod.img}" alt="${prod.nombre}" class="product-img" onclick="abrirVisorImagen('${prod.img}')" title="Haz clic para ampliar">
+                    <div class="product-info">
+                        <div class="product-title">${prod.nombre}</div>
+                        <div class="product-price">$${prod.precio} MXN</div>
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                            <button class="btn-buy-now" onclick="comprarAhoraDirecto('${prod.nombre}', ${prod.precio})">⚡ Comprar ahora</button>
+                            <button class="btn-add" onclick="agregarAlCarrito('${prod.nombre}', ${prod.precio}, '${prod.img}')">+ Agregar al carrito</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Comprar directamente por WhatsApp un solo producto
+        function comprarAhoraDirecto(nombre, precio) {
+            let mensaje = `Hola *El iguano*, me interesa comprar ahora mismo el siguiente producto:\n\n- ${nombre}: $${precio} MXN`;
+            window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
+        }
+
+        function ejecutarBusqueda() {
+            const query = document.getElementById('search-input').value.trim();
+
+            if (query.toLowerCase() === PALABRA_CLAVE_ADMIN.toLowerCase()) {
+                document.getElementById('search-input').value = '';
+                activarModoAdmin();
+                return;
+            }
+
+            let filtrados = productos;
+
+            if (categoriaActual !== 'Todas') {
+                filtrados = filtrados.filter(p => p.categoria === categoriaActual);
+            }
+
+            if (query !== '') {
+                filtrados = filtrados.filter(p => p.nombre.toLowerCase().includes(query.toLowerCase()));
+            }
+
+            renderizarCatalogo(filtrados);
+        }
+
+        function filtrarCategoria(categoria, btn) {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            categoriaActual = categoria;
+            ejecutarBusqueda();
+        }
+
+        // Funciones del Carrito
+        function agregarAlCarrito(nombre, precio, img) {
+            const existe = carrito.find(item => item.nombre === nombre);
+            if (existe) {
+                existe.cantidad += 1;
+            } else {
+                carrito.push({ nombre, precio, img, cantidad: 1 });
+            }
+            actualizarCarritoUI();
+        }
+
+        function cambiarCantidad(index, cambio) {
+            carrito[index].cantidad += cambio;
+            if (carrito[index].cantidad <= 0) {
+                eliminarDelCarrito(index);
+                return;
+            }
+            actualizarCarritoUI();
+        }
+
+        function eliminarDelCarrito(index) {
+            carrito.splice(index, 1);
+            actualizarCarritoUI();
+        }
+
+        function actualizarCarritoUI() {
+            const countLabel = document.getElementById('cart-count-label');
+            const totalLabel = document.getElementById('cart-total-label');
+            const modalTotalLabel = document.getElementById('modal-total-label');
+            const itemsContainer = document.getElementById('cart-items-container');
+
+            const totalPrendas = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+            const totalDinero = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+
+            countLabel.textContent = `🛒 Carrito (${totalPrendas} ${totalPrendas === 1 ? 'prenda' : 'prendas'})`;
+            totalLabel.textContent = `$${totalDinero} MXN →`;
+            modalTotalLabel.textContent = `$${totalDinero} MXN`;
+
+            if (carrito.length === 0) {
+                itemsContainer.innerHTML = '<p style="color: var(--text-muted); text-align: center;">El carrito está vacío.</p>';
+            } else {
+                itemsContainer.innerHTML = '';
+                carrito.forEach((item, index) => {
+                    const subtotal = item.precio * item.cantidad;
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'cart-item';
+                    itemElement.innerHTML = `
+                        <div class="cart-item-info">
+                            <img src="${item.img}" alt="${item.nombre}" class="cart-item-img" onclick="abrirVisorImagen('${item.img}')">
+                            <div class="cart-item-details">
+                                <div class="cart-item-title">${item.nombre}</div>
+                                <div class="cart-item-price">$${subtotal} MXN <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">($${item.precio} c/u)</span></div>
+                            </div>
+                        </div>
+                        <div class="cart-actions">
+                            <div class="cart-controls">
+                                <button class="btn-qty" onclick="cambiarCantidad(${index}, -1)">-</button>
+                                <span class="cart-qty">${item.cantidad}</span>
+                                <button class="btn-qty" onclick="cambiarCantidad(${index}, 1)">+</button>
+                            </div>
+                            <button class="btn-remove-item" onclick="eliminarDelCarrito(${index})" title="Eliminar producto">🗑️</button>
+                        </div>
+                    `;
+                    itemsContainer.appendChild(itemElement);
+                });
+            }
+        }
+
+        function abrirCarrito() { document.getElementById('cart-modal').classList.add('open'); }
+        function cerrarCarrito() { document.getElementById('cart-modal').classList.remove('open'); }
+
+        function enviarPedidoWhatsApp() {
+            if (carrito.length === 0) {
+                alert("Agrega al menos un producto al carrito antes de realizar el pedido.");
+                return;
+            }
+            let listaProductos = carrito.map(item => `- ${item.nombre} x${item.cantidad}: $${item.precio * item.cantidad} MXN`).join('\n');
+            let totalPrendas = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+            let totalDinero = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+            
+            let mensaje = `Hola *El iguano*, me gustaría realizar el siguiente pedido desde la página web:\n\n${listaProductos}\n\n*Total de prendas:* ${totalPrendas}\n*Cuenta Total:* $${totalDinero} MXN`;
+            window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
+        }
+
+        // MODO ADMIN
+        function activarModoAdmin() {
+            const pass = prompt("Acceso Administrador 'El iguano'\nIngresa la contraseña:");
+            if (pass === ADMIN_PASSWORD) {
+                esAdmin = true;
+                alert("¡Modo Administrador activado!");
+                document.getElementById('btn-admin-add').style.display = "block";
+                renderizarCatalogo(productos);
+            } else if (pass !== null) {
+                alert("Contraseña incorrecta.");
+            }
+        }
+
+        function abrirModalAdmin() { document.getElementById('admin-modal').classList.add('open'); }
+        function cerrarModalAdmin() { document.getElementById('admin-modal').classList.remove('open'); }
+
+        function convertirImagenADataURL(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagenTemporalBase64 = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 2. GUARDAR NUEVO PRODUCTO (INSERT)
+        async function guardarNuevoProducto(event) {
+            event.preventDefault();
+
+            const btnSave = document.getElementById('btn-save');
+            btnSave.disabled = true;
+            btnSave.textContent = "Guardando en la nube...";
+
+            const nombre = document.getElementById('prod-nombre').value;
+            const precio = parseFloat(document.getElementById('prod-precio').value);
+            const categoria = document.getElementById('prod-categoria').value;
+            const urlInput = document.getElementById('prod-img-url').value;
+
+            let imgFinal = imagenTemporalBase64 || urlInput || "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano";
+
+            const { data, error } = await supabaseClient
+                .from('productos')
+                .insert([
+                    { nombre, precio, categoria, img: imgFinal }
+                ]);
+
+            btnSave.disabled = false;
+            btnSave.textContent = "Publicar Producto";
+
+            if (error) {
+                alert("Error al guardar el producto: " + error.message);
+                return;
+            }
+
+            document.getElementById('form-nuevo-producto').reset();
+            imagenTemporalBase64 = "";
+            cerrarModalAdmin();
+            alert("¡Producto publicado exitosamente!");
+            cargarProductosDesdeSupabase();
+        }
+
+        // 3. ELIMINAR PRODUCTO (DELETE)
+        async function eliminarProducto(id) {
+            if (confirm("¿Estás seguro de eliminar este producto de la tienda para todos?")) {
+                const { error } = await supabaseClient
+                    .from('productos')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) {
+                    alert("Error al eliminar: " + error.message);
+                } else {
+                    alert("Producto eliminado.");
+                    cargarProductosDesdeSupabase();
+                }
+            }
+        }
+
+        // Scroll Header
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('main-header');
+            if (window.scrollY > 30) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    </script>
+    
+</body>
+</html>
