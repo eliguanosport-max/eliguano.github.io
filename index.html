@@ -205,7 +205,7 @@
             margin-bottom: 12px;
         }
 
-        /* Botones Acción */
+        /* Botón Comprar Ahora (Verde) */
         .btn-buy-now {
             width: 100%;
             background-color: #22c55e;
@@ -219,6 +219,7 @@
             text-transform: uppercase;
         }
 
+        /* Botón Agregar al Carrito */
         .btn-add {
             width: 100%;
             background-color: var(--accent-color);
@@ -326,6 +327,7 @@
             margin-bottom: 15px;
         }
 
+        /* Diseños de Items del Carrito */
         .cart-item {
             display: flex;
             justify-content: space-between;
@@ -411,6 +413,7 @@
             text-align: center;
         }
 
+        /* Botón Bote de Basura */
         .btn-remove-item {
             background: none;
             border: none;
@@ -579,12 +582,13 @@
     </div>
 
     <script>
+        // CONFIGURACIÓN DE SUPABASE
         const SUPABASE_URL = "https://ywixgizcadytczxcbubg.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3aXhnaXpjYWR5dGN6eGNidWJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxMzkzNTIsImV4cCI6MjEwMzcxNTM1Mn0.ABIAb8426hAdnJw5nxvGhxorAL6s8RHvlhHkDsb06Ts";
 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const numeroTelefono = "524961228531"; // Tu WhatsApp real
+        const numeroTelefono = "520000000000"; // Tu WhatsApp real
         const PALABRA_CLAVE_ADMIN = "admin123"; 
         const ADMIN_PASSWORD = "iguano2026";    
 
@@ -596,30 +600,9 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             cargarProductosDesdeSupabase();
-            verificarPedidoEnURL();
         });
 
-        // 1. Detección automática de enlaces con pedidos
-        function verificarPedidoEnURL() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const pedidoEncoded = urlParams.get('pedido');
-
-            if (pedidoEncoded) {
-                try {
-                    const itemsReconstruidos = JSON.parse(decodeURIComponent(pedidoEncoded));
-                    if (Array.isArray(itemsReconstruidos) && itemsReconstruidos.length > 0) {
-                        carrito = itemsReconstruidos;
-                        actualizarCarritoUI();
-                        setTimeout(() => {
-                            abrirCarrito();
-                        }, 500);
-                    }
-                } catch (e) {
-                    console.error("Error al decodificar el pedido de la URL:", e);
-                }
-            }
-        }
-
+        // 1. OBTENER / MOSTRAR PRODUCTOS (SELECT)
         async function cargarProductosDesdeSupabase() {
             const container = document.getElementById('catalog-container');
             container.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">Cargando catálogo...</p>';
@@ -655,7 +638,7 @@
                         <div class="product-title">${prod.nombre}</div>
                         <div class="product-price">$${prod.precio} MXN</div>
                         <div style="display: flex; flex-direction: column; gap: 6px;">
-                            <button class="btn-buy-now" onclick="comprarAhoraDirecto('${prod.nombre}', ${prod.precio}, '${prod.img}')">⚡ Comprar ahora</button>
+                            <button class="btn-buy-now" onclick="comprarAhoraDirecto('${prod.nombre}', ${prod.precio})">⚡ Comprar ahora</button>
                             <button class="btn-add" onclick="agregarAlCarrito('${prod.nombre}', ${prod.precio}, '${prod.img}')">+ Agregar al carrito</button>
                         </div>
                     </div>
@@ -664,18 +647,9 @@
             });
         }
 
-        function comprarAhoraDirecto(nombre, precio, img) {
-            const itemUnico = [{ nombre, precio, img, cantidad: 1 }];
-            const pedidoString = encodeURIComponent(JSON.stringify(itemUnico));
-            
-            // Crea enlace directo a la página web con el pedido
-            const urlBase = window.location.origin + window.location.pathname;
-            const linkPedido = `${urlBase}?pedido=${pedidoString}`;
-
-            let mensaje = `Hola *El iguano*, me interesa comprar ahora mismo este producto:\n\n`;
-            mensaje += `- *${nombre}*: $${precio} MXN\n\n`;
-            mensaje += `🔗 *Ver pedido completo con fotos en la web:*\n${linkPedido}`;
-
+        // Comprar directamente por WhatsApp un solo producto
+        function comprarAhoraDirecto(nombre, precio) {
+            let mensaje = `Hola *El iguano*, me interesa comprar ahora mismo el siguiente producto:\n\n- ${nombre}: $${precio} MXN`;
             window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
 
@@ -708,6 +682,7 @@
             ejecutarBusqueda();
         }
 
+        // Funciones del Carrito
         function agregarAlCarrito(nombre, precio, img) {
             const existe = carrito.find(item => item.nombre === nombre);
             if (existe) {
@@ -783,17 +758,11 @@
                 alert("Agrega al menos un producto al carrito antes de realizar el pedido.");
                 return;
             }
-
-            const pedidoString = encodeURIComponent(JSON.stringify(carrito));
-            const urlBase = window.location.origin + window.location.pathname;
-            const linkPedido = `${urlBase}?pedido=${pedidoString}`;
-
-            let listaProductos = carrito.map(item => `- *${item.nombre}* x${item.cantidad}: $${item.precio * item.cantidad} MXN`).join('\n');
+            let listaProductos = carrito.map(item => `- ${item.nombre} x${item.cantidad}: $${item.precio * item.cantidad} MXN`).join('\n');
             let totalPrendas = carrito.reduce((sum, item) => sum + item.cantidad, 0);
             let totalDinero = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
             
-            let mensaje = `Hola *El iguano*, me gustaría realizar el siguiente pedido desde la página web:\n\n${listaProductos}\n\n*Total de prendas:* ${totalPrendas}\n*Cuenta Total:* $${totalDinero} MXN\n\n🔗 *Ver este pedido con imágenes en la página:*\n${linkPedido}`;
-            
+            let mensaje = `Hola *El iguano*, me gustaría realizar el siguiente pedido desde la página web:\n\n${listaProductos}\n\n*Total de prendas:* ${totalPrendas}\n*Cuenta Total:* $${totalDinero} MXN`;
             window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
 
@@ -824,6 +793,7 @@
             }
         }
 
+        // 2. GUARDAR NUEVO PRODUCTO (INSERT)
         async function guardarNuevoProducto(event) {
             event.preventDefault();
 
@@ -859,6 +829,7 @@
             cargarProductosDesdeSupabase();
         }
 
+        // 3. ELIMINAR PRODUCTO (DELETE)
         async function eliminarProducto(id) {
             if (confirm("¿Estás seguro de eliminar este producto de la tienda para todos?")) {
                 const { error } = await supabaseClient
