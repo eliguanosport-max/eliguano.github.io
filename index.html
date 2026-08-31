@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>El iguano | Caps & Sportswear</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --bg-color: #121212;
@@ -252,7 +253,7 @@
             z-index: 101;
         }
 
-        /* Modales (Carrito y Admin) */
+        /* Modales */
         .modal {
             display: none;
             position: fixed;
@@ -402,7 +403,6 @@
 </head>
 <body>
 
-    <!-- Encabezado -->
     <header id="main-header">
         <img src="Logo.jpeg" alt="El iguano Logo" class="brand-logo">
         <div class="header-text">
@@ -411,12 +411,10 @@
         </div>
     </header>
 
-    <!-- Barra de Búsqueda -->
     <div class="search-container">
         <input type="text" id="search-input" class="search-input" placeholder="🔍 Buscar gorra, playera, hoodie..." oninput="ejecutarBusqueda()">
     </div>
 
-    <!-- Barra de Categorías y Botón de Admin -->
     <div class="categories-wrapper">
         <div class="categories">
             <button class="category-btn active" onclick="filtrarCategoria('Todas', this)">Todas</button>
@@ -427,18 +425,15 @@
         <button class="btn-admin-add" id="btn-admin-add" onclick="abrirModalAdmin()">➕ Agregar Producto</button>
     </div>
 
-    <!-- Catálogo de Productos -->
     <main class="catalog" id="catalog-container">
-        <!-- Productos cargados mediante JavaScript -->
+        <p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">Cargando productos...</p>
     </main>
 
-    <!-- Barra Flotante del Carrito -->
     <div class="cart-bar" onclick="abrirCarrito()">
         <span id="cart-count-label">🛒 Carrito (0)</span>
         <span id="cart-total-label">$0 MXN &rarr;</span>
     </div>
 
-    <!-- Modal del Carrito -->
     <div class="modal" id="cart-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -458,7 +453,6 @@
         </div>
     </div>
 
-    <!-- Modal Agregar Producto (Solo Modo Admin) -->
     <div class="modal" id="admin-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -487,42 +481,58 @@
                     <input type="file" id="prod-file" accept="image/*" onchange="convertirImagenADataURL(event)">
                 </div>
                 <div class="form-group">
-                    <label>O Enlace/Nombre de Imagen guardada:</label>
-                    <input type="text" id="prod-img-url" placeholder="ejemplo.jpg o URL">
+                    <label>O Enlace de Google Drive / URL:</label>
+                    <input type="text" id="prod-img-url" placeholder="Pega el enlace aquí">
                 </div>
-                <button type="submit" class="btn-save-product">Publicar Producto</button>
+                <button type="submit" class="btn-save-product" id="btn-save">Publicar Producto</button>
             </form>
         </div>
     </div>
 
     <script>
+        // CONFIGURACIÓN DE SUPABASE
+        const SUPABASE_URL = "https://ywixgizcadytczxcbubg.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3aXhnaXpjYWR5dGN6eGNidWJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxMzkzNTIsImV4cCI6MjEwMzcxNTM1Mn0.ABIAb8426hAdnJw5nxvGhxorAL6s8RHvlhHkDsb06Ts";
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         const numeroTelefono = "520000000000"; // Reemplaza con tu WhatsApp real
-        const PALABRA_CLAVE_ADMIN = "admin123"; // Escribe esto en la búsqueda para activar Admin
-        const ADMIN_PASSWORD = "iguano2026";    // Contraseña final del Administrador
+        const PALABRA_CLAVE_ADMIN = "admin123"; 
+        const ADMIN_PASSWORD = "iguano2026";    
 
         let esAdmin = false;
         let carrito = [];
         let categoriaActual = 'Todas';
-
-        let productos = JSON.parse(localStorage.getItem('iguano_productos')) || [
-            { id: 1, nombre: "Gorra Snapback Negra", precio: 350, categoria: "Gorras", img: "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Gorra+Snapback+Negra" },
-            { id: 2, nombre: "Gorra Trucker Marfil", precio: 320, categoria: "Gorras", img: "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Gorra+Trucker+Marfil" },
-            { id: 3, nombre: "Playera Slim Fit Negra", precio: 280, categoria: "Ropa Deportiva", img: "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Playera+Slim+Fit" },
-            { id: 4, nombre: "Hoodie Oversize Negra", precio: 550, categoria: "Ofertas", img: "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Hoodie+Oversize" }
-        ];
-
+        let productos = [];
         let imagenTemporalBase64 = "";
 
         document.addEventListener("DOMContentLoaded", () => {
-            renderizarCatalogo(productos);
+            cargarProductosDesdeSupabase();
         });
+
+        // Cargar productos en tiempo real desde la Base de Datos
+        async function cargarProductosDesdeSupabase() {
+            const container = document.getElementById('catalog-container');
+            container.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">Cargando catálogo...</p>';
+
+            const { data, error } = await supabase.from('productos').select('*').order('id', { ascending: false });
+
+            if (error) {
+                console.error("Error al cargar productos:", error);
+                container.innerHTML = '<p style="color: #ef4444; text-align: center; grid-column: 1/-1;">Error al cargar la tienda. Revisa tus claves de Supabase.</p>';
+                return;
+            }
+
+            productos = data;
+            ejecutarBusqueda();
+        }
 
         function renderizarCatalogo(lista) {
             const container = document.getElementById('catalog-container');
             container.innerHTML = '';
 
             if (lista.length === 0) {
-                container.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">No se encontraron productos.</p>';
+                container.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">No hay productos disponibles por ahora.</p>';
                 return;
             }
 
@@ -542,11 +552,9 @@
             });
         }
 
-        // Búsqueda en tiempo real & Detección de Código Secreto
         function ejecutarBusqueda() {
             const query = document.getElementById('search-input').value.trim();
 
-            // Código secreto para activar Admin
             if (query.toLowerCase() === PALABRA_CLAVE_ADMIN.toLowerCase()) {
                 document.getElementById('search-input').value = '';
                 activarModoAdmin();
@@ -566,7 +574,6 @@
             renderizarCatalogo(filtrados);
         }
 
-        // Filtro por categorías
         function filtrarCategoria(categoria, btn) {
             document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
@@ -630,7 +637,7 @@
             window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
 
-        // ACTIVAR MODO ADMIN DESDE LA BÚSQUEDA
+        // MODO ADMIN
         function activarModoAdmin() {
             const pass = prompt("Acceso Administrador 'El iguano'\nIngresa la contraseña:");
             if (pass === ADMIN_PASSWORD) {
@@ -657,8 +664,14 @@
             }
         }
 
-        function guardarNuevoProducto(event) {
+        // GUARDAR PRODUCTO EN SUPABASE
+        async function guardarNuevoProducto(event) {
             event.preventDefault();
+
+            const btnSave = document.getElementById('btn-save');
+            btnSave.disabled = true;
+            btnSave.textContent = "Guardando en la nube...";
+
             const nombre = document.getElementById('prod-nombre').value;
             const precio = parseFloat(document.getElementById('prod-precio').value);
             const categoria = document.getElementById('prod-categoria').value;
@@ -666,33 +679,45 @@
 
             let imgFinal = imagenTemporalBase64 || urlInput || "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano";
 
-            const nuevoProd = {
-                id: Date.now(),
-                nombre,
-                precio,
-                categoria,
-                img: imgFinal
-            };
+            const { data, error } = await supabase
+                .from('productos')
+                .insert([
+                    { nombre, precio, categoria, img: imgFinal }
+                ]);
 
-            productos.push(nuevoProd);
-            localStorage.setItem('iguano_productos', JSON.stringify(productos));
-            renderizarCatalogo(productos);
-            
+            btnSave.disabled = false;
+            btnSave.textContent = "Publicar Producto";
+
+            if (error) {
+                alert("Error al guardar el producto en la nube: " + error.message);
+                return;
+            }
+
             document.getElementById('form-nuevo-producto').reset();
             imagenTemporalBase64 = "";
             cerrarModalAdmin();
-            alert("¡Producto agregado exitosamente!");
+            alert("¡Producto publicado exitosamente para todos los clientes!");
+            cargarProductosDesdeSupabase();
         }
 
-        function eliminarProducto(id) {
-            if (confirm("¿Estás seguro de eliminar este producto del catálogo?")) {
-                productos = productos.filter(p => p.id !== id);
-                localStorage.setItem('iguano_productos', JSON.stringify(productos));
-                renderizarCatalogo(productos);
+        // ELIMINAR PRODUCTO DE SUPABASE
+        async function eliminarProducto(id) {
+            if (confirm("¿Estás seguro de eliminar este producto de la tienda para todos?")) {
+                const { error } = await supabase
+                    .from('productos')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) {
+                    alert("Error al eliminar: " + error.message);
+                } else {
+                    alert("Producto eliminado.");
+                    cargarProductosDesdeSupabase();
+                }
             }
         }
 
-        // Animación Scroll Header
+        // Scroll Header
         window.addEventListener('scroll', function() {
             const header = document.getElementById('main-header');
             if (window.scrollY > 30) {
