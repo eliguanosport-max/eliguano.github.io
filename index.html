@@ -9,7 +9,6 @@
             --bg-color: #121212;
             --card-bg: #1e1e1e;
             --accent-color: #f5f5f0;
-            --accent-hover: #e2e2dc;
             --text-main: #ffffff;
             --text-muted: #a0a0a0;
             --border-color: #2a2a2a;
@@ -72,7 +71,6 @@
             text-transform: uppercase;
         }
 
-        /* Estado contraído al hacer scroll */
         header.scrolled {
             padding: 8px 15px;
         }
@@ -111,7 +109,6 @@
             cursor: pointer;
             font-weight: 600;
             font-size: 0.85rem;
-            transition: all 0.3s ease;
         }
 
         .category-btn.active {
@@ -120,7 +117,7 @@
             border-color: var(--accent-color);
         }
 
-        /* Catálogo de Productos */
+        /* Catálogo */
         .catalog {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -174,10 +171,9 @@
             font-size: 0.85rem;
             cursor: pointer;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
-        /* Botón Flotante de Pedido por WhatsApp */
+        /* Barra Inferior del Carrito */
         .cart-bar {
             position: fixed;
             bottom: 15px;
@@ -193,8 +189,118 @@
             font-weight: 700;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
             cursor: pointer;
-            text-decoration: none;
+            z-index: 101;
+        }
+
+        /* Modal / Ventana Emergente del Carrito */
+        .cart-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 200;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .cart-modal.open {
+            display: flex;
+        }
+
+        .cart-content {
+            background-color: #181818;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .cart-header h2 {
+            font-size: 1.2rem;
+            color: var(--accent-color);
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .cart-items {
+            overflow-y: auto;
+            flex-grow: 1;
+            margin-bottom: 15px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .cart-item-title {
             font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .cart-item-price {
+            font-size: 0.85rem;
+            color: var(--accent-color);
+        }
+
+        .cart-item-remove {
+            background: none;
+            border: none;
+            color: #ef4444;
+            margin-left: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .cart-footer {
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .btn-send-whatsapp {
+            width: 100%;
+            background-color: #22c55e;
+            color: #ffffff;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-transform: uppercase;
         }
     </style>
 </head>
@@ -209,7 +315,7 @@
         </div>
     </header>
 
-    <!-- Filtros de Categoría -->
+    <!-- Categorías -->
     <div class="categories">
         <button class="category-btn active">Todas</button>
         <button class="category-btn">Gorras</button>
@@ -217,14 +323,14 @@
         <button class="category-btn">Ofertas</button>
     </div>
 
-    <!-- Catálogo de Productos Muestra -->
+    <!-- Catálogo de Productos -->
     <main class="catalog">
         <div class="product-card">
             <img src="https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=Gorra+Ejemplo" alt="Gorra" class="product-img">
             <div class="product-info">
                 <div class="product-title">Gorra Snapback Negra</div>
                 <div class="product-price">$350 MXN</div>
-                <button class="btn-add" onclick="pedirProducto('Gorra Snapback Negra')">Pedir por WhatsApp</button>
+                <button class="btn-add" onclick="agregarAlCarrito('Gorra Snapback Negra', 350)">+ Agregar al carrito</button>
             </div>
         </div>
 
@@ -233,28 +339,107 @@
             <div class="product-info">
                 <div class="product-title">Playera Deportiva Fit</div>
                 <div class="product-price">$280 MXN</div>
-                <button class="btn-add" onclick="pedirProducto('Playera Deportiva Fit')">Pedir por WhatsApp</button>
+                <button class="btn-add" onclick="agregarAlCarrito('Playera Deportiva Fit', 280)">+ Agregar al carrito</button>
             </div>
         </div>
     </main>
 
-    <!-- Botón Flotante -->
-    <a href="#" id="whatsapp-link" class="cart-bar">
-        <span>🛒 Catálogo completo</span>
-        <span>WhatsApp &rarr;</span>
-    </a>
+    <!-- Barra Flotante del Carrito -->
+    <div class="cart-bar" onclick="abrirCarrito()">
+        <span id="cart-count-label">🛒 Carrito (0)</span>
+        <span id="cart-total-label">$0 MXN &rarr;</span>
+    </div>
+
+    <!-- Ventana del Carrito -->
+    <div class="cart-modal" id="cart-modal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h2>Tu Pedido</h2>
+                <button class="close-cart" onclick="cerrarCarrito()">&times;</button>
+            </div>
+            <div class="cart-items" id="cart-items-container">
+                <p style="color: var(--text-muted); text-align: center;">El carrito está vacío.</p>
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span id="modal-total-label">$0 MXN</span>
+                </div>
+                <button class="btn-send-whatsapp" onclick="enviarPedidoWhatsApp()">Enviar pedido por WhatsApp</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        const numeroTelefono = "524961228531"; 
+        // NÚMERO DE WHATSAPP (Asegúrate de poner tu número real con el 52 adelante)
+        const numeroTelefono = "520000000000"; 
 
-        function pedirProducto(nombreProducto) {
-            const mensaje = encodeURIComponent(`Hola El iguano, vi tu página web y me interesa comprar: ${nombreProducto}`);
-            window.open(`https://wa.me/${numeroTelefono}?text=${mensaje}`, '_blank');
+        let carrito = [];
+
+        function agregarAlCarrito(nombre, precio) {
+            carrito.push({ nombre, precio });
+            actualizarCarritoUI();
         }
 
-        document.getElementById('whatsapp-link').href = `https://wa.me/${numeroTelefono}?text=${encodeURIComponent('Hola El iguano, me gustaría realizar una consulta sobre sus productos.')}`;
+        function eliminarDelCarrito(index) {
+            carrito.splice(index, 1);
+            actualizarCarritoUI();
+        }
 
-        // Script para ocultar las letras al deslizar hacia abajo
+        function actualizarCarritoUI() {
+            const countLabel = document.getElementById('cart-count-label');
+            const totalLabel = document.getElementById('cart-total-label');
+            const modalTotalLabel = document.getElementById('modal-total-label');
+            const itemsContainer = document.getElementById('cart-items-container');
+
+            const total = carrito.reduce((sum, item) => sum + item.precio, 0);
+
+            countLabel.textContent = `🛒 Carrito (${carrito.length})`;
+            totalLabel.textContent = `$${total} MXN →`;
+            modalTotalLabel.textContent = `$${total} MXN`;
+
+            if (carrito.length === 0) {
+                itemsContainer.innerHTML = '<p style="color: var(--text-muted); text-align: center;">El carrito está vacío.</p>';
+            } else {
+                itemsContainer.innerHTML = '';
+                carrito.forEach((item, index) => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'cart-item';
+                    itemElement.innerHTML = `
+                        <div>
+                            <div class="cart-item-title">${item.nombre}</div>
+                            <div class="cart-item-price">$${item.precio} MXN</div>
+                        </div>
+                        <button class="cart-item-remove" onclick="eliminarDelCarrito(${index})">Quitar</button>
+                    `;
+                    itemsContainer.appendChild(itemElement);
+                });
+            }
+        }
+
+        function abrirCarrito() {
+            document.getElementById('cart-modal').classList.add('open');
+        }
+
+        function cerrarCarrito() {
+            document.getElementById('cart-modal').classList.remove('open');
+        }
+
+        function enviarPedidoWhatsApp() {
+            if (carrito.length === 0) {
+                alert("Agrega al menos un producto al carrito antes de hacer el pedido.");
+                return;
+            }
+
+            let listaProductos = carrito.map(item => `- ${item.nombre}: $${item.precio} MXN`).join('\n');
+            let total = carrito.reduce((sum, item) => sum + item.precio, 0);
+
+            let mensaje = `Hola *El iguano*, me gustaría realizar el siguiente pedido desde la página web:\n\n${listaProductos}\n\n*Total a pagar:* $${total} MXN`;
+
+            window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
+        }
+
+        // Script para ocultar texto al hacer scroll
         window.addEventListener('scroll', function() {
             const header = document.getElementById('main-header');
             if (window.scrollY > 30) {
