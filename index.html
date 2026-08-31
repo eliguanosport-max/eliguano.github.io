@@ -327,31 +327,62 @@
             margin-bottom: 15px;
         }
 
+        /* Diseño de Item de Carrito Mejorado */
         .cart-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
+            padding: 12px 0;
             border-bottom: 1px solid var(--border-color);
         }
 
         .cart-item-title {
             font-size: 0.9rem;
             font-weight: 600;
+            margin-bottom: 3px;
         }
 
         .cart-item-price {
             font-size: 0.85rem;
             color: var(--accent-color);
+            font-weight: 700;
         }
 
-        .cart-item-remove {
+        .cart-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--card-bg);
+            padding: 4px 8px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-qty {
             background: none;
             border: none;
-            color: #ef4444;
-            margin-left: 10px;
-            cursor: pointer;
+            color: var(--text-main);
             font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .btn-qty:active {
+            background-color: var(--border-color);
+        }
+
+        .cart-qty {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            min-width: 18px;
+            text-align: center;
         }
 
         .cart-footer {
@@ -445,7 +476,7 @@
     </main>
 
     <div class="cart-bar" onclick="abrirCarrito()">
-        <span id="cart-count-label">🛒 Carrito (0)</span>
+        <span id="cart-count-label">🛒 Carrito (0 prendas)</span>
         <span id="cart-total-label">$0 MXN &rarr;</span>
     </div>
 
@@ -460,7 +491,7 @@
             </div>
             <div class="cart-footer">
                 <div class="cart-total">
-                    <span>Total:</span>
+                    <span>Cuenta Total:</span>
                     <span id="modal-total-label">$0 MXN</span>
                 </div>
                 <button class="btn-send-whatsapp" onclick="enviarPedidoWhatsApp()">Enviar pedido por WhatsApp</button>
@@ -605,14 +636,22 @@
             ejecutarBusqueda();
         }
 
-        // Carrito
+        // Carrito con Cantidades
         function agregarAlCarrito(nombre, precio) {
-            carrito.push({ nombre, precio });
+            const existe = carrito.find(item => item.nombre === nombre);
+            if (existe) {
+                existe.cantidad += 1;
+            } else {
+                carrito.push({ nombre, precio, cantidad: 1 });
+            }
             actualizarCarritoUI();
         }
 
-        function eliminarDelCarrito(index) {
-            carrito.splice(index, 1);
+        function cambiarCantidad(index, cambio) {
+            carrito[index].cantidad += cambio;
+            if (carrito[index].cantidad <= 0) {
+                carrito.splice(index, 1);
+            }
             actualizarCarritoUI();
         }
 
@@ -622,25 +661,31 @@
             const modalTotalLabel = document.getElementById('modal-total-label');
             const itemsContainer = document.getElementById('cart-items-container');
 
-            const total = carrito.reduce((sum, item) => sum + item.precio, 0);
+            const totalPrendas = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+            const totalDinero = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
 
-            countLabel.textContent = `🛒 Carrito (${carrito.length})`;
-            totalLabel.textContent = `$${total} MXN →`;
-            modalTotalLabel.textContent = `$${total} MXN`;
+            countLabel.textContent = `🛒 Carrito (${totalPrendas} ${totalPrendas === 1 ? 'prenda' : 'prendas'})`;
+            totalLabel.textContent = `$${totalDinero} MXN →`;
+            modalTotalLabel.textContent = `$${totalDinero} MXN`;
 
             if (carrito.length === 0) {
                 itemsContainer.innerHTML = '<p style="color: var(--text-muted); text-align: center;">El carrito está vacío.</p>';
             } else {
                 itemsContainer.innerHTML = '';
                 carrito.forEach((item, index) => {
+                    const subtotal = item.precio * item.cantidad;
                     const itemElement = document.createElement('div');
                     itemElement.className = 'cart-item';
                     itemElement.innerHTML = `
                         <div>
                             <div class="cart-item-title">${item.nombre}</div>
-                            <div class="cart-item-price">$${item.precio} MXN</div>
+                            <div class="cart-item-price">$${subtotal} MXN <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">($${item.precio} c/u)</span></div>
                         </div>
-                        <button class="cart-item-remove" onclick="eliminarDelCarrito(${index})">Quitar</button>
+                        <div class="cart-controls">
+                            <button class="btn-qty" onclick="cambiarCantidad(${index}, -1)">-</button>
+                            <span class="cart-qty">${item.cantidad}</span>
+                            <button class="btn-qty" onclick="cambiarCantidad(${index}, 1)">+</button>
+                        </div>
                     `;
                     itemsContainer.appendChild(itemElement);
                 });
@@ -655,9 +700,11 @@
                 alert("Agrega al menos un producto al carrito antes de realizar el pedido.");
                 return;
             }
-            let listaProductos = carrito.map(item => `- ${item.nombre}: $${item.precio} MXN`).join('\n');
-            let total = carrito.reduce((sum, item) => sum + item.precio, 0);
-            let mensaje = `Hola *El iguano*, me gustaría realizar el siguiente pedido desde la página web:\n\n${listaProductos}\n\n*Total a pagar:* $${total} MXN`;
+            let listaProductos = carrito.map(item => `- ${item.nombre} x${item.cantidad}: $${item.precio * item.cantidad} MXN`).join('\n');
+            let totalPrendas = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+            let totalDinero = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+            
+            let mensaje = `Hola *El iguano*, me gustaría realizar el siguiente pedido desde la página web:\n\n${listaProductos}\n\n*Total de prendas:* ${totalPrendas}\n*Cuenta Total:* $${totalDinero} MXN`;
             window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
 
