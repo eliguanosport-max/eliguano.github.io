@@ -327,14 +327,14 @@
             margin-bottom: 15px;
         }
 
-        /* Diseños de Items del Carrito con Imagen */
+        /* Diseños de Items del Carrito */
         .cart-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 10px 0;
             border-bottom: 1px solid var(--border-color);
-            gap: 12px;
+            gap: 10px;
         }
 
         .cart-item-info {
@@ -370,10 +370,16 @@
             font-weight: 700;
         }
 
-        .cart-controls {
+        .cart-actions {
             display: flex;
             align-items: center;
             gap: 8px;
+        }
+
+        .cart-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
             background-color: var(--card-bg);
             padding: 4px 8px;
             border-radius: 20px;
@@ -387,8 +393,8 @@
             font-weight: bold;
             font-size: 1rem;
             cursor: pointer;
-            width: 22px;
-            height: 22px;
+            width: 20px;
+            height: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -403,8 +409,26 @@
             font-size: 0.85rem;
             font-weight: 700;
             color: var(--accent-color);
-            min-width: 18px;
+            min-width: 16px;
             text-align: center;
+        }
+
+        /* Botón Bote de Basura */
+        .btn-remove-item {
+            background: none;
+            border: none;
+            color: #ef4444;
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s;
+        }
+
+        .btn-remove-item:active {
+            opacity: 0.6;
         }
 
         .cart-footer {
@@ -658,7 +682,7 @@
             ejecutarBusqueda();
         }
 
-        // Carrito con Imagen y Cantidades
+        // Funciones del Carrito
         function agregarAlCarrito(nombre, precio, img) {
             const existe = carrito.find(item => item.nombre === nombre);
             if (existe) {
@@ -672,8 +696,14 @@
         function cambiarCantidad(index, cambio) {
             carrito[index].cantidad += cambio;
             if (carrito[index].cantidad <= 0) {
-                carrito.splice(index, 1);
+                eliminarDelCarrito(index);
+                return;
             }
+            actualizarCarritoUI();
+        }
+
+        function eliminarDelCarrito(index) {
+            carrito.splice(index, 1);
             actualizarCarritoUI();
         }
 
@@ -706,10 +736,13 @@
                                 <div class="cart-item-price">$${subtotal} MXN <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">($${item.precio} c/u)</span></div>
                             </div>
                         </div>
-                        <div class="cart-controls">
-                            <button class="btn-qty" onclick="cambiarCantidad(${index}, -1)">-</button>
-                            <span class="cart-qty">${item.cantidad}</span>
-                            <button class="btn-qty" onclick="cambiarCantidad(${index}, 1)">+</button>
+                        <div class="cart-actions">
+                            <div class="cart-controls">
+                                <button class="btn-qty" onclick="cambiarCantidad(${index}, -1)">-</button>
+                                <span class="cart-qty">${item.cantidad}</span>
+                                <button class="btn-qty" onclick="cambiarCantidad(${index}, 1)">+</button>
+                            </div>
+                            <button class="btn-remove-item" onclick="eliminarDelCarrito(${index})" title="Eliminar producto">🗑️</button>
                         </div>
                     `;
                     itemsContainer.appendChild(itemElement);
