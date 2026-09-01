@@ -40,6 +40,50 @@
             transition: all 0.3s ease;
         }
 
+        .header-content {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Icono de Perfil Admin (Esquina superior derecha) */
+        .admin-profile-btn {
+            position: absolute;
+            top: 0;
+            right: 10px;
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+            color: var(--text-muted);
+        }
+
+        .admin-profile-btn:hover {
+            border-color: var(--accent-color);
+            color: var(--text-main);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .admin-profile-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        .admin-profile-btn.logged-in {
+            border-color: #22c55e;
+            color: #22c55e;
+            background-color: rgba(34, 197, 94, 0.1);
+        }
+
         .brand-logo {
             width: 70px;
             height: 70px;
@@ -86,6 +130,17 @@
             max-height: 0;
             opacity: 0;
             margin-top: 0;
+        }
+
+        header.scrolled .admin-profile-btn {
+            top: -2px;
+            width: 34px;
+            height: 34px;
+        }
+
+        header.scrolled .admin-profile-btn svg {
+            width: 18px;
+            height: 18px;
         }
 
         /* Búsqueda */
@@ -151,18 +206,6 @@
         .admin-controls {
             display: flex;
             gap: 8px;
-        }
-
-        .btn-admin-login {
-            background-color: #2a2a2a;
-            color: var(--text-muted);
-            border: 1px solid var(--border-color);
-            padding: 8px 14px;
-            border-radius: 25px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            cursor: pointer;
-            white-space: nowrap;
         }
 
         .btn-admin-add {
@@ -630,10 +673,18 @@
 <body>
 
     <header id="main-header">
-        <img src="Logo.jpeg" alt="El iguano Logo" class="brand-logo">
-        <div class="header-text">
-            <h1>El iguano</h1>
-            <p>Caps & Sportswear</p>
+        <div class="header-content">
+            <!-- Botón de Icono de Usuario Admin en la esquina superior derecha -->
+            <button class="admin-profile-btn" id="admin-profile-btn" onclick="manejarClicIconoAdmin()" title="Acceso Administrador">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                </svg>
+            </button>
+            <img src="Logo.jpeg" alt="El iguano Logo" class="brand-logo">
+            <div class="header-text">
+                <h1>El iguano</h1>
+                <p>Caps & Sportswear</p>
+            </div>
         </div>
     </header>
 
@@ -649,7 +700,6 @@
             <button class="category-btn" onclick="filtrarCategoria('Ofertas', this)">Ofertas</button>
         </div>
         <div class="admin-controls">
-            <button class="btn-admin-login" id="btn-admin-login" onclick="abrirModalLogin()">🔑 Admin</button>
             <button class="btn-admin-add" id="btn-admin-add" onclick="abrirModalAdmin()">➕ Agregar</button>
             <button class="btn-admin-logout" id="btn-admin-logout" onclick="cerrarSesionAdmin()">Salir</button>
         </div>
@@ -692,11 +742,11 @@
         </div>
     </div>
 
-    <!-- Modal Login Admin Real -->
+    <!-- Modal Login Admin -->
     <div class="modal" id="login-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Iniciar Sesión Admin</h2>
+                <h2>Acceso Administrador</h2>
                 <button class="close-modal" onclick="cerrarModalLogin()">&times;</button>
             </div>
             <form id="form-login-admin" onsubmit="iniciarSesionAdmin(event)">
@@ -812,7 +862,7 @@
             cargarProductosDesdeSupabase();
         });
 
-        // Autenticación Supabase Real
+        // Autenticación Supabase
         async function verificarSesionAdmin() {
             const { data: { user } } = await supabaseClient.auth.getUser();
             if (user) {
@@ -824,17 +874,27 @@
             }
         }
 
+        function manejarClicIconoAdmin() {
+            if (esAdmin) {
+                abrirModalAdmin();
+            } else {
+                abrirModalLogin();
+            }
+        }
+
         function actualizarInterfazAdmin(estaAutenticado) {
-            const btnLogin = document.getElementById('btn-admin-login');
+            const btnProfile = document.getElementById('admin-profile-btn');
             const btnAdd = document.getElementById('btn-admin-add');
             const btnLogout = document.getElementById('btn-admin-logout');
 
             if (estaAutenticado) {
-                btnLogin.style.display = 'none';
+                btnProfile.classList.add('logged-in');
+                btnProfile.title = "Sesión Activa - Publicar Producto";
                 btnAdd.style.display = 'block';
                 btnLogout.style.display = 'block';
             } else {
-                btnLogin.style.display = 'block';
+                btnProfile.classList.remove('logged-in');
+                btnProfile.title = "Acceso Administrador";
                 btnAdd.style.display = 'none';
                 btnLogout.style.display = 'none';
             }
