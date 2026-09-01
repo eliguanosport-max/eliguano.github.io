@@ -16,37 +16,30 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 90px; }
-
         header { background-color: #181818; padding: 20px 15px 15px 15px; text-align: center; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; transition: all 0.3s ease; }
         .header-content { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         
         .admin-profile-btn { position: absolute; top: 0; right: 10px; background: none; border: 1px solid var(--border-color); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted); }
         .admin-profile-btn.logged-in { border-color: #22c55e; color: #22c55e; background-color: rgba(34, 197, 94, 0.1); }
         .admin-profile-btn svg { width: 22px; height: 22px; fill: currentColor; }
-
         .brand-logo { width: 70px; height: 70px; object-fit: contain; border-radius: 50%; transition: all 0.3s ease; }
         .header-text { margin-top: 8px; }
         header h1 { font-size: 1.6rem; text-transform: uppercase; letter-spacing: 3px; color: var(--accent-color); font-weight: 800; }
         header p { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
-
         .search-container { padding: 12px 15px 5px 15px; background-color: var(--bg-color); }
         .search-input { width: 100%; padding: 12px 16px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 25px; color: var(--text-main); font-size: 0.9rem; outline: none; }
-
         .categories-wrapper { display: flex; align-items: center; background-color: var(--bg-color); border-bottom: 1px solid var(--border-color); position: sticky; top: 60px; z-index: 90; padding: 10px 15px; gap: 10px; }
         .categories { display: flex; gap: 10px; overflow-x: auto; flex-grow: 1; align-items: center; }
         .category-btn { background-color: var(--card-bg); color: var(--text-muted); border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 25px; white-space: nowrap; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
         .category-btn.active { background-color: var(--accent-color); color: #121212; border-color: var(--accent-color); }
-
         .subcategories-container { display: none; gap: 8px; padding: 10px 15px; background-color: #181818; border-bottom: 1px solid var(--border-color); overflow-x: auto; align-items: center; }
         .subcategories-container.open { display: flex; }
         .subcategory-btn { background-color: #252525; color: var(--text-muted); border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 18px; white-space: nowrap; cursor: pointer; font-weight: 500; font-size: 0.78rem; }
         .subcategory-btn.active { background-color: #ffffff; color: #000000; border-color: #ffffff; font-weight: 700; }
-
         .admin-controls { display: flex; gap: 8px; }
         .btn-admin-add, .btn-admin-cat { display: none; background-color: #22c55e; color: #ffffff; border: none; padding: 8px 14px; border-radius: 25px; font-weight: 700; font-size: 0.8rem; cursor: pointer; white-space: nowrap; }
         .btn-admin-cat { background-color: #3b82f6; }
         .btn-admin-logout { display: none; background-color: #ef4444; color: #ffffff; border: none; padding: 8px 12px; border-radius: 25px; font-weight: 600; font-size: 0.8rem; cursor: pointer; white-space: nowrap; }
-
         .catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 15px; }
         .product-card { background-color: var(--card-bg); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--border-color); position: relative; }
         .product-card.out-of-stock .product-img { opacity: 0.4; filter: grayscale(80%); }
@@ -56,24 +49,19 @@
         .product-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; }
         .product-price { color: var(--accent-color); font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; }
         .product-size-select { width: 100%; padding: 6px; background-color: #2a2a2a; border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-main); font-size: 0.8rem; margin-bottom: 10px; outline: none; }
-
         .btn-buy-now { width: 100%; background-color: #22c55e; color: #ffffff; border: none; padding: 9px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; cursor: pointer; text-transform: uppercase; }
         .btn-add { width: 100%; background-color: var(--accent-color); color: #121212; border: none; padding: 9px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; cursor: pointer; text-transform: uppercase; }
         .btn-disabled { width: 100%; background-color: #333333; color: #777777; border: none; padding: 9px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; cursor: not-allowed; text-transform: uppercase; }
-
         .btn-delete-admin, .btn-edit-admin { display: none; position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.9); color: #fff; border: none; border-radius: 50%; width: 28px; height: 28px; font-weight: bold; cursor: pointer; z-index: 5; }
         .btn-edit-admin { right: 40px; background: rgba(59, 130, 246, 0.9); }
         .btn-toggle-stock-admin { display: none; position: absolute; top: 8px; left: 8px; background: rgba(34, 197, 94, 0.9); color: #fff; border: none; border-radius: 14px; padding: 0 8px; height: 28px; font-size: 0.75rem; font-weight: bold; cursor: pointer; z-index: 5; }
-
         .cart-bar { position: fixed; bottom: 15px; left: 5%; width: 90%; background-color: var(--accent-color); color: #121212; padding: 14px 20px; border-radius: 30px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6); cursor: pointer; z-index: 101; }
-
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); z-index: 200; justify-content: center; align-items: flex-end; }
         .modal.open { display: flex; }
         .modal-content { background-color: #181818; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px; max-height: 85vh; display: flex; flex-direction: column; border-top: 1px solid var(--border-color); overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 15px; }
         .modal-header h2 { font-size: 1.2rem; color: var(--accent-color); }
         .close-modal { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
-
         .cart-items { overflow-y: auto; flex-grow: 1; margin-bottom: 15px; }
         .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-color); gap: 10px; }
         .cart-item-info { display: flex; align-items: center; gap: 12px; flex-grow: 1; }
@@ -89,14 +77,12 @@
         .cart-footer { border-top: 1px solid var(--border-color); padding-top: 15px; }
         .cart-total { display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; }
         .btn-send-whatsapp { width: 100%; background-color: #22c55e; color: #ffffff; border: none; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; text-transform: uppercase; }
-
         .form-group { margin-bottom: 14px; }
         .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; }
         .form-group input[type="text"], .form-group input[type="email"], .form-group input[type="password"], .form-group input[type="number"], .form-group select { width: 100%; padding: 10px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-main); font-size: 0.9rem; }
         .sizes-checkbox-container { display: flex; flex-wrap: wrap; gap: 8px; background-color: var(--card-bg); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); }
         .size-checkbox-label { display: flex; align-items: center; gap: 5px; background-color: #2a2a2a; padding: 6px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; border: 1px solid var(--border-color); }
         .btn-save-product { width: 100%; background-color: var(--accent-color); color: #121212; border: none; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; margin-top: 10px; }
-
         .cat-admin-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 8px; }
         .btn-cat-del { background-color: #ef4444; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
     </style>
@@ -114,7 +100,6 @@
             </div>
         </div>
     </header>
-
     <div class="search-container">
         <input type="text" id="search-input" class="search-input" placeholder="🔍 Buscar producto..." oninput="ejecutarBusqueda()">
     </div>
@@ -129,18 +114,14 @@
             <button class="btn-admin-logout" id="btn-admin-logout" onclick="cerrarSesionAdmin()">Salir</button>
         </div>
     </div>
-
     <div class="subcategories-container" id="subcategories-container"></div>
-
     <main class="catalog" id="catalog-container">
         <p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">Cargando catálogo...</p>
     </main>
-
     <div class="cart-bar" onclick="abrirCarrito()">
         <span id="cart-count-label">🛒 Carrito (0 prendas)</span>
         <span id="cart-total-label">$0 MXN &rarr;</span>
     </div>
-
     <!-- Visor Imagen -->
     <div class="modal" id="image-viewer-modal" style="align-items: center;" onclick="cerrarVisorImagen()">
         <div style="position: relative; max-width: 90vw; max-height: 90vh;" onclick="event.stopPropagation()">
@@ -148,7 +129,6 @@
             <img id="image-viewer-img" src="" style="max-width: 100%; max-height: 80vh; border-radius: 12px; object-fit: contain;">
         </div>
     </div>
-
     <!-- Modal Carrito -->
     <div class="modal" id="cart-modal">
         <div class="modal-content">
@@ -166,7 +146,6 @@
             </div>
         </div>
     </div>
-
     <!-- Modal Login -->
     <div class="modal" id="login-modal">
         <div class="modal-content">
@@ -187,7 +166,6 @@
             </form>
         </div>
     </div>
-
     <!-- Modal Formulario Producto Admin -->
     <div class="modal" id="admin-modal">
         <div class="modal-content">
@@ -232,7 +210,6 @@
             </form>
         </div>
     </div>
-
     <!-- Modal Gestión Categorías Admin -->
     <div class="modal" id="cat-modal">
         <div class="modal-content">
@@ -256,13 +233,11 @@
             <div id="lista-categorias-admin"></div>
         </div>
     </div>
-
     <script>
         const SUPABASE_URL = "https://ywixgizcadytczxcbubg.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3aXhnaXpjYWR5dGN6eGNidWJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxMzkzNTIsImV4cCI6MjEwMzcxNTM1Mn0.ABIAb8426hAdnJw5nxvGhxorAL6s8RHvlhHkDsb06Ts";
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const numeroTelefono = "524961228531";
-
         let esAdmin = false;
         let carrito = [];
         let categoriaActual = 'Todas';
@@ -270,30 +245,25 @@
         let productos = [];
         let categoriasData = [];
         let imagenTemporalBase64 = "";
-
         document.addEventListener("DOMContentLoaded", async () => {
             await verificarSesionAdmin();
             await cargarCategoriasDesdeSupabase();
             cargarProductosDesdeSupabase();
         });
-
         async function verificarSesionAdmin() {
             const { data: { user } } = await supabaseClient.auth.getUser();
             esAdmin = !!user;
             actualizarInterfazAdmin(esAdmin);
         }
-
         function manejarClicIconoAdmin() {
             if (esAdmin) abrirModalAdminCrear();
             else abrirModalLogin();
         }
-
         function actualizarInterfazAdmin(estaAutenticado) {
             const btnProfile = document.getElementById('admin-profile-btn');
             const btnAdd = document.getElementById('btn-admin-add');
             const btnCat = document.getElementById('btn-admin-cat');
             const btnLogout = document.getElementById('btn-admin-logout');
-
             if (estaAutenticado) {
                 btnProfile.classList.add('logged-in');
                 btnAdd.style.display = 'block';
@@ -306,7 +276,6 @@
                 btnLogout.style.display = 'none';
             }
         }
-
         async function iniciarSesionAdmin(event) {
             event.preventDefault();
             const email = document.getElementById('login-email').value;
@@ -318,7 +287,6 @@
             cerrarModalLogin();
             renderizarCatalogo(productos);
         }
-
         async function cerrarSesionAdmin() {
             if (confirm("¿Cerrar sesión?")) {
                 await supabaseClient.auth.signOut();
@@ -327,7 +295,6 @@
                 renderizarCatalogo(productos);
             }
         }
-
         async function cargarCategoriasDesdeSupabase() {
             const { data, error } = await supabaseClient.from('categorias').select('*').order('id', { ascending: true });
             if (error) return console.error("Error al cargar categorías:", error);
@@ -335,7 +302,6 @@
             renderizarBarraCategorias();
             renderizarSelectCategoriasModal();
         }
-
         function renderizarBarraCategorias() {
             const container = document.getElementById('categories-bar-container');
             let html = `<button class="category-btn ${categoriaActual === 'Todas' ? 'active' : ''}" onclick="filtrarCategoria('Todas', this)">Todas</button>`;
@@ -345,23 +311,19 @@
             });
             container.innerHTML = html;
         }
-
         function renderizarSelectCategoriasModal() {
             const select = document.getElementById('prod-categoria');
             select.innerHTML = categoriasData.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
             actualizarTallasFormulario();
         }
-
         function actualizarTallasFormulario() {
             const catNombre = document.getElementById('prod-categoria').value;
             const container = document.getElementById('sizes-checkbox-container');
             const catObj = categoriasData.find(c => c.nombre === catNombre);
-
             if (!catObj || !catObj.medidas) {
                 container.innerHTML = '<p style="color:var(--text-muted); font-size:0.8rem;">Sin medidas configuradas.</p>';
                 return;
             }
-
             const medidasFiltradas = catObj.medidas.filter(m => m !== 'Todas');
             container.innerHTML = medidasFiltradas.map(m => `
                 <label class="size-checkbox-label">
@@ -369,7 +331,6 @@
                 </label>
             `).join('');
         }
-
         async function cargarProductosDesdeSupabase() {
             const { data, error } = await supabaseClient.from('productos').select('*').order('id', { ascending: false });
             if (!error) {
@@ -377,7 +338,6 @@
                 ejecutarBusqueda();
             }
         }
-
         function renderizarCatalogo(lista) {
             const container = document.getElementById('catalog-container');
             container.innerHTML = '';
@@ -385,13 +345,11 @@
                 container.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">No hay productos disponibles.</p>';
                 return;
             }
-
             lista.forEach(prod => {
                 const estaDisponible = prod.disponible !== false;
                 const listaTallas = prod.tallas ? prod.tallas.split(',').map(t => t.trim()) : ['Única'];
                 const opcionesHTML = listaTallas.map(t => `<option value="${t}">${t}</option>`).join('');
                 const imgUrl = (prod.img && prod.img.trim() !== '' && prod.img !== 'null') ? prod.img : 'https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano';
-
                 const card = document.createElement('div');
                 card.className = `product-card ${estaDisponible ? '' : 'out-of-stock'}`;
                 card.innerHTML = `
@@ -420,35 +378,27 @@
                 container.appendChild(card);
             });
         }
-
         function ejecutarBusqueda() {
             const query = document.getElementById('search-input').value.trim().toLowerCase();
             let filtrados = productos;
-
             if (categoriaActual !== 'Todas') {
                 filtrados = filtrados.filter(p => p.categoria === categoriaActual);
             }
-
             if (subcategoriaActual !== 'Todas') {
                 filtrados = filtrados.filter(p => p.tallas && p.tallas.split(',').map(t => t.trim()).includes(subcategoriaActual));
             }
-
             if (query !== '') {
                 filtrados = filtrados.filter(p => p.nombre.toLowerCase().includes(query));
             }
-
             renderizarCatalogo(filtrados);
         }
-
         function filtrarCategoria(categoria, btn) {
             document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             categoriaActual = categoria;
             subcategoriaActual = 'Todas';
-
             const subContainer = document.getElementById('subcategories-container');
             const catObj = categoriasData.find(c => c.nombre === categoria);
-
             if (catObj && catObj.medidas && catObj.medidas.length > 0) {
                 subContainer.innerHTML = catObj.medidas.map((medida, index) => `
                     <button class="subcategory-btn ${index === 0 ? 'active' : ''}" onclick="filtrarSubcategoria('${medida}', this)">${medida}</button>
@@ -458,33 +408,27 @@
                 subContainer.innerHTML = '';
                 subContainer.classList.remove('open');
             }
-
             ejecutarBusqueda();
         }
-
         function filtrarSubcategoria(medida, btn) {
             document.querySelectorAll('.subcategory-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             subcategoriaActual = medida;
             ejecutarBusqueda();
         }
-
         async function guardarNuevaCategoria(event) {
             event.preventDefault();
             const nombre = document.getElementById('cat-nombre').value.trim();
             const medidasRaw = document.getElementById('cat-medidas').value;
             let medidas = medidasRaw.split(',').map(m => m.trim()).filter(m => m !== '');
             if (!medidas.includes('Todas')) medidas.unshift('Todas');
-
             const { error } = await supabaseClient.from('categorias').insert([{ nombre, medidas }]);
             if (error) return alert("Error: " + error.message);
-
             document.getElementById('form-nueva-categoria').reset();
             await cargarCategoriasDesdeSupabase();
             renderListaCategoriasAdmin();
             alert("Categoría guardada exitosamente");
         }
-
         function renderListaCategoriasAdmin() {
             const container = document.getElementById('lista-categorias-admin');
             container.innerHTML = categoriasData.map(c => `
@@ -497,7 +441,6 @@
                 </div>
             `).join('');
         }
-
         async function eliminarCategoria(id) {
             if (confirm("¿Eliminar esta categoría?")) {
                 const { error } = await supabaseClient.from('categorias').delete().eq('id', id);
@@ -508,13 +451,11 @@
                 }
             }
         }
-
         function abrirModalGestionCategorias() {
             renderListaCategoriasAdmin();
             document.getElementById('cat-modal').classList.add('open');
         }
         function cerrarModalGestionCategorias() { document.getElementById('cat-modal').classList.remove('open'); }
-
         function abrirModalAdminCrear() {
             document.getElementById('form-nuevo-producto').reset();
             document.getElementById('prod-id').value = '';
@@ -523,11 +464,9 @@
             renderizarSelectCategoriasModal();
             document.getElementById('admin-modal').classList.add('open');
         }
-
         function abrirModalAdminEditar(idProd) {
             const prod = productos.find(p => p.id === idProd);
             if (!prod) return;
-
             document.getElementById('form-nuevo-producto').reset();
             document.getElementById('prod-id').value = prod.id;
             document.getElementById('modal-admin-title').textContent = 'Editar Producto';
@@ -536,25 +475,20 @@
             document.getElementById('prod-categoria').value = prod.categoria;
             document.getElementById('prod-disponible').value = prod.disponible !== false ? 'true' : 'false';
             document.getElementById('prod-img-url').value = (prod.img && !prod.img.startsWith('data:')) ? prod.img : '';
-
             actualizarTallasFormulario();
-
             if (prod.tallas) {
                 const tallasArr = prod.tallas.split(',').map(t => t.trim());
                 document.querySelectorAll('.chk-talla').forEach(cb => {
                     if (tallasArr.includes(cb.value)) cb.checked = true;
                 });
             }
-
             document.getElementById('admin-modal').classList.add('open');
         }
-
         function cerrarModalAdmin() { document.getElementById('admin-modal').classList.remove('open'); }
         function abrirModalLogin() { document.getElementById('login-modal').classList.add('open'); }
         function cerrarModalLogin() { document.getElementById('login-modal').classList.remove('open'); }
         function abrirVisorImagen(src) { document.getElementById('image-viewer-img').src = src; document.getElementById('image-viewer-modal').classList.add('open'); }
         function cerrarVisorImagen() { document.getElementById('image-viewer-modal').classList.remove('open'); }
-
         function convertirImagenADataURL(event) {
             const file = event.target.files[0];
             if (file) {
@@ -563,7 +497,6 @@
                 reader.readAsDataURL(file);
             }
         }
-
         async function guardarProducto(event) {
             event.preventDefault();
             const prodId = document.getElementById('prod-id').value;
@@ -573,39 +506,32 @@
             const categoria = document.getElementById('prod-categoria').value;
             const disponible = document.getElementById('prod-disponible').value === 'true';
             const urlInput = document.getElementById('prod-img-url').value;
-
             const chks = document.querySelectorAll('.chk-talla:checked');
             let tallas = Array.from(chks).map(c => c.value).join(', ');
             if (!tallas) tallas = "Única";
-
             let imgFinal = imagenTemporalBase64 || urlInput || "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano";
-
             let res;
             if (esEdicion) {
                 res = await supabaseClient.from('productos').update({ nombre, precio, categoria, tallas, disponible, img: imgFinal }).eq('id', prodId);
             } else {
                 res = await supabaseClient.from('productos').insert([{ nombre, precio, categoria, tallas, disponible, img: imgFinal }]);
             }
-
             if (res.error) alert("Error: " + res.error.message);
             else {
                 cerrarModalAdmin();
                 cargarProductosDesdeSupabase();
             }
         }
-
         async function cambiarEstadoStock(id, nuevoEstado) {
             await supabaseClient.from('productos').update({ disponible: nuevoEstado }).eq('id', id);
             cargarProductosDesdeSupabase();
         }
-
         async function eliminarProducto(id) {
             if (confirm("¿Eliminar producto?")) {
                 await supabaseClient.from('productos').delete().eq('id', id);
                 cargarProductosDesdeSupabase();
             }
         }
-
         function agregarAlCarrito(nombre, precio, img, idProd) {
             const sizeSelect = document.getElementById(`size-select-${idProd}`);
             const talla = sizeSelect ? sizeSelect.value : 'Única';
@@ -614,21 +540,21 @@
             else carrito.push({ nombre, precio, img, talla, cantidad: 1 });
             actualizarCarritoUI();
         }
-
         function cambiarCantidad(index, cambio) {
             carrito[index].cantidad += cambio;
             if (carrito[index].cantidad <= 0) carrito.splice(index, 1);
             actualizarCarritoUI();
         }
-
+        function eliminarDelCarrito(index) {
+            carrito.splice(index, 1);
+            actualizarCarritoUI();
+        }
         function actualizarCarritoUI() {
             const totalPrendas = carrito.reduce((sum, item) => sum + item.cantidad, 0);
             const totalDinero = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-
             document.getElementById('cart-count-label').textContent = `🛒 Carrito (${totalPrendas} prendas)`;
             document.getElementById('cart-total-label').textContent = `$${totalDinero} MXN →`;
             document.getElementById('modal-total-label').textContent = `$${totalDinero} MXN`;
-
             const container = document.getElementById('cart-items-container');
             if (carrito.length === 0) {
                 container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">El carrito está vacío.</p>';
@@ -643,26 +569,26 @@
                                 <div class="cart-item-price">$${item.precio * item.cantidad} MXN</div>
                             </div>
                         </div>
-                        <div class="cart-controls">
-                            <button class="btn-qty" onclick="cambiarCantidad(${index}, -1)">-</button>
-                            <span class="cart-qty">${item.cantidad}</span>
-                            <button class="btn-qty" onclick="cambiarCantidad(${index}, 1)">+</button>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div class="cart-controls">
+                                <button class="btn-qty" onclick="cambiarCantidad(${index}, -1)">-</button>
+                                <span class="cart-qty">${item.cantidad}</span>
+                                <button class="btn-qty" onclick="cambiarCantidad(${index}, 1)">+</button>
+                            </div>
+                            <button class="btn-remove-item" onclick="eliminarDelCarrito(${index})" title="Eliminar del carrito">🗑️</button>
                         </div>
                     </div>
                 `).join('');
             }
         }
-
         function abrirCarrito() { document.getElementById('cart-modal').classList.add('open'); }
         function cerrarCarrito() { document.getElementById('cart-modal').classList.remove('open'); }
-
         function comprarAhoraDirecto(nombre, precio, idProd) {
             const sizeSelect = document.getElementById(`size-select-${idProd}`);
             const talla = sizeSelect ? sizeSelect.value : 'Única';
             let mensaje = `Hola *El iguano*, me interesa comprar ahora mismo el siguiente producto:\n\n- ${nombre} (Talla: ${talla}): $${precio} MXN`;
             window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
-
         function enviarPedidoWhatsApp() {
             if (carrito.length === 0) return alert("El carrito está vacío.");
             let lista = carrito.map(i => `- ${i.nombre} (Talla: ${i.talla}) x${i.cantidad}: $${i.precio * i.cantidad} MXN`).join('\n');
