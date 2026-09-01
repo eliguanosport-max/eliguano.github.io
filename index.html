@@ -83,6 +83,7 @@
         .sizes-checkbox-container { display: flex; flex-wrap: wrap; gap: 8px; background-color: var(--card-bg); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); }
         .size-checkbox-label { display: flex; align-items: center; gap: 5px; background-color: #2a2a2a; padding: 6px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; border: 1px solid var(--border-color); }
         .btn-save-product { width: 100%; background-color: var(--accent-color); color: #121212; border: none; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; margin-top: 10px; }
+        .btn-save-product:disabled { opacity: 0.5; cursor: not-allowed; }
         .cat-admin-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 8px; }
         .btn-cat-del { background-color: #ef4444; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
     </style>
@@ -199,12 +200,12 @@
                     <div class="sizes-checkbox-container" id="sizes-checkbox-container"></div>
                 </div>
                 <div class="form-group">
-                    <label>Cargar Imagen:</label>
-                    <input type="file" id="prod-file" accept="image/*" onchange="convertirImagenADataURL(event)">
+                    <label>Subir Fotografía (Almacenamiento en Supabase Storage):</label>
+                    <input type="file" id="prod-file" accept="image/*">
                 </div>
                 <div class="form-group">
                     <label>O Enlace URL:</label>
-                    <input type="text" id="prod-img-url">
+                    <input type="text" id="prod-img-url" placeholder="https://...">
                 </div>
                 <button type="submit" class="btn-save-product" id="btn-save">Publicar Producto</button>
             </form>
@@ -244,21 +245,24 @@
         let subcategoriaActual = 'Todas';
         let productos = [];
         let categoriasData = [];
-        let imagenTemporalBase64 = "";
+
         document.addEventListener("DOMContentLoaded", async () => {
             await verificarSesionAdmin();
             await cargarCategoriasDesdeSupabase();
             cargarProductosDesdeSupabase();
         });
+
         async function verificarSesionAdmin() {
             const { data: { user } } = await supabaseClient.auth.getUser();
             esAdmin = !!user;
             actualizarInterfazAdmin(esAdmin);
         }
+
         function manejarClicIconoAdmin() {
             if (esAdmin) abrirModalAdminCrear();
             else abrirModalLogin();
         }
+
         function actualizarInterfazAdmin(estaAutenticado) {
             const btnProfile = document.getElementById('admin-profile-btn');
             const btnAdd = document.getElementById('btn-admin-add');
@@ -276,6 +280,7 @@
                 btnLogout.style.display = 'none';
             }
         }
+
         async function iniciarSesionAdmin(event) {
             event.preventDefault();
             const email = document.getElementById('login-email').value;
@@ -287,6 +292,7 @@
             cerrarModalLogin();
             renderizarCatalogo(productos);
         }
+
         async function cerrarSesionAdmin() {
             if (confirm("¿Cerrar sesión?")) {
                 await supabaseClient.auth.signOut();
@@ -295,6 +301,7 @@
                 renderizarCatalogo(productos);
             }
         }
+
         async function cargarCategoriasDesdeSupabase() {
             const { data, error } = await supabaseClient.from('categorias').select('*').order('id', { ascending: true });
             if (error) return console.error("Error al cargar categorías:", error);
@@ -302,6 +309,7 @@
             renderizarBarraCategorias();
             renderizarSelectCategoriasModal();
         }
+
         function renderizarBarraCategorias() {
             const container = document.getElementById('categories-bar-container');
             let html = `<button class="category-btn ${categoriaActual === 'Todas' ? 'active' : ''}" onclick="filtrarCategoria('Todas', this)">Todas</button>`;
@@ -311,11 +319,13 @@
             });
             container.innerHTML = html;
         }
+
         function renderizarSelectCategoriasModal() {
             const select = document.getElementById('prod-categoria');
             select.innerHTML = categoriasData.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
             actualizarTallasFormulario();
         }
+
         function actualizarTallasFormulario() {
             const catNombre = document.getElementById('prod-categoria').value;
             const container = document.getElementById('sizes-checkbox-container');
@@ -331,6 +341,7 @@
                 </label>
             `).join('');
         }
+
         async function cargarProductosDesdeSupabase() {
             const { data, error } = await supabaseClient.from('productos').select('*').order('id', { ascending: false });
             if (!error) {
@@ -338,6 +349,7 @@
                 ejecutarBusqueda();
             }
         }
+
         function renderizarCatalogo(lista) {
             const container = document.getElementById('catalog-container');
             container.innerHTML = '';
@@ -378,6 +390,7 @@
                 container.appendChild(card);
             });
         }
+
         function ejecutarBusqueda() {
             const query = document.getElementById('search-input').value.trim().toLowerCase();
             let filtrados = productos;
@@ -392,6 +405,7 @@
             }
             renderizarCatalogo(filtrados);
         }
+
         function filtrarCategoria(categoria, btn) {
             document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
@@ -410,12 +424,14 @@
             }
             ejecutarBusqueda();
         }
+
         function filtrarSubcategoria(medida, btn) {
             document.querySelectorAll('.subcategory-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             subcategoriaActual = medida;
             ejecutarBusqueda();
         }
+
         async function guardarNuevaCategoria(event) {
             event.preventDefault();
             const nombre = document.getElementById('cat-nombre').value.trim();
@@ -429,6 +445,7 @@
             renderListaCategoriasAdmin();
             alert("Categoría guardada exitosamente");
         }
+
         function renderListaCategoriasAdmin() {
             const container = document.getElementById('lista-categorias-admin');
             container.innerHTML = categoriasData.map(c => `
@@ -441,6 +458,7 @@
                 </div>
             `).join('');
         }
+
         async function eliminarCategoria(id) {
             if (confirm("¿Eliminar esta categoría?")) {
                 const { error } = await supabaseClient.from('categorias').delete().eq('id', id);
@@ -451,19 +469,21 @@
                 }
             }
         }
+
         function abrirModalGestionCategorias() {
             renderListaCategoriasAdmin();
             document.getElementById('cat-modal').classList.add('open');
         }
         function cerrarModalGestionCategorias() { document.getElementById('cat-modal').classList.remove('open'); }
+
         function abrirModalAdminCrear() {
             document.getElementById('form-nuevo-producto').reset();
             document.getElementById('prod-id').value = '';
             document.getElementById('modal-admin-title').textContent = 'Nuevo Producto';
-            imagenTemporalBase64 = "";
             renderizarSelectCategoriasModal();
             document.getElementById('admin-modal').classList.add('open');
         }
+
         function abrirModalAdminEditar(idProd) {
             const prod = productos.find(p => p.id === idProd);
             if (!prod) return;
@@ -484,54 +504,102 @@
             }
             document.getElementById('admin-modal').classList.add('open');
         }
+
         function cerrarModalAdmin() { document.getElementById('admin-modal').classList.remove('open'); }
         function abrirModalLogin() { document.getElementById('login-modal').classList.add('open'); }
         function cerrarModalLogin() { document.getElementById('login-modal').classList.remove('open'); }
         function abrirVisorImagen(src) { document.getElementById('image-viewer-img').src = src; document.getElementById('image-viewer-modal').classList.add('open'); }
         function cerrarVisorImagen() { document.getElementById('image-viewer-modal').classList.remove('open'); }
-        function convertirImagenADataURL(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = e => imagenTemporalBase64 = e.target.result;
-                reader.readAsDataURL(file);
+
+        // Función para subir archivos a Supabase Storage
+        async function subirImagenASupabaseStorage(file) {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+            const filePath = `productos/${fileName}`;
+
+            const { data, error } = await supabaseClient.storage
+                .from('productos')
+                .upload(filePath, file, { cacheControl: '3600', upsert: false });
+
+            if (error) {
+                throw error;
             }
+
+            const { data: publicUrlData } = supabaseClient.storage
+                .from('productos')
+                .getPublicUrl(filePath);
+
+            return publicUrlData.publicUrl;
         }
+
         async function guardarProducto(event) {
             event.preventDefault();
+            const btnSave = document.getElementById('btn-save');
             const prodId = document.getElementById('prod-id').value;
             const esEdicion = prodId !== '';
             const nombre = document.getElementById('prod-nombre').value;
             const precio = parseFloat(document.getElementById('prod-precio').value);
             const categoria = document.getElementById('prod-categoria').value;
             const disponible = document.getElementById('prod-disponible').value === 'true';
-            const urlInput = document.getElementById('prod-img-url').value;
+            const fileInput = document.getElementById('prod-file');
+            const urlInput = document.getElementById('prod-img-url').value.trim();
+
             const chks = document.querySelectorAll('.chk-talla:checked');
             let tallas = Array.from(chks).map(c => c.value).join(', ');
             if (!tallas) tallas = "Única";
-            let imgFinal = imagenTemporalBase64 || urlInput || "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano";
-            let res;
-            if (esEdicion) {
-                res = await supabaseClient.from('productos').update({ nombre, precio, categoria, tallas, disponible, img: imgFinal }).eq('id', prodId);
-            } else {
-                res = await supabaseClient.from('productos').insert([{ nombre, precio, categoria, tallas, disponible, img: imgFinal }]);
-            }
-            if (res.error) alert("Error: " + res.error.message);
-            else {
-                cerrarModalAdmin();
-                cargarProductosDesdeSupabase();
+
+            let imgFinal = urlInput;
+
+            try {
+                btnSave.disabled = true;
+                btnSave.textContent = "Guardando...";
+
+                // Si seleccionó un archivo local/celular, subirlo al Bucket de Storage
+                if (fileInput.files && fileInput.files[0]) {
+                    btnSave.textContent = "Subiendo imagen...";
+                    imgFinal = await subirImagenASupabaseStorage(fileInput.files[0]);
+                } else if (!imgFinal && esEdicion) {
+                    const prodActual = productos.find(p => p.id === parseInt(prodId));
+                    if (prodActual) imgFinal = prodActual.img;
+                }
+
+                if (!imgFinal) {
+                    imgFinal = "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano";
+                }
+
+                let res;
+                if (esEdicion) {
+                    res = await supabaseClient.from('productos').update({ nombre, precio, categoria, tallas, disponible, img: imgFinal }).eq('id', prodId);
+                } else {
+                    res = await supabaseClient.from('productos').insert([{ nombre, precio, categoria, tallas, disponible, img: imgFinal }]);
+                }
+
+                if (res.error) {
+                    alert("Error al guardar en la base de datos: " + res.error.message);
+                } else {
+                    cerrarModalAdmin();
+                    cargarProductosDesdeSupabase();
+                }
+            } catch (err) {
+                alert("Error al procesar la imagen en Storage: " + err.message);
+            } finally {
+                btnSave.disabled = false;
+                btnSave.textContent = "Publicar Producto";
             }
         }
+
         async function cambiarEstadoStock(id, nuevoEstado) {
             await supabaseClient.from('productos').update({ disponible: nuevoEstado }).eq('id', id);
             cargarProductosDesdeSupabase();
         }
+
         async function eliminarProducto(id) {
             if (confirm("¿Eliminar producto?")) {
                 await supabaseClient.from('productos').delete().eq('id', id);
                 cargarProductosDesdeSupabase();
             }
         }
+
         function agregarAlCarrito(nombre, precio, img, idProd) {
             const sizeSelect = document.getElementById(`size-select-${idProd}`);
             const talla = sizeSelect ? sizeSelect.value : 'Única';
@@ -540,15 +608,18 @@
             else carrito.push({ nombre, precio, img, talla, cantidad: 1 });
             actualizarCarritoUI();
         }
+
         function cambiarCantidad(index, cambio) {
             carrito[index].cantidad += cambio;
             if (carrito[index].cantidad <= 0) carrito.splice(index, 1);
             actualizarCarritoUI();
         }
+
         function eliminarDelCarrito(index) {
             carrito.splice(index, 1);
             actualizarCarritoUI();
         }
+
         function actualizarCarritoUI() {
             const totalPrendas = carrito.reduce((sum, item) => sum + item.cantidad, 0);
             const totalDinero = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
@@ -581,14 +652,17 @@
                 `).join('');
             }
         }
+
         function abrirCarrito() { document.getElementById('cart-modal').classList.add('open'); }
         function cerrarCarrito() { document.getElementById('cart-modal').classList.remove('open'); }
+
         function comprarAhoraDirecto(nombre, precio, idProd) {
             const sizeSelect = document.getElementById(`size-select-${idProd}`);
             const talla = sizeSelect ? sizeSelect.value : 'Única';
             let mensaje = `Hola *El iguano*, me interesa comprar ahora mismo el siguiente producto:\n\n- ${nombre} (Talla: ${talla}): $${precio} MXN`;
             window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
+
         function enviarPedidoWhatsApp() {
             if (carrito.length === 0) return alert("El carrito está vacío.");
             let lista = carrito.map(i => `- ${i.nombre} (Talla: ${i.talla}) x${i.cantidad}: $${i.precio * i.cantidad} MXN`).join('\n');
