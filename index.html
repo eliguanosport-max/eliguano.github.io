@@ -208,7 +208,21 @@
             color: var(--accent-color);
             font-size: 1.1rem;
             font-weight: 700;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
+        }
+
+        /* Selector de Talla en Producto */
+        .product-size-select {
+            width: 100%;
+            padding: 6px;
+            background-color: #2a2a2a;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-main);
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            outline: none;
+            cursor: pointer;
         }
 
         /* Botón Comprar Ahora (Verde) */
@@ -368,6 +382,12 @@
         .cart-item-title {
             font-size: 0.9rem;
             font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .cart-item-size {
+            font-size: 0.75rem;
+            color: var(--text-muted);
             margin-bottom: 2px;
         }
 
@@ -568,7 +588,7 @@
             <form id="form-nuevo-producto" onsubmit="guardarNuevoProducto(event)">
                 <div class="form-group">
                     <label>Nombre del Producto:</label>
-                    <input type="text" id="prod-nombre" placeholder="Ej. Gorra Snapback Negra" required>
+                    <input type="text" id="prod-nombre" placeholder="Ej. Playera Deportiva Negra" required>
                 </div>
                 <div class="form-group">
                     <label>Precio (MXN):</label>
@@ -581,6 +601,10 @@
                         <option value="Ropa Deportiva">Ropa Deportiva</option>
                         <option value="Ofertas">Ofertas</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label>Tallas Disponibles (separadas por coma):</label>
+                    <input type="text" id="prod-tallas" placeholder="Ej. S, M, L, XL o Ajustable">
                 </div>
                 <div class="form-group">
                     <label>Cargar Imagen desde tu Celular/PC:</label>
@@ -656,6 +680,10 @@
             }
 
             lista.forEach(prod => {
+                // Tallas por defecto si no existen en BD
+                const listaTallas = prod.tallas ? prod.tallas.split(',').map(t => t.trim()) : ['Ajustable'];
+                const opcionesTallaHTML = listaTallas.map(t => `<option value="${t}">${t}</option>`).join('');
+
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 card.innerHTML = `
@@ -664,9 +692,15 @@
                     <div class="product-info">
                         <div class="product-title">${prod.nombre}</div>
                         <div class="product-price">$${prod.precio} MXN</div>
+                        
+                        <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:4px;">Talla:</label>
+                        <select class="product-size-select" id="size-select-${prod.id}">
+                            ${opcionesTallaHTML}
+                        </select>
+
                         <div style="display: flex; flex-direction: column; gap: 6px;">
-                            <button class="btn-buy-now" onclick="comprarAhoraDirecto('${prod.nombre}', ${prod.precio})">⚡ Comprar ahora</button>
-                            <button class="btn-add" onclick="agregarAlCarrito('${prod.nombre}', ${prod.precio}, '${prod.img}')">+ Agregar al carrito</button>
+                            <button class="btn-buy-now" onclick="comprarAhoraDirecto('${prod.nombre}', ${prod.precio}, ${prod.id})">⚡ Comprar ahora</button>
+                            <button class="btn-add" onclick="agregarAlCarrito('${prod.nombre}', ${prod.precio}, '${prod.img}', ${prod.id})">+ Agregar al carrito</button>
                         </div>
                     </div>
                 `;
@@ -674,9 +708,12 @@
             });
         }
 
-        // Comprar directamente por WhatsApp un solo producto
-        function comprarAhoraDirecto(nombre, precio) {
-            let mensaje = `Hola *El iguano*, me interesa comprar ahora mismo el siguiente producto:\n\n- ${nombre}: $${precio} MXN`;
+        // Comprar directamente por WhatsApp un solo producto especificando su talla
+        function comprarAhoraDirecto(nombre, precio, idProd) {
+            const sizeSelect = document.getElementById(`size-select-${idProd}`);
+            const tallaSeleccionada = sizeSelect ? sizeSelect.value : 'Ajustable';
+
+            let mensaje = `Hola *El iguano*, me interesa comprar ahora mismo el siguiente producto:\n\n- ${nombre} (Talla: ${tallaSeleccionada}): $${precio} MXN`;
             window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
 
@@ -710,12 +747,15 @@
         }
 
         // Funciones del Carrito
-        function agregarAlCarrito(nombre, precio, img) {
-            const existe = carrito.find(item => item.nombre === nombre);
+        function agregarAlCarrito(nombre, precio, img, idProd) {
+            const sizeSelect = document.getElementById(`size-select-${idProd}`);
+            const talla = sizeSelect ? sizeSelect.value : 'Ajustable';
+
+            const existe = carrito.find(item => item.nombre === nombre && item.talla === talla);
             if (existe) {
                 existe.cantidad += 1;
             } else {
-                carrito.push({ nombre, precio, img, cantidad: 1 });
+                carrito.push({ nombre, precio, img, talla, cantidad: 1 });
             }
             actualizarCarritoUI();
         }
@@ -760,6 +800,7 @@
                             <img src="${item.img}" alt="${item.nombre}" class="cart-item-img" onclick="abrirVisorImagen('${item.img}')">
                             <div class="cart-item-details">
                                 <div class="cart-item-title">${item.nombre}</div>
+                                <div class="cart-item-size">Talla: <strong>${item.talla}</strong></div>
                                 <div class="cart-item-price">$${subtotal} MXN <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">($${item.precio} c/u)</span></div>
                             </div>
                         </div>
@@ -785,7 +826,7 @@
                 alert("Agrega al menos un producto al carrito antes de realizar el pedido.");
                 return;
             }
-            let listaProductos = carrito.map(item => `- ${item.nombre} x${item.cantidad}: $${item.precio * item.cantidad} MXN`).join('\n');
+            let listaProductos = carrito.map(item => `- ${item.nombre} (Talla: ${item.talla}) x${item.cantidad}: $${item.precio * item.cantidad} MXN`).join('\n');
             let totalPrendas = carrito.reduce((sum, item) => sum + item.cantidad, 0);
             let totalDinero = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
             
@@ -831,14 +872,16 @@
             const nombre = document.getElementById('prod-nombre').value;
             const precio = parseFloat(document.getElementById('prod-precio').value);
             const categoria = document.getElementById('prod-categoria').value;
+            const tallasInput = document.getElementById('prod-tallas').value.trim();
             const urlInput = document.getElementById('prod-img-url').value;
 
+            const tallas = tallasInput !== "" ? tallasInput : "Ajustable";
             let imgFinal = imagenTemporalBase64 || urlInput || "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano";
 
             const { data, error } = await supabaseClient
                 .from('productos')
                 .insert([
-                    { nombre, precio, categoria, img: imgFinal }
+                    { nombre, precio, categoria, tallas, img: imgFinal }
                 ]);
 
             btnSave.disabled = false;
