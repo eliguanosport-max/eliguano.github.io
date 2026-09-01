@@ -14,646 +14,98 @@
             --text-muted: #a0a0a0;
             --border-color: #2a2a2a;
         }
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            padding-bottom: 90px;
-        }
-        /* Header */
-        header {
-            background-color: #181818;
-            padding: 20px 15px 15px 15px;
-            text-align: center;
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            transition: all 0.3s ease;
-        }
-        .header-content {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        /* Icono de Perfil Admin */
-        .admin-profile-btn {
-            position: absolute;
-            top: 0;
-            right: 10px;
-            background: none;
-            border: 1px solid var(--border-color);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background-color 0.2s, border-color 0.2s;
-            color: var(--text-muted);
-        }
-        .admin-profile-btn:hover {
-            border-color: var(--accent-color);
-            color: var(--text-main);
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-        .admin-profile-btn svg {
-            width: 22px;
-            height: 22px;
-            fill: currentColor;
-        }
-        .admin-profile-btn.logged-in {
-            border-color: #22c55e;
-            color: #22c55e;
-            background-color: rgba(34, 197, 94, 0.1);
-        }
-        .brand-logo {
-            width: 70px;
-            height: 70px;
-            object-fit: contain;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-            user-select: none;
-        }
-        .header-text {
-            max-height: 100px;
-            opacity: 1;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            margin-top: 8px;
-        }
-        header h1 {
-            font-size: 1.6rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            color: var(--accent-color);
-            font-weight: 800;
-        }
-        header p {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        header.scrolled {
-            padding: 8px 15px;
-        }
-        header.scrolled .brand-logo {
-            width: 42px;
-            height: 42px;
-        }
-        header.scrolled .header-text {
-            max-height: 0;
-            opacity: 0;
-            margin-top: 0;
-        }
-        header.scrolled .admin-profile-btn {
-            top: -2px;
-            width: 34px;
-            height: 34px;
-        }
-        header.scrolled .admin-profile-btn svg {
-            width: 18px;
-            height: 18px;
-        }
-        /* Búsqueda */
-        .search-container {
-            padding: 12px 15px 5px 15px;
-            background-color: var(--bg-color);
-        }
-        .search-input {
-            width: 100%;
-            padding: 12px 16px;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 25px;
-            color: var(--text-main);
-            font-size: 0.9rem;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .search-input:focus {
-            border-color: var(--accent-color);
-        }
-        /* Categorías y Acciones Admin */
-        .categories-wrapper {
-            display: flex;
-            align-items: center;
-            background-color: var(--bg-color);
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 60px;
-            z-index: 90;
-            padding: 10px 15px;
-            gap: 10px;
-        }
-        .categories {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            flex-grow: 1;
-            align-items: center;
-        }
-        .category-btn {
-            background-color: var(--card-bg);
-            color: var(--text-muted);
-            border: 1px solid var(--border-color);
-            padding: 8px 18px;
-            border-radius: 25px;
-            white-space: nowrap;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-        .category-btn.active {
-            background-color: var(--accent-color);
-            color: #121212;
-            border-color: var(--accent-color);
-        }
-        /* SUBFILTROS / MEDIDAS DINÁMICAS POR CATEGORÍA */
-        .subcategories-container {
-            display: none;
-            gap: 8px;
-            padding: 10px 15px;
-            background-color: #181818;
-            border-bottom: 1px solid var(--border-color);
-            overflow-x: auto;
-            align-items: center;
-        }
-        .subcategories-container.open {
-            display: flex;
-        }
-        .subcategory-btn {
-            background-color: #252525;
-            color: var(--text-muted);
-            border: 1px solid var(--border-color);
-            padding: 6px 14px;
-            border-radius: 18px;
-            white-space: nowrap;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.78rem;
-            transition: all 0.2s ease;
-        }
-        .subcategory-btn.active {
-            background-color: #ffffff;
-            color: #000000;
-            border-color: #ffffff;
-            font-weight: 700;
-        }
-        .admin-controls {
-            display: flex;
-            gap: 8px;
-        }
-        .btn-admin-add {
-            display: none;
-            background-color: #22c55e;
-            color: #ffffff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 25px;
-            font-weight: 700;
-            font-size: 0.85rem;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-        .btn-admin-logout {
-            display: none;
-            background-color: #ef4444;
-            color: #ffffff;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 25px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-        /* Catálogo */
-        .catalog {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 15px;
-            padding: 15px;
-        }
-        .product-card {
-            background-color: var(--card-bg);
-            border-radius: 10px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            border: 1px solid var(--border-color);
-            position: relative;
-        }
-        .product-card.out-of-stock .product-img {
-            opacity: 0.4;
-            filter: grayscale(80%);
-        }
-        .badge-out-of-stock {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background-color: #ef4444;
-            color: #ffffff;
-            font-size: 0.7rem;
-            font-weight: 800;
-            padding: 4px 8px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            z-index: 4;
-        }
-        .product-img {
-            width: 100%;
-            height: 170px;
-            object-fit: cover;
-            background-color: #252525;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        .product-img:hover {
-            transform: scale(1.02);
-        }
-        .product-info {
-            padding: 12px;
-        }
-        .product-title {
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--text-main);
-        }
-        .product-price {
-            color: var(--accent-color);
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-        .product-size-select {
-            width: 100%;
-            padding: 6px;
-            background-color: #2a2a2a;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            color: var(--text-main);
-            font-size: 0.8rem;
-            margin-bottom: 10px;
-            outline: none;
-            cursor: pointer;
-        }
-        .product-size-select:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .btn-buy-now {
-            width: 100%;
-            background-color: #22c55e;
-            color: #ffffff;
-            border: none;
-            padding: 9px;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 0.8rem;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-        .btn-add {
-            width: 100%;
-            background-color: var(--accent-color);
-            color: #121212;
-            border: none;
-            padding: 9px;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 0.8rem;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-        .btn-disabled {
-            width: 100%;
-            background-color: #333333;
-            color: #777777;
-            border: none;
-            padding: 9px;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 0.8rem;
-            cursor: not-allowed;
-            text-transform: uppercase;
-        }
-        /* Controles Admin en Tarjetas */
-        .btn-delete-admin {
-            display: none;
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: rgba(239, 68, 68, 0.9);
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 5;
-        }
-        .btn-edit-admin {
-            display: none;
-            position: absolute;
-            top: 8px;
-            right: 40px;
-            background: rgba(59, 130, 246, 0.9);
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 5;
-            align-items: center;
-            justify-content: center;
-        }
-        .btn-toggle-stock-admin {
-            display: none;
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            background: rgba(34, 197, 94, 0.9);
-            color: #fff;
-            border: none;
-            border-radius: 14px;
-            padding: 0 8px;
-            height: 28px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 5;
-        }
-        /* Carrito */
-        .cart-bar {
-            position: fixed;
-            bottom: 15px;
-            left: 5%;
-            width: 90%;
-            background-color: var(--accent-color);
-            color: #121212;
-            padding: 14px 20px;
-            border-radius: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 700;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-            cursor: pointer;
-            z-index: 101;
-        }
-        /* Modales */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
-            z-index: 200;
-            justify-content: center;
-            align-items: flex-end;
-        }
-        .modal.open {
-            display: flex;
-        }
-        .modal-content {
-            background-color: #181818;
-            width: 100%;
-            max-width: 500px;
-            border-radius: 20px 20px 0 0;
-            padding: 20px;
-            max-height: 85vh;
-            display: flex;
-            flex-direction: column;
-            border-top: 1px solid var(--border-color);
-            overflow-y: auto;
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 12px;
-            margin-bottom: 15px;
-        }
-        .modal-header h2 {
-            font-size: 1.2rem;
-            color: var(--accent-color);
-        }
-        .close-modal {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-        .cart-items {
-            overflow-y: auto;
-            flex-grow: 1;
-            margin-bottom: 15px;
-        }
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border-color);
-            gap: 10px;
-        }
-        .cart-item-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-grow: 1;
-        }
-        .cart-item-img {
-            width: 48px;
-            height: 48px;
-            object-fit: cover;
-            border-radius: 8px;
-            background-color: #252525;
-            border: 1px solid var(--border-color);
-            cursor: pointer;
-        }
-        .cart-item-details {
-            display: flex;
-            flex-direction: column;
-        }
-        .cart-item-title {
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-        .cart-item-size {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: 2px;
-        }
-        .cart-item-price {
-            font-size: 0.85rem;
-            color: var(--accent-color);
-            font-weight: 700;
-        }
-        .cart-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .cart-controls {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background-color: var(--card-bg);
-            padding: 4px 8px;
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
-        }
-        .btn-qty {
-            background: none;
-            border: none;
-            color: var(--text-main);
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-        .btn-qty:active {
-            background-color: var(--border-color);
-        }
-        .cart-qty {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--accent-color);
-            min-width: 16px;
-            text-align: center;
-        }
-        .btn-remove-item {
-            background: none;
-            border: none;
-            color: #ef4444;
-            font-size: 1.1rem;
-            cursor: pointer;
-            padding: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .cart-footer {
-            border-top: 1px solid var(--border-color);
-            padding-top: 15px;
-        }
-        .cart-total {
-            display: flex;
-            justify-content: space-between;
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 15px;
-        }
-        .btn-send-whatsapp {
-            width: 100%;
-            background-color: #22c55e;
-            color: #ffffff;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.95rem;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-        /* Formulario Administrador */
-        .form-group {
-            margin-bottom: 14px;
-        }
-        .form-group label {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-        .form-group input[type="text"], 
-        .form-group input[type="email"], 
-        .form-group input[type="password"], 
-        .form-group input[type="number"], 
-        .form-group select {
-            width: 100%;
-            padding: 10px;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            color: var(--text-main);
-            font-size: 0.9rem;
-        }
-        .sizes-checkbox-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            background-color: var(--card-bg);
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-        }
-        .size-checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            background-color: #2a2a2a;
-            padding: 6px 10px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            user-select: none;
-            border: 1px solid var(--border-color);
-        }
-        .size-checkbox-label input[type="checkbox"] {
-            accent-color: var(--accent-color);
-            cursor: pointer;
-        }
-        .btn-save-product {
-            width: 100%;
-            background-color: var(--accent-color);
-            color: #121212;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.95rem;
-            cursor: pointer;
-            margin-top: 10px;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 90px; }
+
+        header { background-color: #181818; padding: 20px 15px 15px 15px; text-align: center; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; transition: all 0.3s ease; }
+        .header-content { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        
+        .admin-profile-btn { position: absolute; top: 0; right: 10px; background: none; border: 1px solid var(--border-color); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted); }
+        .admin-profile-btn.logged-in { border-color: #22c55e; color: #22c55e; background-color: rgba(34, 197, 94, 0.1); }
+        .admin-profile-btn svg { width: 22px; height: 22px; fill: currentColor; }
+
+        .brand-logo { width: 70px; height: 70px; object-fit: contain; border-radius: 50%; transition: all 0.3s ease; }
+        .header-text { margin-top: 8px; }
+        header h1 { font-size: 1.6rem; text-transform: uppercase; letter-spacing: 3px; color: var(--accent-color); font-weight: 800; }
+        header p { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
+
+        .search-container { padding: 12px 15px 5px 15px; background-color: var(--bg-color); }
+        .search-input { width: 100%; padding: 12px 16px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 25px; color: var(--text-main); font-size: 0.9rem; outline: none; }
+
+        .categories-wrapper { display: flex; align-items: center; background-color: var(--bg-color); border-bottom: 1px solid var(--border-color); position: sticky; top: 60px; z-index: 90; padding: 10px 15px; gap: 10px; }
+        .categories { display: flex; gap: 10px; overflow-x: auto; flex-grow: 1; align-items: center; }
+        .category-btn { background-color: var(--card-bg); color: var(--text-muted); border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 25px; white-space: nowrap; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
+        .category-btn.active { background-color: var(--accent-color); color: #121212; border-color: var(--accent-color); }
+
+        .subcategories-container { display: none; gap: 8px; padding: 10px 15px; background-color: #181818; border-bottom: 1px solid var(--border-color); overflow-x: auto; align-items: center; }
+        .subcategories-container.open { display: flex; }
+        .subcategory-btn { background-color: #252525; color: var(--text-muted); border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 18px; white-space: nowrap; cursor: pointer; font-weight: 500; font-size: 0.78rem; }
+        .subcategory-btn.active { background-color: #ffffff; color: #000000; border-color: #ffffff; font-weight: 700; }
+
+        .admin-controls { display: flex; gap: 8px; }
+        .btn-admin-add, .btn-admin-cat { display: none; background-color: #22c55e; color: #ffffff; border: none; padding: 8px 14px; border-radius: 25px; font-weight: 700; font-size: 0.8rem; cursor: pointer; white-space: nowrap; }
+        .btn-admin-cat { background-color: #3b82f6; }
+        .btn-admin-logout { display: none; background-color: #ef4444; color: #ffffff; border: none; padding: 8px 12px; border-radius: 25px; font-weight: 600; font-size: 0.8rem; cursor: pointer; white-space: nowrap; }
+
+        .catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 15px; }
+        .product-card { background-color: var(--card-bg); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--border-color); position: relative; }
+        .product-card.out-of-stock .product-img { opacity: 0.4; filter: grayscale(80%); }
+        .badge-out-of-stock { position: absolute; top: 10px; left: 10px; background-color: #ef4444; color: #ffffff; font-size: 0.7rem; font-weight: 800; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; z-index: 4; }
+        .product-img { width: 100%; height: 170px; object-fit: cover; background-color: #252525; cursor: pointer; }
+        .product-info { padding: 12px; }
+        .product-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; }
+        .product-price { color: var(--accent-color); font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; }
+        .product-size-select { width: 100%; padding: 6px; background-color: #2a2a2a; border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-main); font-size: 0.8rem; margin-bottom: 10px; outline: none; }
+
+        .btn-buy-now { width: 100%; background-color: #22c55e; color: #ffffff; border: none; padding: 9px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; cursor: pointer; text-transform: uppercase; }
+        .btn-add { width: 100%; background-color: var(--accent-color); color: #121212; border: none; padding: 9px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; cursor: pointer; text-transform: uppercase; }
+        .btn-disabled { width: 100%; background-color: #333333; color: #777777; border: none; padding: 9px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; cursor: not-allowed; text-transform: uppercase; }
+
+        .btn-delete-admin, .btn-edit-admin { display: none; position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.9); color: #fff; border: none; border-radius: 50%; width: 28px; height: 28px; font-weight: bold; cursor: pointer; z-index: 5; }
+        .btn-edit-admin { right: 40px; background: rgba(59, 130, 246, 0.9); }
+        .btn-toggle-stock-admin { display: none; position: absolute; top: 8px; left: 8px; background: rgba(34, 197, 94, 0.9); color: #fff; border: none; border-radius: 14px; padding: 0 8px; height: 28px; font-size: 0.75rem; font-weight: bold; cursor: pointer; z-index: 5; }
+
+        .cart-bar { position: fixed; bottom: 15px; left: 5%; width: 90%; background-color: var(--accent-color); color: #121212; padding: 14px 20px; border-radius: 30px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6); cursor: pointer; z-index: 101; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); z-index: 200; justify-content: center; align-items: flex-end; }
+        .modal.open { display: flex; }
+        .modal-content { background-color: #181818; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px; max-height: 85vh; display: flex; flex-direction: column; border-top: 1px solid var(--border-color); overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 15px; }
+        .modal-header h2 { font-size: 1.2rem; color: var(--accent-color); }
+        .close-modal { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
+
+        .cart-items { overflow-y: auto; flex-grow: 1; margin-bottom: 15px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-color); gap: 10px; }
+        .cart-item-info { display: flex; align-items: center; gap: 12px; flex-grow: 1; }
+        .cart-item-img { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; background-color: #252525; border: 1px solid var(--border-color); }
+        .cart-item-details { display: flex; flex-direction: column; }
+        .cart-item-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 2px; }
+        .cart-item-size { font-size: 0.75rem; color: var(--text-muted); }
+        .cart-item-price { font-size: 0.85rem; color: var(--accent-color); font-weight: 700; }
+        .cart-controls { display: flex; align-items: center; gap: 6px; background-color: var(--card-bg); padding: 4px 8px; border-radius: 20px; border: 1px solid var(--border-color); }
+        .btn-qty { background: none; border: none; color: var(--text-main); font-weight: bold; font-size: 1rem; cursor: pointer; width: 20px; height: 20px; }
+        .cart-qty { font-size: 0.85rem; font-weight: 700; color: var(--accent-color); min-width: 16px; text-align: center; }
+        .btn-remove-item { background: none; border: none; color: #ef4444; font-size: 1.1rem; cursor: pointer; padding: 4px; }
+        .cart-footer { border-top: 1px solid var(--border-color); padding-top: 15px; }
+        .cart-total { display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; }
+        .btn-send-whatsapp { width: 100%; background-color: #22c55e; color: #ffffff; border: none; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; text-transform: uppercase; }
+
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; }
+        .form-group input[type="text"], .form-group input[type="email"], .form-group input[type="password"], .form-group input[type="number"], .form-group select { width: 100%; padding: 10px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-main); font-size: 0.9rem; }
+        .sizes-checkbox-container { display: flex; flex-wrap: wrap; gap: 8px; background-color: var(--card-bg); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); }
+        .size-checkbox-label { display: flex; align-items: center; gap: 5px; background-color: #2a2a2a; padding: 6px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; border: 1px solid var(--border-color); }
+        .btn-save-product { width: 100%; background-color: var(--accent-color); color: #121212; border: none; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; margin-top: 10px; }
+
+        .cat-admin-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 8px; }
+        .btn-cat-del { background-color: #ef4444; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
     </style>
 </head>
 <body>
     <header id="main-header">
         <div class="header-content">
             <button class="admin-profile-btn" id="admin-profile-btn" onclick="manejarClicIconoAdmin()" title="Mi Cuenta">
-                <svg viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-                </svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
             </button>
             <img src="Logo.jpeg" alt="El iguano Logo" class="brand-logo">
             <div class="header-text">
@@ -662,41 +114,38 @@
             </div>
         </div>
     </header>
+
     <div class="search-container">
-        <input type="text" id="search-input" class="search-input" placeholder="🔍 Buscar gorra, playera, hoodie..." oninput="ejecutarBusqueda()">
+        <input type="text" id="search-input" class="search-input" placeholder="🔍 Buscar producto..." oninput="ejecutarBusqueda()">
     </div>
     
     <div class="categories-wrapper">
-        <div class="categories">
-            <button class="category-btn active" onclick="filtrarCategoria('Todas', this)">Todas</button>
-            <button class="category-btn" onclick="filtrarCategoria('Gorras', this)">Gorras</button>
-            <button class="category-btn" onclick="filtrarCategoria('Ropa Deportiva', this)">Ropa Deportiva</button>
-            <button class="category-btn" onclick="filtrarCategoria('Ofertas', this)">Ofertas</button>
+        <div class="categories" id="categories-bar-container">
+            <!-- Carga dinámica -->
         </div>
         <div class="admin-controls">
-            <button class="btn-admin-add" id="btn-admin-add" onclick="abrirModalAdminCrear()">➕ Agregar</button>
+            <button class="btn-admin-add" id="btn-admin-add" onclick="abrirModalAdminCrear()">➕ Producto</button>
+            <button class="btn-admin-cat" id="btn-admin-cat" onclick="abrirModalGestionCategorias()">📂 Categorías</button>
             <button class="btn-admin-logout" id="btn-admin-logout" onclick="cerrarSesionAdmin()">Salir</button>
         </div>
     </div>
 
-    <!-- CONTENEDOR DINÁMICO DE MEDIDAS / SUBFILTROS -->
-    <div class="subcategories-container" id="subcategories-container">
-        <!-- Se llena dinámicamente según la categoría seleccionada -->
-    </div>
+    <div class="subcategories-container" id="subcategories-container"></div>
 
     <main class="catalog" id="catalog-container">
-        <p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">Cargando productos...</p>
+        <p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">Cargando catálogo...</p>
     </main>
+
     <div class="cart-bar" onclick="abrirCarrito()">
         <span id="cart-count-label">🛒 Carrito (0 prendas)</span>
         <span id="cart-total-label">$0 MXN &rarr;</span>
     </div>
 
-    <!-- Modal Visor de Imagen -->
+    <!-- Visor Imagen -->
     <div class="modal" id="image-viewer-modal" style="align-items: center;" onclick="cerrarVisorImagen()">
-        <div style="position: relative; max-width: 90vw; max-height: 90vh; display: flex; justify-content: center; align-items: center;" onclick="event.stopPropagation()">
+        <div style="position: relative; max-width: 90vw; max-height: 90vh;" onclick="event.stopPropagation()">
             <button class="close-modal" onclick="cerrarVisorImagen()" style="position: absolute; top: -40px; right: 0; color: #fff; font-size: 2.5rem;">&times;</button>
-            <img id="image-viewer-img" src="" alt="Vista previa" style="max-width: 100%; max-height: 80vh; border-radius: 12px; object-fit: contain; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+            <img id="image-viewer-img" src="" style="max-width: 100%; max-height: 80vh; border-radius: 12px; object-fit: contain;">
         </div>
     </div>
 
@@ -707,9 +156,7 @@
                 <h2>Tu Pedido</h2>
                 <button class="close-modal" onclick="cerrarCarrito()">&times;</button>
             </div>
-            <div class="cart-items" id="cart-items-container">
-                <p style="color: var(--text-muted); text-align: center;">El carrito está vacío.</p>
-            </div>
+            <div class="cart-items" id="cart-items-container"></div>
             <div class="cart-footer">
                 <div class="cart-total">
                     <span>Cuenta Total:</span>
@@ -730,18 +177,18 @@
             <form id="form-login-admin" onsubmit="iniciarSesionAdmin(event)">
                 <div class="form-group">
                     <label>Correo Electrónico:</label>
-                    <input type="email" id="login-email" placeholder="tu-correo@email.com" required>
+                    <input type="email" id="login-email" required>
                 </div>
                 <div class="form-group">
                     <label>Contraseña:</label>
-                    <input type="password" id="login-password" placeholder="••••••••" required>
+                    <input type="password" id="login-password" required>
                 </div>
                 <button type="submit" class="btn-save-product" id="btn-login-submit">INICIAR SESIÓN</button>
             </form>
         </div>
     </div>
 
-    <!-- Modal Formulario Producto Admin (Crear / Editar) -->
+    <!-- Modal Formulario Producto Admin -->
     <div class="modal" id="admin-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -750,22 +197,17 @@
             </div>
             <form id="form-nuevo-producto" onsubmit="guardarProducto(event)">
                 <input type="hidden" id="prod-id" value="">
-                
                 <div class="form-group">
                     <label>Nombre del Producto:</label>
-                    <input type="text" id="prod-nombre" placeholder="Ej. Playera Deportiva Negra" required>
+                    <input type="text" id="prod-nombre" required>
                 </div>
                 <div class="form-group">
                     <label>Precio (MXN):</label>
-                    <input type="number" id="prod-precio" placeholder="350" required>
+                    <input type="number" id="prod-precio" required>
                 </div>
                 <div class="form-group">
                     <label>Categoría:</label>
-                    <select id="prod-categoria" onchange="actualizarTallasFormulario()">
-                        <option value="Gorras">Gorras</option>
-                        <option value="Ropa Deportiva">Ropa Deportiva</option>
-                        <option value="Ofertas">Ofertas</option>
-                    </select>
+                    <select id="prod-categoria" onchange="actualizarTallasFormulario()"></select>
                 </div>
                 <div class="form-group">
                     <label>Estado inicial:</label>
@@ -774,52 +216,44 @@
                         <option value="false">Agotado</option>
                     </select>
                 </div>
-
-                <!-- TALLAS DE GORRAS -->
-                <div class="form-group" id="group-tallas-gorras">
-                    <label>Selecciona Tallas de Gorra:</label>
-                    <div class="sizes-checkbox-container">
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="Ajustable"> Ajustable</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="Flexfit"> Flexfit</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="S/M"> S/M</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="L/XL"> L/XL</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="6 7/8"> 6 7/8</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="7"> 7</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="7 1/8"> 7 1/8</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="7 1/4"> 7 1/4</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="7 3/8"> 7 3/8</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="7 1/2"> 7 1/2</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="7 5/8"> 7 5/8</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="7 3/4"> 7 3/4</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="7 7/8"> 7 7/8</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="8"> 8</label>
-                    </div>
-                </div>
-
-                <!-- TALLAS OTROS PRODUCTOS -->
-                <div class="form-group" id="group-tallas-ropa" style="display: none;">
-                    <label>Selecciona Tallas del Producto:</label>
-                    <div class="sizes-checkbox-container">
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-ropa" value="Unitalla"> Unitalla</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-ropa" value="XS"> XS</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-ropa" value="S"> S</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-ropa" value="M"> M</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-ropa" value="L"> L</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-ropa" value="XL"> XL</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-ropa" value="XXL"> XXL</label>
-                    </div>
-                </div>
-
                 <div class="form-group">
-                    <label>Cargar Nueva Imagen (Opcional si vas a editar):</label>
+                    <label>Selecciona Tallas del Producto:</label>
+                    <div class="sizes-checkbox-container" id="sizes-checkbox-container"></div>
+                </div>
+                <div class="form-group">
+                    <label>Cargar Imagen:</label>
                     <input type="file" id="prod-file" accept="image/*" onchange="convertirImagenADataURL(event)">
                 </div>
                 <div class="form-group">
-                    <label>O Enlace de Google Drive / URL:</label>
-                    <input type="text" id="prod-img-url" placeholder="Pega el enlace aquí">
+                    <label>O Enlace URL:</label>
+                    <input type="text" id="prod-img-url">
                 </div>
                 <button type="submit" class="btn-save-product" id="btn-save">Publicar Producto</button>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal Gestión Categorías Admin -->
+    <div class="modal" id="cat-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Gestionar Categorías</h2>
+                <button class="close-modal" onclick="cerrarModalGestionCategorias()">&times;</button>
+            </div>
+            <form id="form-nueva-categoria" onsubmit="guardarNuevaCategoria(event)">
+                <div class="form-group">
+                    <label>Nombre de Categoría:</label>
+                    <input type="text" id="cat-nombre" placeholder="Ej. Calzado" required>
+                </div>
+                <div class="form-group">
+                    <label>Medidas/Tallas (Separadas por comas):</label>
+                    <input type="text" id="cat-medidas" placeholder="Ej. 25, 26, 27, 28" required>
+                </div>
+                <button type="submit" class="btn-save-product" id="btn-save-cat">Guardar Categoría</button>
+            </form>
+            <hr style="border-color: var(--border-color); margin: 20px 0;">
+            <h3 style="font-size: 0.95rem; margin-bottom: 10px;">Categorías Actuales</h3>
+            <div id="lista-categorias-admin"></div>
         </div>
     </div>
 
@@ -834,51 +268,41 @@
         let categoriaActual = 'Todas';
         let subcategoriaActual = 'Todas';
         let productos = [];
+        let categoriasData = [];
         let imagenTemporalBase64 = "";
-
-        const medidasPorCategoria = {
-            'Gorras': ['Todas', 'Ajustable', 'Flexfit', 'S/M', 'L/XL', '6 7/8', '7', '7 1/8', '7 1/4', '7 3/8', '7 1/2', '7 5/8', '7 3/4', '7 7/8', '8'],
-            'Ropa Deportiva': ['Todas', 'Unitalla', 'XS', 'S', 'M', 'L', 'XL', 'XXL']
-        };
 
         document.addEventListener("DOMContentLoaded", async () => {
             await verificarSesionAdmin();
+            await cargarCategoriasDesdeSupabase();
             cargarProductosDesdeSupabase();
         });
 
         async function verificarSesionAdmin() {
             const { data: { user } } = await supabaseClient.auth.getUser();
-            if (user) {
-                esAdmin = true;
-                actualizarInterfazAdmin(true);
-            } else {
-                esAdmin = false;
-                actualizarInterfazAdmin(false);
-            }
+            esAdmin = !!user;
+            actualizarInterfazAdmin(esAdmin);
         }
 
         function manejarClicIconoAdmin() {
-            if (esAdmin) {
-                abrirModalAdminCrear();
-            } else {
-                abrirModalLogin();
-            }
+            if (esAdmin) abrirModalAdminCrear();
+            else abrirModalLogin();
         }
 
         function actualizarInterfazAdmin(estaAutenticado) {
             const btnProfile = document.getElementById('admin-profile-btn');
             const btnAdd = document.getElementById('btn-admin-add');
+            const btnCat = document.getElementById('btn-admin-cat');
             const btnLogout = document.getElementById('btn-admin-logout');
 
             if (estaAutenticado) {
                 btnProfile.classList.add('logged-in');
-                btnProfile.title = "Sesión Activa - Publicar Producto";
                 btnAdd.style.display = 'block';
+                btnCat.style.display = 'block';
                 btnLogout.style.display = 'block';
             } else {
                 btnProfile.classList.remove('logged-in');
-                btnProfile.title = "Mi Cuenta";
                 btnAdd.style.display = 'none';
+                btnCat.style.display = 'none';
                 btnLogout.style.display = 'none';
             }
         }
@@ -887,134 +311,109 @@
             event.preventDefault();
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
-            const btnSubmit = document.getElementById('btn-login-submit');
-
-            btnSubmit.disabled = true;
-            btnSubmit.textContent = "Verificando...";
-
-            const { data, error } = await supabaseClient.auth.signInWithPassword({
-                email: email,
-                password: password,
-            });
-
-            btnSubmit.disabled = false;
-            btnSubmit.textContent = "INICIAR SESIÓN";
-
-            if (error) {
-                alert("Error al iniciar sesión: " + error.message);
-                return;
-            }
-
+            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) return alert("Error: " + error.message);
             esAdmin = true;
             actualizarInterfazAdmin(true);
             cerrarModalLogin();
-            document.getElementById('form-login-admin').reset();
             renderizarCatalogo(productos);
-            alert("¡Bienvenido al panel de administración!");
         }
 
         async function cerrarSesionAdmin() {
-            if (confirm("¿Deseas cerrar la sesión?")) {
+            if (confirm("¿Cerrar sesión?")) {
                 await supabaseClient.auth.signOut();
                 esAdmin = false;
                 actualizarInterfazAdmin(false);
                 renderizarCatalogo(productos);
-                alert("Sesión cerrada.");
             }
         }
 
-        function abrirModalLogin() { document.getElementById('login-modal').classList.add('open'); }
-        function cerrarModalLogin() { document.getElementById('login-modal').classList.remove('open'); }
+        async function cargarCategoriasDesdeSupabase() {
+            const { data, error } = await supabaseClient.from('categorias').select('*').order('id', { ascending: true });
+            if (error) return console.error("Error al cargar categorías:", error);
+            categoriasData = data || [];
+            renderizarBarraCategorias();
+            renderizarSelectCategoriasModal();
+        }
+
+        function renderizarBarraCategorias() {
+            const container = document.getElementById('categories-bar-container');
+            let html = `<button class="category-btn ${categoriaActual === 'Todas' ? 'active' : ''}" onclick="filtrarCategoria('Todas', this)">Todas</button>`;
+            
+            categoriasData.forEach(cat => {
+                html += `<button class="category-btn ${categoriaActual === cat.nombre ? 'active' : ''}" onclick="filtrarCategoria('${cat.nombre}', this)">${cat.nombre}</button>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderizarSelectCategoriasModal() {
+            const select = document.getElementById('prod-categoria');
+            select.innerHTML = categoriasData.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
+            actualizarTallasFormulario();
+        }
 
         function actualizarTallasFormulario() {
-            const cat = document.getElementById('prod-categoria').value;
-            const containerGorras = document.getElementById('group-tallas-gorras');
-            const containerRopa = document.getElementById('group-tallas-ropa');
+            const catNombre = document.getElementById('prod-categoria').value;
+            const container = document.getElementById('sizes-checkbox-container');
+            const catObj = categoriasData.find(c => c.nombre === catNombre);
 
-            if (cat === 'Gorras') {
-                containerGorras.style.display = 'block';
-                containerRopa.style.display = 'none';
-            } else {
-                containerGorras.style.display = 'none';
-                containerRopa.style.display = 'block';
-            }
-        }
-
-        function abrirVisorImagen(src) {
-            const modal = document.getElementById('image-viewer-modal');
-            const img = document.getElementById('image-viewer-img');
-            img.src = src;
-            modal.classList.add('open');
-        }
-
-        function cerrarVisorImagen() {
-            const modal = document.getElementById('image-viewer-modal');
-            modal.classList.remove('open');
-        }
-
-        async function cargarProductosDesdeSupabase() {
-            const container = document.getElementById('catalog-container');
-            container.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">Cargando catálogo...</p>';
-
-            const { data, error } = await supabaseClient.from('productos').select('*').order('id', { ascending: false });
-
-            if (error) {
-                console.error("Error al cargar productos:", error);
-                container.innerHTML = '<p style="color: #ef4444; text-align: center; grid-column: 1/-1;">Error al cargar la tienda.</p>';
+            if (!catObj || !catObj.medidas) {
+                container.innerHTML = '<p style="color:var(--text-muted); font-size:0.8rem;">Sin medidas configuradas.</p>';
                 return;
             }
 
-            productos = data || [];
-            ejecutarBusqueda();
+            const medidasFiltradas = catObj.medidas.filter(m => m !== 'Todas');
+            container.innerHTML = medidasFiltradas.map(m => `
+                <label class="size-checkbox-label">
+                    <input type="checkbox" class="chk-talla" value="${m}"> ${m}
+                </label>
+            `).join('');
+        }
+
+        async function cargarProductosDesdeSupabase() {
+            const { data, error } = await supabaseClient.from('productos').select('*').order('id', { ascending: false });
+            if (!error) {
+                productos = data || [];
+                ejecutarBusqueda();
+            }
         }
 
         function renderizarCatalogo(lista) {
             const container = document.getElementById('catalog-container');
             container.innerHTML = '';
-
             if (lista.length === 0) {
-                container.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">No hay productos disponibles con estos filtros.</p>';
+                container.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">No hay productos disponibles.</p>';
                 return;
             }
 
             lista.forEach(prod => {
                 const estaDisponible = prod.disponible !== false;
-                const listaTallas = prod.tallas ? prod.tallas.split(',').map(t => t.trim()) : ['Ajustable'];
-                const opcionesTallaHTML = listaTallas.map(t => `<option value="${t}">${t}</option>`).join('');
+                const listaTallas = prod.tallas ? prod.tallas.split(',').map(t => t.trim()) : ['Única'];
+                const opcionesHTML = listaTallas.map(t => `<option value="${t}">${t}</option>`).join('');
+                const imgUrl = (prod.img && prod.img.trim() !== '' && prod.img !== 'null') ? prod.img : 'https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano';
 
                 const card = document.createElement('div');
                 card.className = `product-card ${estaDisponible ? '' : 'out-of-stock'}`;
-                
-                const imgUrl = (prod.img && prod.img.trim() !== '' && prod.img !== 'null') 
-                    ? prod.img 
-                    : 'https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano';
-
                 card.innerHTML = `
                     ${!estaDisponible ? `<div class="badge-out-of-stock">Agotado</div>` : ''}
                     ${esAdmin ? `
                         <button class="btn-toggle-stock-admin" style="display:block; background:${estaDisponible ? '#ef4444' : '#22c55e'}" onclick="cambiarEstadoStock(${prod.id}, ${!estaDisponible})">
-                            ${estaDisponible ? 'Marcar Agotado' : 'Marcar Disponible'}
+                            ${estaDisponible ? 'Agotar' : 'Disponible'}
                         </button>
-                        <button class="btn-edit-admin" style="display:flex;" onclick="abrirModalAdminEditar(${prod.id})" title="Editar producto">✏️</button>
-                        <button class="btn-delete-admin" style="display:block;" onclick="eliminarProducto(${prod.id})" title="Eliminar producto">&times;</button>
+                        <button class="btn-edit-admin" style="display:flex;" onclick="abrirModalAdminEditar(${prod.id})">✏️</button>
+                        <button class="btn-delete-admin" style="display:block;" onclick="eliminarProducto(${prod.id})">&times;</button>
                     ` : ''}
-                    <img src="${imgUrl}" alt="${prod.nombre}" class="product-img" onclick="abrirVisorImagen('${imgUrl}')" title="Haz clic para ampliar">
+                    <img src="${imgUrl}" alt="${prod.nombre}" class="product-img" onclick="abrirVisorImagen('${imgUrl}')">
                     <div class="product-info">
                         <div class="product-title">${prod.nombre}</div>
                         <div class="product-price">$${prod.precio} MXN</div>
-                        
                         <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:4px;">Talla:</label>
-                        <select class="product-size-select" id="size-select-${prod.id}" ${!estaDisponible ? 'disabled' : ''}>
-                            ${opcionesTallaHTML}
-                        </select>
-
+                        <select class="product-size-select" id="size-select-${prod.id}" ${!estaDisponible ? 'disabled' : ''}>${opcionesHTML}</select>
                         <div style="display: flex; flex-direction: column; gap: 6px;">
                             ${estaDisponible ? `
                                 <button class="btn-buy-now" onclick="comprarAhoraDirecto('${prod.nombre}', ${prod.precio}, ${prod.id})">⚡ Comprar ahora</button>
-                                <button class="btn-add" onclick="agregarAlCarrito('${prod.nombre}', ${prod.precio}, '${imgUrl}', ${prod.id})">+ Agregar al carrito</button>
-                            ` : `
-                                <button class="btn-disabled" disabled>Agotado</button>
-                            `}
+                                <button class="btn-add" onclick="agregarAlCarrito('${prod.nombre}', ${prod.precio}, '${imgUrl}', ${prod.id})">+ Al carrito</button>
+                            ` : `<button class="btn-disabled" disabled>Agotado</button>`}
                         </div>
                     </div>
                 `;
@@ -1022,46 +421,18 @@
             });
         }
 
-        async function cambiarEstadoStock(id, nuevoEstado) {
-            const { error } = await supabaseClient
-                .from('productos')
-                .update({ disponible: nuevoEstado })
-                .eq('id', id);
-
-            if (error) {
-                alert("Error al actualizar estado: " + error.message);
-            } else {
-                cargarProductosDesdeSupabase();
-            }
-        }
-
-        function comprarAhoraDirecto(nombre, precio, idProd) {
-            const sizeSelect = document.getElementById(`size-select-${idProd}`);
-            const tallaSeleccionada = sizeSelect ? sizeSelect.value : 'Ajustable';
-            let mensaje = `Hola *El iguano*, me interesa comprar ahora mismo el siguiente producto:\n\n- ${nombre} (Talla: ${tallaSeleccionada}): $${precio} MXN`;
-            window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
-        }
-
-        /* FILTRADO DINÁMICO POR CATEGORÍA Y MEDIDAS */
         function ejecutarBusqueda() {
             const query = document.getElementById('search-input').value.trim().toLowerCase();
             let filtrados = productos;
 
-            // 1. Filtrar por Categoría Principal
             if (categoriaActual !== 'Todas') {
                 filtrados = filtrados.filter(p => p.categoria === categoriaActual);
             }
 
-            // 2. Filtrar por Subcategoría / Medida seleccionada
             if (subcategoriaActual !== 'Todas') {
-                filtrados = filtrados.filter(p => {
-                    if (!p.tallas) return false;
-                    const listaTallas = p.tallas.split(',').map(t => t.trim());
-                    return listaTallas.includes(subcategoriaActual);
-                });
+                filtrados = filtrados.filter(p => p.tallas && p.tallas.split(',').map(t => t.trim()).includes(subcategoriaActual));
             }
 
-            // 3. Filtrar por Texto de Búsqueda
             if (query !== '') {
                 filtrados = filtrados.filter(p => p.nombre.toLowerCase().includes(query));
             }
@@ -1069,7 +440,6 @@
             renderizarCatalogo(filtrados);
         }
 
-        /* SELECCIÓN DE CATEGORÍA Y ACTUALIZACIÓN DE BARRA DE MEDIDAS */
         function filtrarCategoria(categoria, btn) {
             document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
@@ -1077,10 +447,10 @@
             subcategoriaActual = 'Todas';
 
             const subContainer = document.getElementById('subcategories-container');
+            const catObj = categoriasData.find(c => c.nombre === categoria);
 
-            if (medidasPorCategoria[categoria]) {
-                const medidas = medidasPorCategoria[categoria];
-                subContainer.innerHTML = medidas.map((medida, index) => `
+            if (catObj && catObj.medidas && catObj.medidas.length > 0) {
+                subContainer.innerHTML = catObj.medidas.map((medida, index) => `
                     <button class="subcategory-btn ${index === 0 ? 'active' : ''}" onclick="filtrarSubcategoria('${medida}', this)">${medida}</button>
                 `).join('');
                 subContainer.classList.add('open');
@@ -1092,7 +462,6 @@
             ejecutarBusqueda();
         }
 
-        /* SELECCIÓN DE MEDIDA / TALLA ESPECÍFICA */
         function filtrarSubcategoria(medida, btn) {
             document.querySelectorAll('.subcategory-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
@@ -1100,105 +469,58 @@
             ejecutarBusqueda();
         }
 
-        function agregarAlCarrito(nombre, precio, img, idProd) {
-            const sizeSelect = document.getElementById(`size-select-${idProd}`);
-            const talla = sizeSelect ? sizeSelect.value : 'Ajustable';
+        async function guardarNuevaCategoria(event) {
+            event.preventDefault();
+            const nombre = document.getElementById('cat-nombre').value.trim();
+            const medidasRaw = document.getElementById('cat-medidas').value;
+            let medidas = medidasRaw.split(',').map(m => m.trim()).filter(m => m !== '');
+            if (!medidas.includes('Todas')) medidas.unshift('Todas');
 
-            const existe = carrito.find(item => item.nombre === nombre && item.talla === talla);
-            if (existe) {
-                existe.cantidad += 1;
-            } else {
-                carrito.push({ nombre, precio, img, talla, cantidad: 1 });
-            }
-            actualizarCarritoUI();
+            const { error } = await supabaseClient.from('categorias').insert([{ nombre, medidas }]);
+            if (error) return alert("Error: " + error.message);
+
+            document.getElementById('form-nueva-categoria').reset();
+            await cargarCategoriasDesdeSupabase();
+            renderListaCategoriasAdmin();
+            alert("Categoría guardada exitosamente");
         }
 
-        function cambiarCantidad(index, cambio) {
-            carrito[index].cantidad += cambio;
-            if (carrito[index].cantidad <= 0) {
-                eliminarDelCarrito(index);
-                return;
-            }
-            actualizarCarritoUI();
+        function renderListaCategoriasAdmin() {
+            const container = document.getElementById('lista-categorias-admin');
+            container.innerHTML = categoriasData.map(c => `
+                <div class="cat-admin-item">
+                    <div>
+                        <strong>${c.nombre}</strong><br>
+                        <small style="color:var(--text-muted);">${c.medidas.join(', ')}</small>
+                    </div>
+                    <button class="btn-cat-del" onclick="eliminarCategoria(${c.id})">Eliminar</button>
+                </div>
+            `).join('');
         }
 
-        function eliminarDelCarrito(index) {
-            carrito.splice(index, 1);
-            actualizarCarritoUI();
-        }
-
-        function actualizarCarritoUI() {
-            const countLabel = document.getElementById('cart-count-label');
-            const totalLabel = document.getElementById('cart-total-label');
-            const modalTotalLabel = document.getElementById('modal-total-label');
-            const itemsContainer = document.getElementById('cart-items-container');
-
-            const totalPrendas = carrito.reduce((sum, item) => sum + item.cantidad, 0);
-            const totalDinero = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-
-            countLabel.textContent = `🛒 Carrito (${totalPrendas} ${totalPrendas === 1 ? 'prenda' : 'prendas'})`;
-            totalLabel.textContent = `$${totalDinero} MXN →`;
-            modalTotalLabel.textContent = `$${totalDinero} MXN`;
-
-            if (carrito.length === 0) {
-                itemsContainer.innerHTML = '<p style="color: var(--text-muted); text-align: center;">El carrito está vacío.</p>';
-            } else {
-                itemsContainer.innerHTML = '';
-                carrito.forEach((item, index) => {
-                    const subtotal = item.precio * item.cantidad;
-                    const itemElement = document.createElement('div');
-                    itemElement.className = 'cart-item';
-                    itemElement.innerHTML = `
-                        <div class="cart-item-info">
-                            <img src="${item.img}" alt="${item.nombre}" class="cart-item-img" onclick="abrirVisorImagen('${item.img}')">
-                            <div class="cart-item-details">
-                                <div class="cart-item-title">${item.nombre}</div>
-                                <div class="cart-item-size">Talla: <strong>${item.talla}</strong></div>
-                                <div class="cart-item-price">$${subtotal} MXN <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">($${item.precio} c/u)</span></div>
-                            </div>
-                        </div>
-                        <div class="cart-actions">
-                            <div class="cart-controls">
-                                <button class="btn-qty" onclick="cambiarCantidad(${index}, -1)">-</button>
-                                <span class="cart-qty">${item.cantidad}</span>
-                                <button class="btn-qty" onclick="cambiarCantidad(${index}, 1)">+</button>
-                            </div>
-                            <button class="btn-remove-item" onclick="eliminarDelCarrito(${index})" title="Eliminar producto">🗑️</button>
-                        </div>
-                    `;
-                    itemsContainer.appendChild(itemElement);
-                });
+        async function eliminarCategoria(id) {
+            if (confirm("¿Eliminar esta categoría?")) {
+                const { error } = await supabaseClient.from('categorias').delete().eq('id', id);
+                if (error) alert("Error: " + error.message);
+                else {
+                    await cargarCategoriasDesdeSupabase();
+                    renderListaCategoriasAdmin();
+                }
             }
         }
 
-        function abrirCarrito() { document.getElementById('cart-modal').classList.add('open'); }
-        function cerrarCarrito() { document.getElementById('cart-modal').classList.remove('open'); }
-
-        function enviarPedidoWhatsApp() {
-            if (carrito.length === 0) {
-                alert("Agrega al menos un producto al carrito antes de realizar el pedido.");
-                return;
-            }
-
-            let listaProductos = carrito.map(item => `- ${item.nombre} (Talla: ${item.talla}) x${item.cantidad}: $${item.precio * item.cantidad} MXN`).join('\n');
-            let totalPrendas = carrito.reduce((sum, item) => sum + item.cantidad, 0);
-            let totalDinero = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-            
-            let mensaje = `Hola *El iguano*, me gustaría realizar el siguiente pedido desde la página web:\n\n${listaProductos}\n\n*Total de prendas:* ${totalPrendas}\n*Cuenta Total:* $${totalDinero} MXN`;
-            window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
+        function abrirModalGestionCategorias() {
+            renderListaCategoriasAdmin();
+            document.getElementById('cat-modal').classList.add('open');
         }
+        function cerrarModalGestionCategorias() { document.getElementById('cat-modal').classList.remove('open'); }
 
-        /* --- FORMULARIO ADMIN (CREAR / EDITAR) --- */
         function abrirModalAdminCrear() {
             document.getElementById('form-nuevo-producto').reset();
             document.getElementById('prod-id').value = '';
             document.getElementById('modal-admin-title').textContent = 'Nuevo Producto';
-            document.getElementById('btn-save').textContent = 'Publicar Producto';
             imagenTemporalBase64 = "";
-            document.getElementById('prod-categoria').value = 'Gorras';
-            actualizarTallasFormulario();
-            
-            document.querySelectorAll('.chk-talla-gorra').forEach(cb => cb.checked = (cb.value === 'Ajustable'));
+            renderizarSelectCategoriasModal();
             document.getElementById('admin-modal').classList.add('open');
         }
 
@@ -1209,28 +531,18 @@
             document.getElementById('form-nuevo-producto').reset();
             document.getElementById('prod-id').value = prod.id;
             document.getElementById('modal-admin-title').textContent = 'Editar Producto';
-            document.getElementById('btn-save').textContent = 'Guardar Cambios';
-            imagenTemporalBase64 = "";
-
             document.getElementById('prod-nombre').value = prod.nombre;
             document.getElementById('prod-precio').value = prod.precio;
-            document.getElementById('prod-categoria').value = prod.categoria || 'Gorras';
+            document.getElementById('prod-categoria').value = prod.categoria;
             document.getElementById('prod-disponible').value = prod.disponible !== false ? 'true' : 'false';
             document.getElementById('prod-img-url').value = (prod.img && !prod.img.startsWith('data:')) ? prod.img : '';
 
             actualizarTallasFormulario();
 
-            document.querySelectorAll('.chk-talla-gorra, .chk-talla-ropa').forEach(cb => cb.checked = false);
             if (prod.tallas) {
-                const tallasArray = prod.tallas.split(',').map(t => t.trim());
-                const checkboxes = prod.categoria === 'Gorras' 
-                    ? document.querySelectorAll('.chk-talla-gorra') 
-                    : document.querySelectorAll('.chk-talla-ropa');
-                
-                checkboxes.forEach(cb => {
-                    if (tallasArray.includes(cb.value)) {
-                        cb.checked = true;
-                    }
+                const tallasArr = prod.tallas.split(',').map(t => t.trim());
+                document.querySelectorAll('.chk-talla').forEach(cb => {
+                    if (tallasArr.includes(cb.value)) cb.checked = true;
                 });
             }
 
@@ -1238,110 +550,126 @@
         }
 
         function cerrarModalAdmin() { document.getElementById('admin-modal').classList.remove('open'); }
+        function abrirModalLogin() { document.getElementById('login-modal').classList.add('open'); }
+        function cerrarModalLogin() { document.getElementById('login-modal').classList.remove('open'); }
+        function abrirVisorImagen(src) { document.getElementById('image-viewer-img').src = src; document.getElementById('image-viewer-modal').classList.add('open'); }
+        function cerrarVisorImagen() { document.getElementById('image-viewer-modal').classList.remove('open'); }
 
         function convertirImagenADataURL(event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    imagenTemporalBase64 = e.target.result;
-                };
+                reader.onload = e => imagenTemporalBase64 = e.target.result;
                 reader.readAsDataURL(file);
             }
         }
 
         async function guardarProducto(event) {
             event.preventDefault();
-            const btnSave = document.getElementById('btn-save');
             const prodId = document.getElementById('prod-id').value;
             const esEdicion = prodId !== '';
-
-            btnSave.disabled = true;
-            btnSave.textContent = esEdicion ? "Guardando cambios..." : "Guardando en la nube...";
-
             const nombre = document.getElementById('prod-nombre').value;
             const precio = parseFloat(document.getElementById('prod-precio').value);
             const categoria = document.getElementById('prod-categoria').value;
             const disponible = document.getElementById('prod-disponible').value === 'true';
             const urlInput = document.getElementById('prod-img-url').value;
 
-            let checkboxes;
-            if (categoria === 'Gorras') {
-                checkboxes = document.querySelectorAll('.chk-talla-gorra:checked');
-            } else {
-                checkboxes = document.querySelectorAll('.chk-talla-ropa:checked');
-            }
+            const chks = document.querySelectorAll('.chk-talla:checked');
+            let tallas = Array.from(chks).map(c => c.value).join(', ');
+            if (!tallas) tallas = "Única";
 
-            let tallasSeleccionadas = Array.from(checkboxes).map(cb => cb.value);
-            if (tallasSeleccionadas.length === 0) {
-                tallasSeleccionadas = [categoria === 'Gorras' ? "Ajustable" : "Unitalla"];
-            }
+            let imgFinal = imagenTemporalBase64 || urlInput || "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano";
 
-            const tallas = tallasSeleccionadas.join(', ');
-
-            let imgFinal = "";
+            let res;
             if (esEdicion) {
-                const prodOriginal = productos.find(p => p.id == prodId);
-                imgFinal = imagenTemporalBase64 || urlInput || (prodOriginal ? prodOriginal.img : "");
+                res = await supabaseClient.from('productos').update({ nombre, precio, categoria, tallas, disponible, img: imgFinal }).eq('id', prodId);
             } else {
-                imgFinal = imagenTemporalBase64 || urlInput || "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano";
+                res = await supabaseClient.from('productos').insert([{ nombre, precio, categoria, tallas, disponible, img: imgFinal }]);
             }
 
-            let error;
-            if (esEdicion) {
-                const res = await supabaseClient
-                    .from('productos')
-                    .update({ nombre, precio, categoria, tallas, disponible, img: imgFinal })
-                    .eq('id', prodId);
-                error = res.error;
-            } else {
-                const res = await supabaseClient
-                    .from('productos')
-                    .insert([
-                        { nombre, precio, categoria, tallas, disponible, img: imgFinal }
-                    ]);
-                error = res.error;
+            if (res.error) alert("Error: " + res.error.message);
+            else {
+                cerrarModalAdmin();
+                cargarProductosDesdeSupabase();
             }
+        }
 
-            btnSave.disabled = false;
-            btnSave.textContent = esEdicion ? "Guardar Cambios" : "Publicar Producto";
-
-            if (error) {
-                alert("Error al guardar el producto: " + error.message);
-                return;
-            }
-
-            document.getElementById('form-nuevo-producto').reset();
-            imagenTemporalBase64 = "";
-            cerrarModalAdmin();
-            alert(esEdicion ? "¡Producto actualizado con éxito!" : "¡Producto publicado exitosamente!");
+        async function cambiarEstadoStock(id, nuevoEstado) {
+            await supabaseClient.from('productos').update({ disponible: nuevoEstado }).eq('id', id);
             cargarProductosDesdeSupabase();
         }
 
         async function eliminarProducto(id) {
-            if (confirm("¿Estás seguro de eliminar este producto de la tienda para todos?")) {
-                const { error } = await supabaseClient
-                    .from('productos')
-                    .delete()
-                    .eq('id', id);
-
-                if (error) {
-                    alert("Error al eliminar: " + error.message);
-                } else {
-                    alert("Producto eliminado.");
-                    cargarProductosDesdeSupabase();
-                }
+            if (confirm("¿Eliminar producto?")) {
+                await supabaseClient.from('productos').delete().eq('id', id);
+                cargarProductosDesdeSupabase();
             }
         }
 
-        window.addEventListener('scroll', function() {
-            const header = document.getElementById('main-header');
-            if (window.scrollY > 30) {
-                header.classList.add('scrolled');
+        function agregarAlCarrito(nombre, precio, img, idProd) {
+            const sizeSelect = document.getElementById(`size-select-${idProd}`);
+            const talla = sizeSelect ? sizeSelect.value : 'Única';
+            const existe = carrito.find(item => item.nombre === nombre && item.talla === talla);
+            if (existe) existe.cantidad += 1;
+            else carrito.push({ nombre, precio, img, talla, cantidad: 1 });
+            actualizarCarritoUI();
+        }
+
+        function cambiarCantidad(index, cambio) {
+            carrito[index].cantidad += cambio;
+            if (carrito[index].cantidad <= 0) carrito.splice(index, 1);
+            actualizarCarritoUI();
+        }
+
+        function actualizarCarritoUI() {
+            const totalPrendas = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+            const totalDinero = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+
+            document.getElementById('cart-count-label').textContent = `🛒 Carrito (${totalPrendas} prendas)`;
+            document.getElementById('cart-total-label').textContent = `$${totalDinero} MXN →`;
+            document.getElementById('modal-total-label').textContent = `$${totalDinero} MXN`;
+
+            const container = document.getElementById('cart-items-container');
+            if (carrito.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">El carrito está vacío.</p>';
             } else {
-                header.classList.remove('scrolled');
+                container.innerHTML = carrito.map((item, index) => `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <img src="${item.img}" class="cart-item-img">
+                            <div class="cart-item-details">
+                                <div class="cart-item-title">${item.nombre}</div>
+                                <div class="cart-item-size">Talla: <strong>${item.talla}</strong></div>
+                                <div class="cart-item-price">$${item.precio * item.cantidad} MXN</div>
+                            </div>
+                        </div>
+                        <div class="cart-controls">
+                            <button class="btn-qty" onclick="cambiarCantidad(${index}, -1)">-</button>
+                            <span class="cart-qty">${item.cantidad}</span>
+                            <button class="btn-qty" onclick="cambiarCantidad(${index}, 1)">+</button>
+                        </div>
+                    </div>
+                `).join('');
             }
-        });
+        }
+
+        function abrirCarrito() { document.getElementById('cart-modal').classList.add('open'); }
+        function cerrarCarrito() { document.getElementById('cart-modal').classList.remove('open'); }
+
+        function comprarAhoraDirecto(nombre, precio, idProd) {
+            const sizeSelect = document.getElementById(`size-select-${idProd}`);
+            const talla = sizeSelect ? sizeSelect.value : 'Única';
+            let mensaje = `Hola *El iguano*, me interesa comprar ahora mismo el siguiente producto:\n\n- ${nombre} (Talla: ${talla}): $${precio} MXN`;
+            window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
+        }
+
+        function enviarPedidoWhatsApp() {
+            if (carrito.length === 0) return alert("El carrito está vacío.");
+            let lista = carrito.map(i => `- ${i.nombre} (Talla: ${i.talla}) x${i.cantidad}: $${i.precio * i.cantidad} MXN`).join('\n');
+            let totalDinero = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+            let mensaje = `Hola *El iguano*, me gustaría realizar el siguiente pedido:\n\n${lista}\n\n*Cuenta Total:* $${totalDinero} MXN`;
+            window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
+        }
     </script>
 </body>
 </html>
