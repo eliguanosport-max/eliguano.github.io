@@ -361,6 +361,7 @@
             text-transform: uppercase;
         }
 
+        /* Controles de Administración en Tarjetas */
         .btn-delete-admin {
             display: none;
             position: absolute;
@@ -377,11 +378,30 @@
             z-index: 5;
         }
 
+        .btn-edit-admin {
+            display: none;
+            position: absolute;
+            top: 8px;
+            right: 40px;
+            background: rgba(59, 130, 246, 0.9);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 5;
+            align-items: center;
+            justify-content: center;
+        }
+
         .btn-toggle-stock-admin {
             display: none;
             position: absolute;
             top: 8px;
-            right: 42px;
+            left: 8px;
             background: rgba(34, 197, 94, 0.9);
             color: #fff;
             border: none;
@@ -700,7 +720,7 @@
             <button class="category-btn" onclick="filtrarCategoria('Ofertas', this)">Ofertas</button>
         </div>
         <div class="admin-controls">
-            <button class="btn-admin-add" id="btn-admin-add" onclick="abrirModalAdmin()">➕ Agregar</button>
+            <button class="btn-admin-add" id="btn-admin-add" onclick="abrirModalAdminCrear()">➕ Agregar</button>
             <button class="btn-admin-logout" id="btn-admin-logout" onclick="cerrarSesionAdmin()">Salir</button>
         </div>
     </div>
@@ -763,14 +783,16 @@
         </div>
     </div>
 
-    <!-- Modal Formulario Producto Admin -->
+    <!-- Modal Formulario Producto Admin (Crear / Editar) -->
     <div class="modal" id="admin-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Nuevo Producto</h2>
+                <h2 id="modal-admin-title">Nuevo Producto</h2>
                 <button class="close-modal" onclick="cerrarModalAdmin()">&times;</button>
             </div>
-            <form id="form-nuevo-producto" onsubmit="guardarNuevoProducto(event)">
+            <form id="form-nuevo-producto" onsubmit="guardarProducto(event)">
+                <input type="hidden" id="prod-id" value="">
+                
                 <div class="form-group">
                     <label>Nombre del Producto:</label>
                     <input type="text" id="prod-nombre" placeholder="Ej. Playera Deportiva Negra" required>
@@ -799,7 +821,7 @@
                 <div class="form-group" id="group-tallas-gorras">
                     <label>Selecciona Tallas de Gorra:</label>
                     <div class="sizes-checkbox-container">
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="Ajustable" checked> Ajustable</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="Ajustable"> Ajustable</label>
                         <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="Flexfit"> Flexfit</label>
                         <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="S/M"> S/M</label>
                         <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="L/XL"> L/XL</label>
@@ -820,7 +842,7 @@
                 <div class="form-group" id="group-tallas-ropa" style="display: none;">
                     <label>Selecciona Tallas del Producto:</label>
                     <div class="sizes-checkbox-container">
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-ropa" value="Unitalla" checked> Unitalla</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-ropa" value="Unitalla"> Unitalla</label>
                         <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-ropa" value="XS"> XS</label>
                         <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-ropa" value="S"> S</label>
                         <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-ropa" value="M"> M</label>
@@ -831,7 +853,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Cargar Imagen desde tu Celular/PC:</label>
+                    <label>Cargar Nueva Imagen (Opcional si vas a editar):</label>
                     <input type="file" id="prod-file" accept="image/*" onchange="convertirImagenADataURL(event)">
                 </div>
                 <div class="form-group">
@@ -876,7 +898,7 @@
 
         function manejarClicIconoAdmin() {
             if (esAdmin) {
-                abrirModalAdmin();
+                abrirModalAdminCrear();
             } else {
                 abrirModalLogin();
             }
@@ -1008,7 +1030,8 @@
                         <button class="btn-toggle-stock-admin" style="display:block; background:${estaDisponible ? '#ef4444' : '#22c55e'}" onclick="cambiarEstadoStock(${prod.id}, ${!estaDisponible})">
                             ${estaDisponible ? 'Marcar Agotado' : 'Marcar Disponible'}
                         </button>
-                        <button class="btn-delete-admin" style="display:block;" onclick="eliminarProducto(${prod.id})">&times;</button>
+                        <button class="btn-edit-admin" style="display:flex;" onclick="abrirModalAdminEditar(${prod.id})" title="Editar producto">✏️</button>
+                        <button class="btn-delete-admin" style="display:block;" onclick="eliminarProducto(${prod.id})" title="Eliminar producto">&times;</button>
                     ` : ''}
                     <img src="${prod.img}" alt="${prod.nombre}" class="product-img" onclick="abrirVisorImagen('${prod.img}')" title="Haz clic para ampliar">
                     <div class="product-info">
@@ -1165,10 +1188,64 @@
             window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
 
-        function abrirModalAdmin() { 
-            document.getElementById('admin-modal').classList.add('open');
+        /* --- FUNCIONES FORMULARIO ADMIN (CREAR / EDITAR) --- */
+
+        function abrirModalAdminCrear() {
+            document.getElementById('form-nuevo-producto').reset();
+            document.getElementById('prod-id').value = '';
+            document.getElementById('modal-admin-title').textContent = 'Nuevo Producto';
+            document.getElementById('btn-save').textContent = 'Publicar Producto';
+            imagenTemporalBase64 = "";
+
+            // Seleccionar por defecto
+            document.getElementById('prod-categoria').value = 'Gorras';
             actualizarTallasFormulario();
+            
+            // Marcar por defecto "Ajustable"
+            document.querySelectorAll('.chk-talla-gorra').forEach(cb => cb.checked = (cb.value === 'Ajustable'));
+
+            document.getElementById('admin-modal').classList.add('open');
         }
+
+        function abrirModalAdminEditar(idProd) {
+            const prod = productos.find(p => p.id === idProd);
+            if (!prod) return;
+
+            document.getElementById('form-nuevo-producto').reset();
+            document.getElementById('prod-id').value = prod.id;
+            document.getElementById('modal-admin-title').textContent = 'Editar Producto';
+            document.getElementById('btn-save').textContent = 'Guardar Cambios';
+            imagenTemporalBase64 = "";
+
+            // Llenar campos con datos existentes
+            document.getElementById('prod-nombre').value = prod.nombre;
+            document.getElementById('prod-precio').value = prod.precio;
+            document.getElementById('prod-categoria').value = prod.categoria || 'Gorras';
+            document.getElementById('prod-disponible').value = prod.disponible !== false ? 'true' : 'false';
+            document.getElementById('prod-img-url').value = prod.img && !prod.img.startsWith('data:') ? prod.img : '';
+
+            actualizarTallasFormulario();
+
+            // Desmarcar todas las tallas
+            document.querySelectorAll('.chk-talla-gorra, .chk-talla-ropa').forEach(cb => cb.checked = false);
+
+            // Marcar las tallas guardadas del producto
+            if (prod.tallas) {
+                const tallasArray = prod.tallas.split(',').map(t => t.trim());
+                const checkboxes = prod.categoria === 'Gorras' 
+                    ? document.querySelectorAll('.chk-talla-gorra') 
+                    : document.querySelectorAll('.chk-talla-ropa');
+                
+                checkboxes.forEach(cb => {
+                    if (tallasArray.includes(cb.value)) {
+                        cb.checked = true;
+                    }
+                });
+            }
+
+            document.getElementById('admin-modal').classList.add('open');
+        }
+
         function cerrarModalAdmin() { document.getElementById('admin-modal').classList.remove('open'); }
 
         function convertirImagenADataURL(event) {
@@ -1182,12 +1259,15 @@
             }
         }
 
-        async function guardarNuevoProducto(event) {
+        async function guardarProducto(event) {
             event.preventDefault();
 
             const btnSave = document.getElementById('btn-save');
+            const prodId = document.getElementById('prod-id').value;
+            const esEdicion = prodId !== '';
+
             btnSave.disabled = true;
-            btnSave.textContent = "Guardando en la nube...";
+            btnSave.textContent = esEdicion ? "Guardando cambios..." : "Guardando en la nube...";
 
             const nombre = document.getElementById('prod-nombre').value;
             const precio = parseFloat(document.getElementById('prod-precio').value);
@@ -1209,16 +1289,37 @@
             }
 
             const tallas = tallasSeleccionadas.join(', ');
-            let imgFinal = imagenTemporalBase64 || urlInput || "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano";
 
-            const { data, error } = await supabaseClient
-                .from('productos')
-                .insert([
-                    { nombre, precio, categoria, tallas, disponible, img: imgFinal }
-                ]);
+            // Obtener producto original si es edición para conservar la imagen antigua si no se subió una nueva
+            let imgFinal = "";
+            if (esEdicion) {
+                const prodOriginal = productos.find(p => p.id == prodId);
+                imgFinal = imagenTemporalBase64 || urlInput || (prodOriginal ? prodOriginal.img : "");
+            } else {
+                imgFinal = imagenTemporalBase64 || urlInput || "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano";
+            }
+
+            let error;
+
+            if (esEdicion) {
+                // UPDATE en Supabase
+                const res = await supabaseClient
+                    .from('productos')
+                    .update({ nombre, precio, categoria, tallas, disponible, img: imgFinal })
+                    .eq('id', prodId);
+                error = res.error;
+            } else {
+                // INSERT en Supabase
+                const res = await supabaseClient
+                    .from('productos')
+                    .insert([
+                        { nombre, precio, categoria, tallas, disponible, img: imgFinal }
+                    ]);
+                error = res.error;
+            }
 
             btnSave.disabled = false;
-            btnSave.textContent = "Publicar Producto";
+            btnSave.textContent = esEdicion ? "Guardar Cambios" : "Publicar Producto";
 
             if (error) {
                 alert("Error al guardar el producto: " + error.message);
@@ -1228,7 +1329,7 @@
             document.getElementById('form-nuevo-producto').reset();
             imagenTemporalBase64 = "";
             cerrarModalAdmin();
-            alert("¡Producto publicado exitosamente!");
+            alert(esEdicion ? "¡Producto actualizado con éxito!" : "¡Producto publicado exitosamente!");
             cargarProductosDesdeSupabase();
         }
 
