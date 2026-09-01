@@ -482,7 +482,7 @@
             text-transform: uppercase;
         }
 
-        /* Formulario Administrador y Selección de Tallas */
+        /* Formulario Administrador y Selección de Tallas Dinámicas */
         .form-group {
             margin-bottom: 14px;
         }
@@ -506,7 +506,6 @@
             font-size: 0.9rem;
         }
 
-        /* Checkboxes de Tallas */
         .sizes-checkbox-container {
             display: flex;
             flex-wrap: wrap;
@@ -625,24 +624,45 @@
                 </div>
                 <div class="form-group">
                     <label>Categoría:</label>
-                    <select id="prod-categoria">
+                    <select id="prod-categoria" onchange="actualizarTallasFormulario()">
                         <option value="Gorras">Gorras</option>
                         <option value="Ropa Deportiva">Ropa Deportiva</option>
                         <option value="Ofertas">Ofertas</option>
                     </select>
                 </div>
 
-                <!-- DESPLEGABLE / CHECKBOXES DE TALLAS -->
-                <div class="form-group">
-                    <label>Selecciona las Tallas Disponibles:</label>
+                <!-- TALLAS DE GORRAS -->
+                <div class="form-group" id="group-tallas-gorras">
+                    <label>Selecciona Tallas de Gorra:</label>
                     <div class="sizes-checkbox-container">
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla" value="Unitalla / Ajustable" checked> Unitalla</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla" value="XS"> XS</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla" value="S"> S</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla" value="M"> M</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla" value="L"> L</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla" value="XL"> XL</label>
-                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla" value="XXL"> XXL</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="Ajustable" checked> Ajustable</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="Flexfit"> Flexfit</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="S/M"> S/M</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="L/XL"> L/XL</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="6 7/8"> 6 7/8</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="7"> 7</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="7 1/8"> 7 1/8</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="7 1/4"> 7 1/4</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="7 3/8"> 7 3/8</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="7 1/2"> 7 1/2</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="7 5/8"> 7 5/8</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="7 3/4"> 7 3/4</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="7 7/8"> 7 7/8</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-gorra" value="8"> 8</label>
+                    </div>
+                </div>
+
+                <!-- TALLAS OTROS PRODUCTOS -->
+                <div class="form-group" id="group-tallas-ropa" style="display: none;">
+                    <label>Selecciona Tallas del Producto:</label>
+                    <div class="sizes-checkbox-container">
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-ropa" value="Unitalla" checked> Unitalla</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-ropa" value="XS"> XS</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-ropa" value="S"> S</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-ropa" value="M"> M</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-ropa" value="L"> L</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-ropa" value="XL"> XL</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla-ropa" value="XXL"> XXL</label>
                     </div>
                 </div>
 
@@ -678,6 +698,21 @@
         document.addEventListener("DOMContentLoaded", () => {
             cargarProductosDesdeSupabase();
         });
+
+        // Alternar casillas de tallas según categoría elegida
+        function actualizarTallasFormulario() {
+            const cat = document.getElementById('prod-categoria').value;
+            const containerGorras = document.getElementById('group-tallas-gorras');
+            const containerRopa = document.getElementById('group-tallas-ropa');
+
+            if (cat === 'Gorras') {
+                containerGorras.style.display = 'block';
+                containerRopa.style.display = 'none';
+            } else {
+                containerGorras.style.display = 'none';
+                containerRopa.style.display = 'block';
+            }
+        }
 
         function abrirVisorImagen(src) {
             const modal = document.getElementById('image-viewer-modal');
@@ -717,7 +752,7 @@
             }
 
             lista.forEach(prod => {
-                const listaTallas = prod.tallas ? prod.tallas.split(',').map(t => t.trim()) : ['Unitalla / Ajustable'];
+                const listaTallas = prod.tallas ? prod.tallas.split(',').map(t => t.trim()) : ['Ajustable'];
                 const opcionesTallaHTML = listaTallas.map(t => `<option value="${t}">${t}</option>`).join('');
 
                 const card = document.createElement('div');
@@ -746,7 +781,7 @@
 
         function comprarAhoraDirecto(nombre, precio, idProd) {
             const sizeSelect = document.getElementById(`size-select-${idProd}`);
-            const tallaSeleccionada = sizeSelect ? sizeSelect.value : 'Unitalla / Ajustable';
+            const tallaSeleccionada = sizeSelect ? sizeSelect.value : 'Ajustable';
 
             let mensaje = `Hola *El iguano*, me interesa comprar ahora mismo el siguiente producto:\n\n- ${nombre} (Talla: ${tallaSeleccionada}): $${precio} MXN`;
             window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
@@ -783,7 +818,7 @@
 
         function agregarAlCarrito(nombre, precio, img, idProd) {
             const sizeSelect = document.getElementById(`size-select-${idProd}`);
-            const talla = sizeSelect ? sizeSelect.value : 'Unitalla / Ajustable';
+            const talla = sizeSelect ? sizeSelect.value : 'Ajustable';
 
             const existe = carrito.find(item => item.nombre === nombre && item.talla === talla);
             if (existe) {
@@ -880,7 +915,10 @@
             }
         }
 
-        function abrirModalAdmin() { document.getElementById('admin-modal').classList.add('open'); }
+        function abrirModalAdmin() { 
+            document.getElementById('admin-modal').classList.add('open');
+            actualizarTallasFormulario();
+        }
         function cerrarModalAdmin() { document.getElementById('admin-modal').classList.remove('open'); }
 
         function convertirImagenADataURL(event) {
@@ -894,7 +932,6 @@
             }
         }
 
-        // GUARDAR NUEVO PRODUCTO LEYENDO LAS TALLAS SELECCIONADAS
         async function guardarNuevoProducto(event) {
             event.preventDefault();
 
@@ -907,13 +944,17 @@
             const categoria = document.getElementById('prod-categoria').value;
             const urlInput = document.getElementById('prod-img-url').value;
 
-            // Obtener todas las tallas marcadas en los checkboxes
-            const checkboxes = document.querySelectorAll('.chk-talla:checked');
+            let checkboxes;
+            if (categoria === 'Gorras') {
+                checkboxes = document.querySelectorAll('.chk-talla-gorra:checked');
+            } else {
+                checkboxes = document.querySelectorAll('.chk-talla-ropa:checked');
+            }
+
             let tallasSeleccionadas = Array.from(checkboxes).map(cb => cb.value);
 
-            // Si no se marcó ninguna, se establece 'Unitalla / Ajustable' por defecto
             if (tallasSeleccionadas.length === 0) {
-                tallasSeleccionadas = ["Unitalla / Ajustable"];
+                tallasSeleccionadas = [categoria === 'Gorras' ? "Ajustable" : "Unitalla"];
             }
 
             const tallas = tallasSeleccionadas.join(', ');
