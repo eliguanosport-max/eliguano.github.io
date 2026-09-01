@@ -179,7 +179,7 @@
             color: #121212;
             border-color: var(--accent-color);
         }
-        /* SUBFILTROS DE GORRAS */
+        /* SUBFILTROS / MEDIDAS DINÁMICAS POR CATEGORÍA */
         .subcategories-container {
             display: none;
             gap: 8px;
@@ -209,32 +209,6 @@
             color: #000000;
             border-color: #ffffff;
             font-weight: 700;
-        }
-        /* FILTRO DE TALLA */
-        .size-filter-select {
-            background-color: var(--card-bg);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            padding: 8px 14px;
-            border-radius: 25px;
-            white-space: nowrap;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85rem;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .size-filter-select:focus,
-        .size-filter-select:hover {
-            border-color: var(--accent-color);
-        }
-        .size-filter-select optgroup {
-            background-color: #181818;
-            color: var(--text-muted);
-        }
-        .size-filter-select option {
-            background-color: #181818;
-            color: var(--text-main);
         }
         .admin-controls {
             display: flex;
@@ -695,39 +669,9 @@
     <div class="categories-wrapper">
         <div class="categories">
             <button class="category-btn active" onclick="filtrarCategoria('Todas', this)">Todas</button>
-            <button class="category-btn" onclick="filtrarCategoria('Gorras', this)">Gorras ▾</button>
+            <button class="category-btn" onclick="filtrarCategoria('Gorras', this)">Gorras</button>
             <button class="category-btn" onclick="filtrarCategoria('Ropa Deportiva', this)">Ropa Deportiva</button>
             <button class="category-btn" onclick="filtrarCategoria('Ofertas', this)">Ofertas</button>
-
-            <!-- FILTRO DE TALLAS -->
-            <select id="size-filter-select" class="size-filter-select" onchange="ejecutarBusqueda()">
-                <option value="Todas">Talla: Todas</option>
-                <optgroup label="Gorras">
-                    <option value="Ajustable">Ajustable</option>
-                    <option value="Flexfit">Flexfit</option>
-                    <option value="S/M">S/M</option>
-                    <option value="L/XL">L/XL</option>
-                    <option value="6 7/8">6 7/8</option>
-                    <option value="7">7</option>
-                    <option value="7 1/8">7 1/8</option>
-                    <option value="7 1/4">7 1/4</option>
-                    <option value="7 3/8">7 3/8</option>
-                    <option value="7 1/2">7 1/2</option>
-                    <option value="7 5/8">7 5/8</option>
-                    <option value="7 3/4">7 3/4</option>
-                    <option value="7 7/8">7 7/8</option>
-                    <option value="8">8</option>
-                </optgroup>
-                <optgroup label="Ropa / General">
-                    <option value="Unitalla">Unitalla</option>
-                    <option value="XS">XS</option>
-                    <option value="S">S</option>
-                    <option value="M">M</option>
-                    <option value="L">L</option>
-                    <option value="XL">XL</option>
-                    <option value="XXL">XXL</option>
-                </optgroup>
-            </select>
         </div>
         <div class="admin-controls">
             <button class="btn-admin-add" id="btn-admin-add" onclick="abrirModalAdminCrear()">➕ Agregar</button>
@@ -735,14 +679,9 @@
         </div>
     </div>
 
-    <!-- CONTENEDOR DESPLEGABLE DE SUBFILTROS DE GORRAS -->
-    <div class="subcategories-container" id="subcategories-gorras">
-        <span style="font-size:0.75rem; color:var(--text-muted); font-weight:bold; margin-right:4px;">Tipo:</span>
-        <button class="subcategory-btn active" onclick="filtrarSubcategoria('Todas', this)">Todas las Gorras</button>
-        <button class="subcategory-btn" onclick="filtrarSubcategoria('Cerrada', this)">Cerradas (Fitted)</button>
-        <button class="subcategory-btn" onclick="filtrarSubcategoria('Snapback', this)">Snapback / Broche</button>
-        <button class="subcategory-btn" onclick="filtrarSubcategoria('Flexfit', this)">Flexfit</button>
-        <button class="subcategory-btn" onclick="filtrarSubcategoria('Beisbol', this)">Béisbol</button>
+    <!-- CONTENEDOR DINÁMICO DE MEDIDAS / SUBFILTROS -->
+    <div class="subcategories-container" id="subcategories-container">
+        <!-- Se llena dinámicamente según la categoría seleccionada -->
     </div>
 
     <main class="catalog" id="catalog-container">
@@ -893,9 +832,14 @@
         let esAdmin = false;
         let carrito = [];
         let categoriaActual = 'Todas';
-        let subcategoriaGorraActual = 'Todas';
+        let subcategoriaActual = 'Todas';
         let productos = [];
         let imagenTemporalBase64 = "";
+
+        const medidasPorCategoria = {
+            'Gorras': ['Todas', 'Ajustable', 'Flexfit', 'S/M', 'L/XL', '6 7/8', '7', '7 1/8', '7 1/4', '7 3/8', '7 1/2', '7 5/8', '7 3/4', '7 7/8', '8'],
+            'Ropa Deportiva': ['Todas', 'Unitalla', 'XS', 'S', 'M', 'L', 'XL', 'XXL']
+        };
 
         document.addEventListener("DOMContentLoaded", async () => {
             await verificarSesionAdmin();
@@ -1041,7 +985,6 @@
                 const card = document.createElement('div');
                 card.className = `product-card ${estaDisponible ? '' : 'out-of-stock'}`;
                 
-                // Asegurar imagen válida o placeholder si viene null/vacío
                 const imgUrl = (prod.img && prod.img.trim() !== '' && prod.img !== 'null') 
                     ? prod.img 
                     : 'https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano';
@@ -1099,10 +1042,9 @@
             window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
 
-        /* FILTRADO MULTI-NIVEL (TEXTO + CATEGORÍA + SUBFILTRO GORRAS + TALLA) */
+        /* FILTRADO DINÁMICO POR CATEGORÍA Y MEDIDAS */
         function ejecutarBusqueda() {
             const query = document.getElementById('search-input').value.trim().toLowerCase();
-            const tallaSeleccionada = document.getElementById('size-filter-select').value;
             let filtrados = productos;
 
             // 1. Filtrar por Categoría Principal
@@ -1110,26 +1052,16 @@
                 filtrados = filtrados.filter(p => p.categoria === categoriaActual);
             }
 
-            // 2. Filtrar por Subcategoría de Gorra (si aplica)
-            if (categoriaActual === 'Gorras' && subcategoriaGorraActual !== 'Todas') {
-                const subQuery = subcategoriaGorraActual.toLowerCase();
-                filtrados = filtrados.filter(p => {
-                    const enNombre = p.nombre ? p.nombre.toLowerCase().includes(subQuery) : false;
-                    const enTallas = p.tallas ? p.tallas.toLowerCase().includes(subQuery) : false;
-                    return enNombre || enTallas;
-                });
-            }
-
-            // 3. Filtrar por Talla
-            if (tallaSeleccionada !== 'Todas') {
+            // 2. Filtrar por Subcategoría / Medida seleccionada
+            if (subcategoriaActual !== 'Todas') {
                 filtrados = filtrados.filter(p => {
                     if (!p.tallas) return false;
                     const listaTallas = p.tallas.split(',').map(t => t.trim());
-                    return listaTallas.includes(tallaSeleccionada);
+                    return listaTallas.includes(subcategoriaActual);
                 });
             }
 
-            // 4. Filtrar por Texto de Búsqueda
+            // 3. Filtrar por Texto de Búsqueda
             if (query !== '') {
                 filtrados = filtrados.filter(p => p.nombre.toLowerCase().includes(query));
             }
@@ -1137,29 +1069,34 @@
             renderizarCatalogo(filtrados);
         }
 
-        /* SELECCIÓN DE CATEGORÍA Y DESPLIEGUE DE SUBFILTROS */
+        /* SELECCIÓN DE CATEGORÍA Y ACTUALIZACIÓN DE BARRA DE MEDIDAS */
         function filtrarCategoria(categoria, btn) {
             document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             categoriaActual = categoria;
+            subcategoriaActual = 'Todas';
 
-            const subContainer = document.getElementById('subcategories-gorras');
+            const subContainer = document.getElementById('subcategories-container');
 
-            if (categoria === 'Gorras') {
+            if (medidasPorCategoria[categoria]) {
+                const medidas = medidasPorCategoria[categoria];
+                subContainer.innerHTML = medidas.map((medida, index) => `
+                    <button class="subcategory-btn ${index === 0 ? 'active' : ''}" onclick="filtrarSubcategoria('${medida}', this)">${medida}</button>
+                `).join('');
                 subContainer.classList.add('open');
             } else {
+                subContainer.innerHTML = '';
                 subContainer.classList.remove('open');
-                subcategoriaGorraActual = 'Todas'; // Reiniciar subfiltro si cambia de categoría
             }
 
             ejecutarBusqueda();
         }
 
-        /* SELECCIÓN DE SUBFILTRO DE GORRAS */
-        function filtrarSubcategoria(subtipo, btn) {
+        /* SELECCIÓN DE MEDIDA / TALLA ESPECÍFICA */
+        function filtrarSubcategoria(medida, btn) {
             document.querySelectorAll('.subcategory-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            subcategoriaGorraActual = subtipo;
+            subcategoriaActual = medida;
             ejecutarBusqueda();
         }
 
