@@ -225,7 +225,7 @@
             cursor: pointer;
         }
 
-        /* Botón Comprar Ahora (Verde) */
+        /* Botón Comprar Ahora */
         .btn-buy-now {
             width: 100%;
             background-color: #22c55e;
@@ -347,7 +347,6 @@
             margin-bottom: 15px;
         }
 
-        /* Diseños de Items del Carrito */
         .cart-item {
             display: flex;
             justify-content: space-between;
@@ -440,7 +439,6 @@
             text-align: center;
         }
 
-        /* Botón Bote de Basura */
         .btn-remove-item {
             background: none;
             border: none;
@@ -484,7 +482,7 @@
             text-transform: uppercase;
         }
 
-        /* Formulario Administrador */
+        /* Formulario Administrador y Selección de Tallas */
         .form-group {
             margin-bottom: 14px;
         }
@@ -493,10 +491,12 @@
             display: block;
             font-size: 0.85rem;
             color: var(--text-muted);
-            margin-bottom: 5px;
+            margin-bottom: 6px;
         }
 
-        .form-group input, .form-group select {
+        .form-group input[type="text"], 
+        .form-group input[type="number"], 
+        .form-group select {
             width: 100%;
             padding: 10px;
             background-color: var(--card-bg);
@@ -504,6 +504,35 @@
             border-radius: 6px;
             color: var(--text-main);
             font-size: 0.9rem;
+        }
+
+        /* Checkboxes de Tallas */
+        .sizes-checkbox-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            background-color: var(--card-bg);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .size-checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background-color: #2a2a2a;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            user-select: none;
+            border: 1px solid var(--border-color);
+        }
+
+        .size-checkbox-label input[type="checkbox"] {
+            accent-color: var(--accent-color);
+            cursor: pointer;
         }
 
         .btn-save-product {
@@ -602,10 +631,21 @@
                         <option value="Ofertas">Ofertas</option>
                     </select>
                 </div>
+
+                <!-- DESPLEGABLE / CHECKBOXES DE TALLAS -->
                 <div class="form-group">
-                    <label>Tallas Disponibles (separadas por coma):</label>
-                    <input type="text" id="prod-tallas" placeholder="Ej. S, M, L, XL o Ajustable">
+                    <label>Selecciona las Tallas Disponibles:</label>
+                    <div class="sizes-checkbox-container">
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla" value="Unitalla / Ajustable" checked> Unitalla</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla" value="XS"> XS</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla" value="S"> S</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla" value="M"> M</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla" value="L"> L</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla" value="XL"> XL</label>
+                        <label class="size-checkbox-label"><input type="checkbox" class="chk-talla" value="XXL"> XXL</label>
+                    </div>
                 </div>
+
                 <div class="form-group">
                     <label>Cargar Imagen desde tu Celular/PC:</label>
                     <input type="file" id="prod-file" accept="image/*" onchange="convertirImagenADataURL(event)">
@@ -620,13 +660,12 @@
     </div>
 
     <script>
-        // CONFIGURACIÓN DE SUPABASE
         const SUPABASE_URL = "https://ywixgizcadytczxcbubg.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3aXhnaXpjYWR5dGN6eGNidWJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxMzkzNTIsImV4cCI6MjEwMzcxNTM1Mn0.ABIAb8426hAdnJw5nxvGhxorAL6s8RHvlhHkDsb06Ts";
 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const numeroTelefono = "524961228531"; // Tu WhatsApp real
+        const numeroTelefono = "524961228531";
         const PALABRA_CLAVE_ADMIN = "admin123"; 
         const ADMIN_PASSWORD = "iguano2026";    
 
@@ -640,7 +679,6 @@
             cargarProductosDesdeSupabase();
         });
 
-        // Visor de Imagen Grande
         function abrirVisorImagen(src) {
             const modal = document.getElementById('image-viewer-modal');
             const img = document.getElementById('image-viewer-img');
@@ -653,7 +691,6 @@
             modal.classList.remove('open');
         }
 
-        // 1. OBTENER / MOSTRAR PRODUCTOS (SELECT)
         async function cargarProductosDesdeSupabase() {
             const container = document.getElementById('catalog-container');
             container.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">Cargando catálogo...</p>';
@@ -662,7 +699,7 @@
 
             if (error) {
                 console.error("Error al cargar productos:", error);
-                container.innerHTML = '<p style="color: #ef4444; text-align: center; grid-column: 1/-1;">Error al cargar la tienda. Revisa la consola o permisos.</p>';
+                container.innerHTML = '<p style="color: #ef4444; text-align: center; grid-column: 1/-1;">Error al cargar la tienda.</p>';
                 return;
             }
 
@@ -680,8 +717,7 @@
             }
 
             lista.forEach(prod => {
-                // Tallas por defecto si no existen en BD
-                const listaTallas = prod.tallas ? prod.tallas.split(',').map(t => t.trim()) : ['Ajustable'];
+                const listaTallas = prod.tallas ? prod.tallas.split(',').map(t => t.trim()) : ['Unitalla / Ajustable'];
                 const opcionesTallaHTML = listaTallas.map(t => `<option value="${t}">${t}</option>`).join('');
 
                 const card = document.createElement('div');
@@ -708,10 +744,9 @@
             });
         }
 
-        // Comprar directamente por WhatsApp un solo producto especificando su talla
         function comprarAhoraDirecto(nombre, precio, idProd) {
             const sizeSelect = document.getElementById(`size-select-${idProd}`);
-            const tallaSeleccionada = sizeSelect ? sizeSelect.value : 'Ajustable';
+            const tallaSeleccionada = sizeSelect ? sizeSelect.value : 'Unitalla / Ajustable';
 
             let mensaje = `Hola *El iguano*, me interesa comprar ahora mismo el siguiente producto:\n\n- ${nombre} (Talla: ${tallaSeleccionada}): $${precio} MXN`;
             window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
@@ -746,10 +781,9 @@
             ejecutarBusqueda();
         }
 
-        // Funciones del Carrito
         function agregarAlCarrito(nombre, precio, img, idProd) {
             const sizeSelect = document.getElementById(`size-select-${idProd}`);
-            const talla = sizeSelect ? sizeSelect.value : 'Ajustable';
+            const talla = sizeSelect ? sizeSelect.value : 'Unitalla / Ajustable';
 
             const existe = carrito.find(item => item.nombre === nombre && item.talla === talla);
             if (existe) {
@@ -834,7 +868,6 @@
             window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
 
-        // MODO ADMIN
         function activarModoAdmin() {
             const pass = prompt("Acceso Administrador 'El iguano'\nIngresa la contraseña:");
             if (pass === ADMIN_PASSWORD) {
@@ -861,7 +894,7 @@
             }
         }
 
-        // 2. GUARDAR NUEVO PRODUCTO (INSERT)
+        // GUARDAR NUEVO PRODUCTO LEYENDO LAS TALLAS SELECCIONADAS
         async function guardarNuevoProducto(event) {
             event.preventDefault();
 
@@ -872,10 +905,18 @@
             const nombre = document.getElementById('prod-nombre').value;
             const precio = parseFloat(document.getElementById('prod-precio').value);
             const categoria = document.getElementById('prod-categoria').value;
-            const tallasInput = document.getElementById('prod-tallas').value.trim();
             const urlInput = document.getElementById('prod-img-url').value;
 
-            const tallas = tallasInput !== "" ? tallasInput : "Ajustable";
+            // Obtener todas las tallas marcadas en los checkboxes
+            const checkboxes = document.querySelectorAll('.chk-talla:checked');
+            let tallasSeleccionadas = Array.from(checkboxes).map(cb => cb.value);
+
+            // Si no se marcó ninguna, se establece 'Unitalla / Ajustable' por defecto
+            if (tallasSeleccionadas.length === 0) {
+                tallasSeleccionadas = ["Unitalla / Ajustable"];
+            }
+
+            const tallas = tallasSeleccionadas.join(', ');
             let imgFinal = imagenTemporalBase64 || urlInput || "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano";
 
             const { data, error } = await supabaseClient
@@ -899,7 +940,6 @@
             cargarProductosDesdeSupabase();
         }
 
-        // 3. ELIMINAR PRODUCTO (DELETE)
         async function eliminarProducto(id) {
             if (confirm("¿Estás seguro de eliminar este producto de la tienda para todos?")) {
                 const { error } = await supabaseClient
@@ -916,7 +956,6 @@
             }
         }
 
-        // Scroll Header
         window.addEventListener('scroll', function() {
             const header = document.getElementById('main-header');
             if (window.scrollY > 30) {
@@ -926,6 +965,5 @@
             }
         });
     </script>
-    
 </body>
 </html>
