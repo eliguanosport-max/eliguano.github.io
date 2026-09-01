@@ -48,6 +48,7 @@
             justify-content: center;
         }
 
+        /* Icono de Perfil Admin (Esquina superior derecha) */
         .admin-profile-btn {
             position: absolute;
             top: 0;
@@ -207,21 +208,17 @@
             gap: 8px;
         }
 
-        .btn-admin-add, .btn-admin-cat {
+        .btn-admin-add {
             display: none;
             background-color: #22c55e;
             color: #ffffff;
             border: none;
-            padding: 8px 14px;
+            padding: 8px 16px;
             border-radius: 25px;
             font-weight: 700;
             font-size: 0.85rem;
             cursor: pointer;
             white-space: nowrap;
-        }
-
-        .btn-admin-cat {
-            background-color: #3b82f6;
         }
 
         .btn-admin-logout {
@@ -323,6 +320,19 @@
         .product-size-select:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+
+        .btn-buy-now {
+            width: 100%;
+            background-color: #22c55e;
+            color: #ffffff;
+            border: none;
+            padding: 9px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-transform: uppercase;
         }
 
         .btn-add {
@@ -505,6 +515,7 @@
             border-radius: 8px;
             background-color: #252525;
             border: 1px solid var(--border-color);
+            cursor: pointer;
         }
 
         .cart-item-details {
@@ -677,40 +688,13 @@
             cursor: pointer;
             margin-top: 10px;
         }
-
-        /* Lista de gestión de categorías */
-        .category-manage-list {
-            margin-top: 15px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 10px;
-        }
-
-        .category-manage-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            margin-bottom: 8px;
-        }
-
-        .btn-delete-cat {
-            background-color: #ef4444;
-            color: white;
-            border: none;
-            padding: 4px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
     </style>
 </head>
 <body>
 
     <header id="main-header">
         <div class="header-content">
+            <!-- Botón de Icono de Usuario Admin en la esquina superior derecha -->
             <button class="admin-profile-btn" id="admin-profile-btn" onclick="manejarClicIconoAdmin()" title="Mi Cuenta">
                 <svg viewBox="0 0 24 24">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
@@ -729,10 +713,13 @@
     </div>
 
     <div class="categories-wrapper">
-        <div class="categories" id="categories-bar">
-            </div>
+        <div class="categories">
+            <button class="category-btn active" onclick="filtrarCategoria('Todas', this)">Todas</button>
+            <button class="category-btn" onclick="filtrarCategoria('Gorras', this)">Gorras</button>
+            <button class="category-btn" onclick="filtrarCategoria('Ropa Deportiva', this)">Ropa Deportiva</button>
+            <button class="category-btn" onclick="filtrarCategoria('Ofertas', this)">Ofertas</button>
+        </div>
         <div class="admin-controls">
-            <button class="btn-admin-cat" id="btn-admin-cat" onclick="abrirModalCategorias()">🏷️ Categorías</button>
             <button class="btn-admin-add" id="btn-admin-add" onclick="abrirModalAdminCrear()">➕ Agregar</button>
             <button class="btn-admin-logout" id="btn-admin-logout" onclick="cerrarSesionAdmin()">Salir</button>
         </div>
@@ -747,6 +734,7 @@
         <span id="cart-total-label">$0 MXN &rarr;</span>
     </div>
 
+    <!-- Modal Visor de Imagen -->
     <div class="modal" id="image-viewer-modal" style="align-items: center;" onclick="cerrarVisorImagen()">
         <div style="position: relative; max-width: 90vw; max-height: 90vh; display: flex; justify-content: center; align-items: center;" onclick="event.stopPropagation()">
             <button class="close-modal" onclick="cerrarVisorImagen()" style="position: absolute; top: -40px; right: 0; color: #fff; font-size: 2.5rem;">&times;</button>
@@ -754,6 +742,7 @@
         </div>
     </div>
 
+    <!-- Modal Carrito -->
     <div class="modal" id="cart-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -773,6 +762,7 @@
         </div>
     </div>
 
+    <!-- Modal Login -->
     <div class="modal" id="login-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -793,24 +783,7 @@
         </div>
     </div>
 
-    <div class="modal" id="categories-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Administrar Categorías</h2>
-                <button class="close-modal" onclick="cerrarModalCategorias()">&times;</button>
-            </div>
-            <form id="form-nueva-categoria" onsubmit="agregarCategoria(event)">
-                <div class="form-group">
-                    <label>Nueva Categoría:</label>
-                    <input type="text" id="cat-nombre" placeholder="Ej. Chaquetas, Accesorios..." required>
-                </div>
-                <button type="submit" class="btn-save-product">Agregar Categoría</button>
-            </form>
-            <div class="category-manage-list" id="category-manage-list">
-                </div>
-        </div>
-    </div>
-
+    <!-- Modal Formulario Producto Admin (Crear / Editar) -->
     <div class="modal" id="admin-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -831,7 +804,10 @@
                 <div class="form-group">
                     <label>Categoría:</label>
                     <select id="prod-categoria" onchange="actualizarTallasFormulario()">
-                        </select>
+                        <option value="Gorras">Gorras</option>
+                        <option value="Ropa Deportiva">Ropa Deportiva</option>
+                        <option value="Ofertas">Ofertas</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>Estado inicial:</label>
@@ -841,6 +817,7 @@
                     </select>
                 </div>
 
+                <!-- TALLAS DE GORRAS -->
                 <div class="form-group" id="group-tallas-gorras">
                     <label>Selecciona Tallas de Gorra:</label>
                     <div class="sizes-checkbox-container">
@@ -861,6 +838,7 @@
                     </div>
                 </div>
 
+                <!-- TALLAS OTROS PRODUCTOS -->
                 <div class="form-group" id="group-tallas-ropa" style="display: none;">
                     <label>Selecciona Tallas del Producto:</label>
                     <div class="sizes-checkbox-container">
@@ -888,506 +866,259 @@
     </div>
 
     <script>
-        // CONFIGURACIÓN DE SUPABASE Y WHATSAPP
         const SUPABASE_URL = "https://ywixgizcadytczxcbubg.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3aXhnaXpjYWR5dGN6eGNidWJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxMzkzNTIsImV4cCI6MjEwMzcxNTM1Mn0.ABIAb8426hAdnJw5nxvGhxorAL6s8RHvlhHkDsb06Ts";
-        
-        // Reemplaza los ceros por tu número de WhatsApp real (Ej: "524921234567")
-        const NUMERO_WHATSAPP = "520000000000"; 
 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // ESTADO GLOBAL
-        let productos = [];
-        let categorias = ["Gorras", "Ropa Deportiva", "Ofertas"];
-        let carrito = [];
-        let categoriaActual = "Todas";
+        const numeroTelefono = "524961228531";
+
         let esAdmin = false;
-        let imagenTemporalDataURL = "";
+        let carrito = [];
+        let categoriaActual = 'Todas';
+        let productos = [];
+        let imagenTemporalBase64 = "";
 
-        // INICIALIZACIÓN
-        window.onload = async () => {
-            cargarCategoriasGuardadas();
-            renderizarBarraCategorias();
-            renderizarSelectCategorias();
-            await comprobarSesion();
-            await cargarProductosDesdeSupabase();
-        };
-
-        // GESTIÓN DE CATEGORÍAS EN LOCALSTORAGE
-        function cargarCategoriasGuardadas() {
-            const guardadas = localStorage.getItem("iguano_categorias");
-            if (guardadas) {
-                categorias = JSON.parse(guardadas);
-            }
-        }
-
-        function guardarCategorias() {
-            localStorage.setItem("iguano_categorias", JSON.stringify(categorias));
-        }
-
-        function renderizarBarraCategorias() {
-            const contenedor = document.getElementById("categories-bar");
-            let html = `<button class="category-btn ${categoriaActual === 'Todas' ? 'active' : ''}" onclick="filtrarCategoria('Todas', this)">Todas</button>`;
-
-            categorias.forEach(cat => {
-                const activeClass = categoriaActual === cat ? 'active' : '';
-                html += `<button class="category-btn ${activeClass}" onclick="filtrarCategoria('${cat}', this)">${cat}</button>`;
-            });
-
-            contenedor.innerHTML = html;
-        }
-
-        function renderizarSelectCategorias() {
-            const select = document.getElementById("prod-categoria");
-            let html = "";
-            categorias.forEach(cat => {
-                html += `<option value="${cat}">${cat}</option>`;
-            });
-            select.innerHTML = html;
-        }
-
-        function abrirModalCategorias() {
-            renderizarListaAdministrarCategorias();
-            document.getElementById("categories-modal").classList.add("open");
-        }
-
-        function cerrarModalCategorias() {
-            document.getElementById("categories-modal").classList.remove("open");
-        }
-
-        function renderizarListaAdministrarCategorias() {
-            const lista = document.getElementById("category-manage-list");
-            let html = "";
-            categorias.forEach((cat, index) => {
-                html += `
-                    <div class="category-manage-item">
-                        <span>${cat}</span>
-                        <button class="btn-delete-cat" onclick="eliminarCategoria(${index})">Eliminar</button>
-                    </div>
-                `;
-            });
-            lista.innerHTML = html;
-        }
-
-        function agregarCategoria(e) {
-            e.preventDefault();
-            const input = document.getElementById("cat-nombre");
-            const nuevaCat = input.value.trim();
-            if (nuevaCat && !categorias.includes(nuevaCat)) {
-                categorias.push(nuevaCat);
-                guardarCategorias();
-                renderizarBarraCategorias();
-                renderizarSelectCategorias();
-                renderizarListaAdministrarCategorias();
-                input.value = "";
-            }
-        }
-
-        function eliminarCategoria(index) {
-            if (confirm(`¿Eliminar la categoría "${categorias[index]}"?`)) {
-                categorias.splice(index, 1);
-                guardarCategorias();
-                renderizarBarraCategorias();
-                renderizarSelectCategorias();
-                renderizarListaAdministrarCategorias();
-            }
-        }
-
-        // CONTROL DEL HEADER Y SCROLL
-        window.addEventListener("scroll", () => {
-            const header = document.getElementById("main-header");
-            if (window.scrollY > 30) {
-                header.classList.add("scrolled");
-            } else {
-                header.classList.remove("scrolled");
-            }
+        document.addEventListener("DOMContentLoaded", async () => {
+            await verificarSesionAdmin();
+            cargarProductosDesdeSupabase();
         });
 
-        // AUTENTICACIÓN Y ROLES
-        async function comprobarSesion() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) {
+        // Autenticación Supabase
+        async function verificarSesionAdmin() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (user) {
                 esAdmin = true;
-                actualizarInterfazAdmin();
+                actualizarInterfazAdmin(true);
             } else {
                 esAdmin = false;
-                actualizarInterfazAdmin();
+                actualizarInterfazAdmin(false);
             }
-        }
-
-        function actualizarInterfazAdmin() {
-            const btnProfile = document.getElementById("admin-profile-btn");
-            const btnAdd = document.getElementById("btn-admin-add");
-            const btnCat = document.getElementById("btn-admin-cat");
-            const btnLogout = document.getElementById("btn-admin-logout");
-
-            if (esAdmin) {
-                btnProfile.classList.add("logged-in");
-                btnAdd.style.display = "block";
-                btnCat.style.display = "block";
-                btnLogout.style.display = "block";
-            } else {
-                btnProfile.classList.remove("logged-in");
-                btnAdd.style.display = "none";
-                btnCat.style.display = "none";
-                btnLogout.style.display = "none";
-            }
-            renderizarProductos(productos);
         }
 
         function manejarClicIconoAdmin() {
             if (esAdmin) {
-                alert("Sesión iniciada como administrador.");
+                abrirModalAdminCrear();
             } else {
-                document.getElementById("login-modal").classList.add("open");
+                abrirModalLogin();
             }
         }
 
-        function cerrarModalLogin() {
-            document.getElementById("login-modal").classList.remove("open");
+        function actualizarInterfazAdmin(estaAutenticado) {
+            const btnProfile = document.getElementById('admin-profile-btn');
+            const btnAdd = document.getElementById('btn-admin-add');
+            const btnLogout = document.getElementById('btn-admin-logout');
+
+            if (estaAutenticado) {
+                btnProfile.classList.add('logged-in');
+                btnProfile.title = "Sesión Activa - Publicar Producto";
+                btnAdd.style.display = 'block';
+                btnLogout.style.display = 'block';
+            } else {
+                btnProfile.classList.remove('logged-in');
+                btnProfile.title = "Mi Cuenta";
+                btnAdd.style.display = 'none';
+                btnLogout.style.display = 'none';
+            }
         }
 
-        async function iniciarSesionAdmin(e) {
-            e.preventDefault();
-            const email = document.getElementById("login-email").value;
-            const password = document.getElementById("login-password").value;
-            const btnSubmit = document.getElementById("btn-login-submit");
+        async function iniciarSesionAdmin(event) {
+            event.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const btnSubmit = document.getElementById('btn-login-submit');
 
-            btnSubmit.innerText = "Cargando...";
             btnSubmit.disabled = true;
+            btnSubmit.textContent = "Verificando...";
 
             const { data, error } = await supabaseClient.auth.signInWithPassword({
                 email: email,
                 password: password,
             });
 
+            btnSubmit.disabled = false;
+            btnSubmit.textContent = "INICIAR SESIÓN";
+
             if (error) {
-                alert("Error de autenticación: " + error.message);
-            } else {
-                esAdmin = true;
-                actualizarInterfazAdmin();
-                cerrarModalLogin();
+                alert("Error al iniciar sesión: " + error.message);
+                return;
             }
 
-            btnSubmit.innerText = "INICIAR SESIÓN";
-            btnSubmit.disabled = false;
+            esAdmin = true;
+            actualizarInterfazAdmin(true);
+            cerrarModalLogin();
+            document.getElementById('form-login-admin').reset();
+            renderizarCatalogo(productos);
+            alert("¡Bienvenido al panel de administración!");
         }
 
         async function cerrarSesionAdmin() {
-            await supabaseClient.auth.signOut();
-            esAdmin = false;
-            actualizarInterfazAdmin();
+            if (confirm("¿Deseas cerrar la sesión?")) {
+                await supabaseClient.auth.signOut();
+                esAdmin = false;
+                actualizarInterfazAdmin(false);
+                renderizarCatalogo(productos);
+                alert("Sesión cerrada.");
+            }
         }
 
-        // LECTURA DE PRODUCTOS (SUPABASE)
+        function abrirModalLogin() { document.getElementById('login-modal').classList.add('open'); }
+        function cerrarModalLogin() { document.getElementById('login-modal').classList.remove('open'); }
+
+        function actualizarTallasFormulario() {
+            const cat = document.getElementById('prod-categoria').value;
+            const containerGorras = document.getElementById('group-tallas-gorras');
+            const containerRopa = document.getElementById('group-tallas-ropa');
+
+            if (cat === 'Gorras') {
+                containerGorras.style.display = 'block';
+                containerRopa.style.display = 'none';
+            } else {
+                containerGorras.style.display = 'none';
+                containerRopa.style.display = 'block';
+            }
+        }
+
+        function abrirVisorImagen(src) {
+            const modal = document.getElementById('image-viewer-modal');
+            const img = document.getElementById('image-viewer-img');
+            img.src = src;
+            modal.classList.add('open');
+        }
+
+        function cerrarVisorImagen() {
+            const modal = document.getElementById('image-viewer-modal');
+            modal.classList.remove('open');
+        }
+
         async function cargarProductosDesdeSupabase() {
-            const contenedor = document.getElementById("catalog-container");
-            const { data, error } = await supabaseClient
-                .from("productos")
-                .select("*")
-                .order("created_at", { ascending: false });
+            const container = document.getElementById('catalog-container');
+            container.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">Cargando catálogo...</p>';
+
+            const { data, error } = await supabaseClient.from('productos').select('*').order('id', { ascending: false });
 
             if (error) {
-                contenedor.innerHTML = `<p style="color: #ef4444; text-align: center; grid-column: 1/-1;">Error al cargar catálogo: ${error.message}</p>`;
+                console.error("Error al cargar productos:", error);
+                container.innerHTML = '<p style="color: #ef4444; text-align: center; grid-column: 1/-1;">Error al cargar la tienda.</p>';
                 return;
             }
 
             productos = data || [];
-            renderizarProductos(productos);
-        }
-
-        function renderizarProductos(lista) {
-            const contenedor = document.getElementById("catalog-container");
-            if (lista.length === 0) {
-                contenedor.innerHTML = `<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">No hay productos disponibles.</p>`;
-                return;
-            }
-
-            let html = "";
-            lista.forEach(p => {
-                const disponible = p.disponible !== false;
-                const outOfStockClass = disponible ? "" : "out-of-stock";
-                
-                // Formatear tallas
-                let tallasArray = [];
-                if (Array.isArray(p.tallas)) {
-                    tallasArray = p.tallas;
-                } else if (typeof p.tallas === "string") {
-                    tallasArray = p.tallas.split(",").map(t => t.trim());
-                }
-
-                let optionsTallas = "";
-                if (tallasArray.length > 0) {
-                    tallasArray.forEach(t => {
-                        optionsTallas += `<option value="${t}">${t}</option>`;
-                    });
-                } else {
-                    optionsTallas = `<option value="Única">Talla Única</option>`;
-                }
-
-                const displayAdminControls = esAdmin ? "flex" : "none";
-
-                html += `
-                    <div class="product-card ${outOfStockClass}">
-                        ${!disponible ? '<span class="badge-out-of-stock">Agotado</span>' : ''}
-                        
-                        <button class="btn-delete-admin" style="display: ${displayAdminControls}" onclick="eliminarProducto('${p.id}')">&times;</button>
-                        <button class="btn-edit-admin" style="display: ${displayAdminControls}" onclick="abrirModalAdminEditar('${p.id}')">✏️</button>
-                        <button class="btn-toggle-stock-admin" style="display: ${displayAdminControls}" onclick="cambiarDisponibilidad('${p.id}', ${!disponible})">
-                            ${disponible ? 'Agotar' : 'Activar'}
-                        </button>
-
-                        <img src="${p.imagen_url || 'https://via.placeholder.com/300'}" alt="${p.nombre}" class="product-img" onclick="abrirVisorImagen('${p.imagen_url}')">
-                        
-                        <div class="product-info">
-                            <h3 class="product-title">${p.nombre}</h3>
-                            <div class="product-price">$${p.precio} MXN</div>
-                            
-                            <select class="product-size-select" id="size-select-${p.id}" ${!disponible ? 'disabled' : ''}>
-                                ${optionsTallas}
-                            </select>
-
-                            ${disponible ? 
-                                `<button class="btn-add" onclick="agregarAlCarrito('${p.id}')">Agregar</button>` :
-                                `<button class="btn-disabled" disabled>Agotado</button>`
-                            }
-                        </div>
-                    </div>
-                `;
-            });
-
-            contenedor.innerHTML = html;
-        }
-
-        // BÚSQUEDA Y FILTRADO
-        function filtrarCategoria(cat, elemento) {
-            categoriaActual = cat;
-            document.querySelectorAll(".category-btn").forEach(btn => btn.classList.remove("active"));
-            elemento.classList.add("active");
             ejecutarBusqueda();
         }
 
+        function renderizarCatalogo(lista) {
+            const container = document.getElementById('catalog-container');
+            container.innerHTML = '';
+
+            if (lista.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">No hay productos disponibles por ahora.</p>';
+                return;
+            }
+
+            lista.forEach(prod => {
+                const estaDisponible = prod.disponible !== false;
+                const listaTallas = prod.tallas ? prod.tallas.split(',').map(t => t.trim()) : ['Ajustable'];
+                const opcionesTallaHTML = listaTallas.map(t => `<option value="${t}">${t}</option>`).join('');
+
+                const card = document.createElement('div');
+                card.className = `product-card ${estaDisponible ? '' : 'out-of-stock'}`;
+                
+                card.innerHTML = `
+                    ${!estaDisponible ? `<div class="badge-out-of-stock">Agotado</div>` : ''}
+                    ${esAdmin ? `
+                        <button class="btn-toggle-stock-admin" style="display:block; background:${estaDisponible ? '#ef4444' : '#22c55e'}" onclick="cambiarEstadoStock(${prod.id}, ${!estaDisponible})">
+                            ${estaDisponible ? 'Marcar Agotado' : 'Marcar Disponible'}
+                        </button>
+                        <button class="btn-edit-admin" style="display:flex;" onclick="abrirModalAdminEditar(${prod.id})" title="Editar producto">✏️</button>
+                        <button class="btn-delete-admin" style="display:block;" onclick="eliminarProducto(${prod.id})" title="Eliminar producto">&times;</button>
+                    ` : ''}
+                    <img src="${prod.img}" alt="${prod.nombre}" class="product-img" onclick="abrirVisorImagen('${prod.img}')" title="Haz clic para ampliar">
+                    <div class="product-info">
+                        <div class="product-title">${prod.nombre}</div>
+                        <div class="product-price">$${prod.precio} MXN</div>
+                        
+                        <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:4px;">Talla:</label>
+                        <select class="product-size-select" id="size-select-${prod.id}" ${!estaDisponible ? 'disabled' : ''}>
+                            ${opcionesTallaHTML}
+                        </select>
+
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                            ${estaDisponible ? `
+                                <button class="btn-buy-now" onclick="comprarAhoraDirecto('${prod.nombre}', ${prod.precio}, ${prod.id})">⚡ Comprar ahora</button>
+                                <button class="btn-add" onclick="agregarAlCarrito('${prod.nombre}', ${prod.precio}, '${prod.img}', ${prod.id})">+ Agregar al carrito</button>
+                            ` : `
+                                <button class="btn-disabled" disabled>Agotado</button>
+                            `}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        async function cambiarEstadoStock(id, nuevoEstado) {
+            const { error } = await supabaseClient
+                .from('productos')
+                .update({ disponible: nuevoEstado })
+                .eq('id', id);
+
+            if (error) {
+                alert("Error al actualizar estado: " + error.message);
+            } else {
+                cargarProductosDesdeSupabase();
+            }
+        }
+
+        function comprarAhoraDirecto(nombre, precio, idProd) {
+            const sizeSelect = document.getElementById(`size-select-${idProd}`);
+            const tallaSeleccionada = sizeSelect ? sizeSelect.value : 'Ajustable';
+
+            let mensaje = `Hola *El iguano*, me interesa comprar ahora mismo el siguiente producto:\n\n- ${nombre} (Talla: ${tallaSeleccionada}): $${precio} MXN`;
+            window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
+        }
+
         function ejecutarBusqueda() {
-            const query = document.getElementById("search-input").value.toLowerCase();
+            const query = document.getElementById('search-input').value.trim();
+
             let filtrados = productos;
 
-            if (categoriaActual !== "Todas") {
+            if (categoriaActual !== 'Todas') {
                 filtrados = filtrados.filter(p => p.categoria === categoriaActual);
             }
 
-            if (query) {
-                filtrados = filtrados.filter(p => p.nombre.toLowerCase().includes(query));
+            if (query !== '') {
+                filtrados = filtrados.filter(p => p.nombre.toLowerCase().includes(query.toLowerCase()));
             }
 
-            renderizarProductos(filtrados);
+            renderizarCatalogo(filtrados);
         }
 
-        // IMÁGENES Y VISOR
-        function abrirVisorImagen(url) {
-            if (!url) return;
-            document.getElementById("image-viewer-img").src = url;
-            document.getElementById("image-viewer-modal").classList.add("open");
+        function filtrarCategoria(categoria, btn) {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            categoriaActual = categoria;
+            ejecutarBusqueda();
         }
 
-        function cerrarVisorImagen() {
-            document.getElementById("image-viewer-modal").classList.remove("open");
-        }
+        function agregarAlCarrito(nombre, precio, img, idProd) {
+            const sizeSelect = document.getElementById(`size-select-${idProd}`);
+            const talla = sizeSelect ? sizeSelect.value : 'Ajustable';
 
-        function convertirImagenADataURL(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                imagenTemporalDataURL = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function procesarUrlDrive(url) {
-            if (!url) return "";
-            if (url.includes("drive.google.com")) {
-                const match = url.match(/\/d\/([^\/]+)/) || url.match(/id=([^&]+)/);
-                if (match && match[1]) {
-                    return `https://lh3.googleusercontent.com/u/0/d/${match[1]}`;
-                }
-            }
-            return url;
-        }
-
-        // CREAR / EDITAR / ELIMINAR PRODUCTOS (ADMIN)
-        function actualizarTallasFormulario() {
-            const cat = document.getElementById("prod-categoria").value;
-            const groupGorras = document.getElementById("group-tallas-gorras");
-            const groupRopa = document.getElementById("group-tallas-ropa");
-
-            if (cat === "Gorras") {
-                groupGorras.style.display = "block";
-                groupRopa.style.display = "none";
+            const existe = carrito.find(item => item.nombre === nombre && item.talla === talla);
+            if (existe) {
+                existe.cantidad += 1;
             } else {
-                groupGorras.style.display = "none";
-                groupRopa.style.display = "block";
+                carrito.push({ nombre, precio, img, talla, cantidad: 1 });
             }
-        }
-
-        function abrirModalAdminCrear() {
-            document.getElementById("modal-admin-title").innerText = "Nuevo Producto";
-            document.getElementById("prod-id").value = "";
-            document.getElementById("prod-nombre").value = "";
-            document.getElementById("prod-precio").value = "";
-            document.getElementById("prod-disponible").value = "true";
-            document.getElementById("prod-file").value = "";
-            document.getElementById("prod-img-url").value = "";
-            imagenTemporalDataURL = "";
-
-            document.querySelectorAll(".chk-talla-gorra, .chk-talla-ropa").forEach(c => c.checked = false);
-            
-            actualizarTallasFormulario();
-            document.getElementById("admin-modal").classList.add("open");
-        }
-
-        function abrirModalAdminEditar(id) {
-            const p = productos.find(item => item.id == id);
-            if (!p) return;
-
-            document.getElementById("modal-admin-title").innerText = "Editar Producto";
-            document.getElementById("prod-id").value = p.id;
-            document.getElementById("prod-nombre").value = p.nombre;
-            document.getElementById("prod-precio").value = p.precio;
-            document.getElementById("prod-categoria").value = p.categoria || "Gorras";
-            document.getElementById("prod-disponible").value = p.disponible !== false ? "true" : "false";
-            document.getElementById("prod-img-url").value = p.imagen_url || "";
-            document.getElementById("prod-file").value = "";
-            imagenTemporalDataURL = "";
-
-            actualizarTallasFormulario();
-
-            // Marcar tallas seleccionadas
-            let tallasArray = Array.isArray(p.tallas) ? p.tallas : (p.tallas ? p.tallas.split(",") : []);
-            tallasArray = tallasArray.map(t => t.trim());
-
-            document.querySelectorAll(".chk-talla-gorra, .chk-talla-ropa").forEach(chk => {
-                chk.checked = tallasArray.includes(chk.value);
-            });
-
-            document.getElementById("admin-modal").classList.add("open");
-        }
-
-        function cerrarModalAdmin() {
-            document.getElementById("admin-modal").classList.remove("open");
-        }
-
-        async function guardarProducto(e) {
-            e.preventDefault();
-            const id = document.getElementById("prod-id").value;
-            const nombre = document.getElementById("prod-nombre").value.trim();
-            const precio = parseFloat(document.getElementById("prod-precio").value);
-            const categoria = document.getElementById("prod-categoria").value;
-            const disponible = document.getElementById("prod-disponible").value === "true";
-            
-            // Obtener tallas seleccionadas
-            const tallasSeleccionadas = [];
-            const selectorClass = categoria === "Gorras" ? ".chk-talla-gorra" : ".chk-talla-ropa";
-            document.querySelectorAll(`${selectorClass}:checked`).forEach(c => tallasSeleccionadas.push(c.value));
-
-            // Procesar URL de Imagen
-            let urlImagen = procesarUrlDrive(document.getElementById("prod-img-url").value.trim());
-            if (imagenTemporalDataURL) {
-                urlImagen = imagenTemporalDataURL;
-            }
-
-            const btnSave = document.getElementById("btn-save");
-            btnSave.innerText = "Guardando...";
-            btnSave.disabled = true;
-
-            const payload = {
-                nombre,
-                precio,
-                categoria,
-                disponible,
-                tallas: tallasSeleccionadas
-            };
-
-            if (urlImagen) {
-                payload.imagen_url = urlImagen;
-            }
-
-            let error;
-            if (id) {
-                // Actualizar existente
-                const res = await supabaseClient.from("productos").update(payload).eq("id", id);
-                error = res.error;
-            } else {
-                // Crear nuevo
-                const res = await supabaseClient.from("productos").insert([payload]);
-                error = res.error;
-            }
-
-            if (error) {
-                alert("Error al guardar: " + error.message);
-            } else {
-                await cargarProductosDesdeSupabase();
-                cerrarModalAdmin();
-            }
-
-            btnSave.innerText = "Publicar Producto";
-            btnSave.disabled = false;
-        }
-
-        async function cambiarDisponibilidad(id, nuevoEstado) {
-            const { error } = await supabaseClient
-                .from("productos")
-                .update({ disponible: nuevoEstado })
-                .eq("id", id);
-
-            if (error) {
-                alert("Error al cambiar estado: " + error.message);
-            } else {
-                await cargarProductosDesdeSupabase();
-            }
-        }
-
-        async function eliminarProducto(id) {
-            if (!confirm("¿Estás seguro de eliminar este producto del catálogo?")) return;
-
-            const { error } = await supabaseClient.from("productos").delete().eq("id", id);
-            if (error) {
-                alert("Error al eliminar: " + error.message);
-            } else {
-                await cargarProductosDesdeSupabase();
-            }
-        }
-
-        // CARRITO Y WHATSAPP
-        function agregarAlCarrito(id) {
-            const p = productos.find(item => item.id == id);
-            if (!p) return;
-
-            const sizeSelect = document.getElementById(`size-select-${id}`);
-            const tallaSeleccionada = sizeSelect ? sizeSelect.value : "Única";
-
-            const itemExistente = carrito.find(item => item.id == id && item.talla === tallaSeleccionada);
-
-            if (itemExistente) {
-                itemExistente.cantidad++;
-            } else {
-                carrito.push({
-                    id: p.id,
-                    nombre: p.nombre,
-                    precio: p.precio,
-                    talla: tallaSeleccionada,
-                    imagen: p.imagen_url,
-                    cantidad: 1
-                });
-            }
-
             actualizarCarritoUI();
         }
 
-        function cambiarCantidad(index, delta) {
-            carrito[index].cantidad += delta;
+        function cambiarCantidad(index, cambio) {
+            carrito[index].cantidad += cambio;
             if (carrito[index].cantidad <= 0) {
-                carrito.splice(index, 1);
+                eliminarDelCarrito(index);
+                return;
             }
             actualizarCarritoUI();
         }
@@ -1398,29 +1129,33 @@
         }
 
         function actualizarCarritoUI() {
+            const countLabel = document.getElementById('cart-count-label');
+            const totalLabel = document.getElementById('cart-total-label');
+            const modalTotalLabel = document.getElementById('modal-total-label');
+            const itemsContainer = document.getElementById('cart-items-container');
+
             const totalPrendas = carrito.reduce((sum, item) => sum + item.cantidad, 0);
-            const totalPrecio = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+            const totalDinero = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
 
-            document.getElementById("cart-count-label").innerText = `🛒 Carrito (${totalPrendas} prendas)`;
-            document.getElementById("cart-total-label").innerText = `$${totalPrecio} MXN \u2192`;
-            document.getElementById("modal-total-label").innerText = `$${totalPrecio} MXN`;
+            countLabel.textContent = `🛒 Carrito (${totalPrendas} ${totalPrendas === 1 ? 'prenda' : 'prendas'})`;
+            totalLabel.textContent = `$${totalDinero} MXN →`;
+            modalTotalLabel.textContent = `$${totalDinero} MXN`;
 
-            const container = document.getElementById("cart-items-container");
             if (carrito.length === 0) {
-                container.innerHTML = `<p style="color: var(--text-muted); text-align: center;">El carrito está vacío.</p>`;
-                return;
-            }
-
-            let html = "";
-            carrito.forEach((item, index) => {
-                html += `
-                    <div class="cart-item">
+                itemsContainer.innerHTML = '<p style="color: var(--text-muted); text-align: center;">El carrito está vacío.</p>';
+            } else {
+                itemsContainer.innerHTML = '';
+                carrito.forEach((item, index) => {
+                    const subtotal = item.precio * item.cantidad;
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'cart-item';
+                    itemElement.innerHTML = `
                         <div class="cart-item-info">
-                            <img src="${item.imagen || 'https://via.placeholder.com/50'}" class="cart-item-img" alt="${item.nombre}">
+                            <img src="${item.img}" alt="${item.nombre}" class="cart-item-img" onclick="abrirVisorImagen('${item.img}')">
                             <div class="cart-item-details">
-                                <span class="cart-item-title">${item.nombre}</span>
-                                <span class="cart-item-size">Talla: ${item.talla}</span>
-                                <span class="cart-item-price">$${item.precio * item.cantidad} MXN</span>
+                                <div class="cart-item-title">${item.nombre}</div>
+                                <div class="cart-item-size">Talla: <strong>${item.talla}</strong></div>
+                                <div class="cart-item-price">$${subtotal} MXN <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">($${item.precio} c/u)</span></div>
                             </div>
                         </div>
                         <div class="cart-actions">
@@ -1429,46 +1164,199 @@
                                 <span class="cart-qty">${item.cantidad}</span>
                                 <button class="btn-qty" onclick="cambiarCantidad(${index}, 1)">+</button>
                             </div>
-                            <button class="btn-remove-item" onclick="eliminarDelCarrito(${index})">&times;</button>
+                            <button class="btn-remove-item" onclick="eliminarDelCarrito(${index})" title="Eliminar producto">🗑️</button>
                         </div>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
+                    `;
+                    itemsContainer.appendChild(itemElement);
+                });
+            }
         }
 
-        function abrirCarrito() {
-            document.getElementById("cart-modal").classList.add("open");
-        }
-
-        function cerrarCarrito() {
-            document.getElementById("cart-modal").classList.remove("open");
-        }
+        function abrirCarrito() { document.getElementById('cart-modal').classList.add('open'); }
+        function cerrarCarrito() { document.getElementById('cart-modal').classList.remove('open'); }
 
         function enviarPedidoWhatsApp() {
             if (carrito.length === 0) {
-                alert("El carrito está vacío.");
+                alert("Agrega al menos un producto al carrito antes de realizar el pedido.");
+                return;
+            }
+            let listaProductos = carrito.map(item => `- ${item.nombre} (Talla: ${item.talla}) x${item.cantidad}: $${item.precio * item.cantidad} MXN`).join('\n');
+            let totalPrendas = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+            let totalDinero = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+            
+            let mensaje = `Hola *El iguano*, me gustaría realizar el siguiente pedido desde la página web:\n\n${listaProductos}\n\n*Total de prendas:* ${totalPrendas}\n*Cuenta Total:* $${totalDinero} MXN`;
+            window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
+        }
+
+        /* --- FUNCIONES FORMULARIO ADMIN (CREAR / EDITAR) --- */
+
+        function abrirModalAdminCrear() {
+            document.getElementById('form-nuevo-producto').reset();
+            document.getElementById('prod-id').value = '';
+            document.getElementById('modal-admin-title').textContent = 'Nuevo Producto';
+            document.getElementById('btn-save').textContent = 'Publicar Producto';
+            imagenTemporalBase64 = "";
+
+            // Seleccionar por defecto
+            document.getElementById('prod-categoria').value = 'Gorras';
+            actualizarTallasFormulario();
+            
+            // Marcar por defecto "Ajustable"
+            document.querySelectorAll('.chk-talla-gorra').forEach(cb => cb.checked = (cb.value === 'Ajustable'));
+
+            document.getElementById('admin-modal').classList.add('open');
+        }
+
+        function abrirModalAdminEditar(idProd) {
+            const prod = productos.find(p => p.id === idProd);
+            if (!prod) return;
+
+            document.getElementById('form-nuevo-producto').reset();
+            document.getElementById('prod-id').value = prod.id;
+            document.getElementById('modal-admin-title').textContent = 'Editar Producto';
+            document.getElementById('btn-save').textContent = 'Guardar Cambios';
+            imagenTemporalBase64 = "";
+
+            // Llenar campos con datos existentes
+            document.getElementById('prod-nombre').value = prod.nombre;
+            document.getElementById('prod-precio').value = prod.precio;
+            document.getElementById('prod-categoria').value = prod.categoria || 'Gorras';
+            document.getElementById('prod-disponible').value = prod.disponible !== false ? 'true' : 'false';
+            document.getElementById('prod-img-url').value = prod.img && !prod.img.startsWith('data:') ? prod.img : '';
+
+            actualizarTallasFormulario();
+
+            // Desmarcar todas las tallas
+            document.querySelectorAll('.chk-talla-gorra, .chk-talla-ropa').forEach(cb => cb.checked = false);
+
+            // Marcar las tallas guardadas del producto
+            if (prod.tallas) {
+                const tallasArray = prod.tallas.split(',').map(t => t.trim());
+                const checkboxes = prod.categoria === 'Gorras' 
+                    ? document.querySelectorAll('.chk-talla-gorra') 
+                    : document.querySelectorAll('.chk-talla-ropa');
+                
+                checkboxes.forEach(cb => {
+                    if (tallasArray.includes(cb.value)) {
+                        cb.checked = true;
+                    }
+                });
+            }
+
+            document.getElementById('admin-modal').classList.add('open');
+        }
+
+        function cerrarModalAdmin() { document.getElementById('admin-modal').classList.remove('open'); }
+
+        function convertirImagenADataURL(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagenTemporalBase64 = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function guardarProducto(event) {
+            event.preventDefault();
+
+            const btnSave = document.getElementById('btn-save');
+            const prodId = document.getElementById('prod-id').value;
+            const esEdicion = prodId !== '';
+
+            btnSave.disabled = true;
+            btnSave.textContent = esEdicion ? "Guardando cambios..." : "Guardando en la nube...";
+
+            const nombre = document.getElementById('prod-nombre').value;
+            const precio = parseFloat(document.getElementById('prod-precio').value);
+            const categoria = document.getElementById('prod-categoria').value;
+            const disponible = document.getElementById('prod-disponible').value === 'true';
+            const urlInput = document.getElementById('prod-img-url').value;
+
+            let checkboxes;
+            if (categoria === 'Gorras') {
+                checkboxes = document.querySelectorAll('.chk-talla-gorra:checked');
+            } else {
+                checkboxes = document.querySelectorAll('.chk-talla-ropa:checked');
+            }
+
+            let tallasSeleccionadas = Array.from(checkboxes).map(cb => cb.value);
+
+            if (tallasSeleccionadas.length === 0) {
+                tallasSeleccionadas = [categoria === 'Gorras' ? "Ajustable" : "Unitalla"];
+            }
+
+            const tallas = tallasSeleccionadas.join(', ');
+
+            // Obtener producto original si es edición para conservar la imagen antigua si no se subió una nueva
+            let imgFinal = "";
+            if (esEdicion) {
+                const prodOriginal = productos.find(p => p.id == prodId);
+                imgFinal = imagenTemporalBase64 || urlInput || (prodOriginal ? prodOriginal.img : "");
+            } else {
+                imgFinal = imagenTemporalBase64 || urlInput || "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano";
+            }
+
+            let error;
+
+            if (esEdicion) {
+                // UPDATE en Supabase
+                const res = await supabaseClient
+                    .from('productos')
+                    .update({ nombre, precio, categoria, tallas, disponible, img: imgFinal })
+                    .eq('id', prodId);
+                error = res.error;
+            } else {
+                // INSERT en Supabase
+                const res = await supabaseClient
+                    .from('productos')
+                    .insert([
+                        { nombre, precio, categoria, tallas, disponible, img: imgFinal }
+                    ]);
+                error = res.error;
+            }
+
+            btnSave.disabled = false;
+            btnSave.textContent = esEdicion ? "Guardar Cambios" : "Publicar Producto";
+
+            if (error) {
+                alert("Error al guardar el producto: " + error.message);
                 return;
             }
 
-            let mensaje = "¡Hola! Quisiera realizar el siguiente pedido:\n\n";
-            let total = 0;
-
-            carrito.forEach((item, i) => {
-                const subtotal = item.precio * item.cantidad;
-                total += subtotal;
-                mensaje += `${i + 1}. *${item.nombre}*\n`;
-                mensaje += `   - Talla: ${item.talla}\n`;
-                mensaje += `   - Cantidad: ${item.cantidad}\n`;
-                mensaje += `   - Subtotal: $${subtotal} MXN\n\n`;
-            });
-
-            mensaje += `*Total a pagar: $${total} MXN*`;
-
-            const url = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(mensaje)}`;
-            window.open(url, "_blank");
+            document.getElementById('form-nuevo-producto').reset();
+            imagenTemporalBase64 = "";
+            cerrarModalAdmin();
+            alert(esEdicion ? "¡Producto actualizado con éxito!" : "¡Producto publicado exitosamente!");
+            cargarProductosDesdeSupabase();
         }
+
+        async function eliminarProducto(id) {
+            if (confirm("¿Estás seguro de eliminar este producto de la tienda para todos?")) {
+                const { error } = await supabaseClient
+                    .from('productos')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) {
+                    alert("Error al eliminar: " + error.message);
+                } else {
+                    alert("Producto eliminado.");
+                    cargarProductosDesdeSupabase();
+                }
+            }
+        }
+
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('main-header');
+            if (window.scrollY > 30) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
     </script>
 </body>
 </html>
