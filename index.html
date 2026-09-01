@@ -28,7 +28,7 @@
             padding-bottom: 90px;
         }
 
-        /* Header Dinámico */
+        /* Header */
         header {
             background-color: #181818;
             padding: 20px 15px 15px 15px;
@@ -88,7 +88,7 @@
             margin-top: 0;
         }
 
-        /* Barra de Búsqueda */
+        /* Búsqueda */
         .search-container {
             padding: 12px 15px 5px 15px;
             background-color: var(--bg-color);
@@ -110,7 +110,7 @@
             border-color: var(--accent-color);
         }
 
-        /* Categorías y Botón Admin */
+        /* Categorías y Acciones Admin */
         .categories-wrapper {
             display: flex;
             align-items: center;
@@ -148,6 +148,23 @@
             border-color: var(--accent-color);
         }
 
+        .admin-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-admin-login {
+            background-color: #2a2a2a;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 8px 14px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
         .btn-admin-add {
             display: none;
             background-color: #22c55e;
@@ -157,6 +174,19 @@
             border-radius: 25px;
             font-weight: 700;
             font-size: 0.85rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .btn-admin-logout {
+            display: none;
+            background-color: #ef4444;
+            color: #ffffff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.8rem;
             cursor: pointer;
             white-space: nowrap;
         }
@@ -178,6 +208,26 @@
             justify-content: space-between;
             border: 1px solid var(--border-color);
             position: relative;
+        }
+
+        .product-card.out-of-stock .product-img {
+            opacity: 0.4;
+            filter: grayscale(80%);
+        }
+
+        .badge-out-of-stock {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #ef4444;
+            color: #ffffff;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            z-index: 4;
         }
 
         .product-img {
@@ -211,7 +261,6 @@
             margin-bottom: 10px;
         }
 
-        /* Selector de Talla en Producto */
         .product-size-select {
             width: 100%;
             padding: 6px;
@@ -225,7 +274,11 @@
             cursor: pointer;
         }
 
-        /* Botón Comprar Ahora */
+        .product-size-select:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .btn-buy-now {
             width: 100%;
             background-color: #22c55e;
@@ -239,7 +292,6 @@
             text-transform: uppercase;
         }
 
-        /* Botón Agregar al Carrito */
         .btn-add {
             width: 100%;
             background-color: var(--accent-color);
@@ -250,6 +302,19 @@
             font-weight: 700;
             font-size: 0.8rem;
             cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .btn-disabled {
+            width: 100%;
+            background-color: #333333;
+            color: #777777;
+            border: none;
+            padding: 9px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: not-allowed;
             text-transform: uppercase;
         }
 
@@ -269,7 +334,24 @@
             z-index: 5;
         }
 
-        /* Barra Inferior del Carrito */
+        .btn-toggle-stock-admin {
+            display: none;
+            position: absolute;
+            top: 8px;
+            right: 42px;
+            background: rgba(34, 197, 94, 0.9);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            padding: 0 8px;
+            height: 28px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 5;
+        }
+
+        /* Carrito */
         .cart-bar {
             position: fixed;
             bottom: 15px;
@@ -449,11 +531,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.2s;
-        }
-
-        .btn-remove-item:active {
-            opacity: 0.6;
         }
 
         .cart-footer {
@@ -482,7 +559,7 @@
             text-transform: uppercase;
         }
 
-        /* Formulario Administrador y Selección de Tallas Dinámicas */
+        /* Formulario Administrador */
         .form-group {
             margin-bottom: 14px;
         }
@@ -495,6 +572,8 @@
         }
 
         .form-group input[type="text"], 
+        .form-group input[type="email"], 
+        .form-group input[type="password"], 
         .form-group input[type="number"], 
         .form-group select {
             width: 100%;
@@ -569,7 +648,11 @@
             <button class="category-btn" onclick="filtrarCategoria('Ropa Deportiva', this)">Ropa Deportiva</button>
             <button class="category-btn" onclick="filtrarCategoria('Ofertas', this)">Ofertas</button>
         </div>
-        <button class="btn-admin-add" id="btn-admin-add" onclick="abrirModalAdmin()">➕ Agregar Producto</button>
+        <div class="admin-controls">
+            <button class="btn-admin-login" id="btn-admin-login" onclick="abrirModalLogin()">🔑 Admin</button>
+            <button class="btn-admin-add" id="btn-admin-add" onclick="abrirModalAdmin()">➕ Agregar</button>
+            <button class="btn-admin-logout" id="btn-admin-logout" onclick="cerrarSesionAdmin()">Salir</button>
+        </div>
     </div>
 
     <main class="catalog" id="catalog-container">
@@ -581,6 +664,7 @@
         <span id="cart-total-label">$0 MXN &rarr;</span>
     </div>
 
+    <!-- Modal Visor de Imagen -->
     <div class="modal" id="image-viewer-modal" style="align-items: center;" onclick="cerrarVisorImagen()">
         <div style="position: relative; max-width: 90vw; max-height: 90vh; display: flex; justify-content: center; align-items: center;" onclick="event.stopPropagation()">
             <button class="close-modal" onclick="cerrarVisorImagen()" style="position: absolute; top: -40px; right: 0; color: #fff; font-size: 2.5rem;">&times;</button>
@@ -588,6 +672,7 @@
         </div>
     </div>
 
+    <!-- Modal Carrito -->
     <div class="modal" id="cart-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -607,6 +692,28 @@
         </div>
     </div>
 
+    <!-- Modal Login Admin Real -->
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Iniciar Sesión Admin</h2>
+                <button class="close-modal" onclick="cerrarModalLogin()">&times;</button>
+            </div>
+            <form id="form-login-admin" onsubmit="iniciarSesionAdmin(event)">
+                <div class="form-group">
+                    <label>Correo Electrónico:</label>
+                    <input type="email" id="login-email" placeholder="admin@tu-dominio.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Contraseña:</label>
+                    <input type="password" id="login-password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-save-product" id="btn-login-submit">Ingresar al Panel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Formulario Producto Admin -->
     <div class="modal" id="admin-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -628,6 +735,13 @@
                         <option value="Gorras">Gorras</option>
                         <option value="Ropa Deportiva">Ropa Deportiva</option>
                         <option value="Ofertas">Ofertas</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Estado inicial:</label>
+                    <select id="prod-disponible">
+                        <option value="true">Disponible</option>
+                        <option value="false">Agotado</option>
                     </select>
                 </div>
 
@@ -686,8 +800,6 @@
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const numeroTelefono = "524961228531";
-        const PALABRA_CLAVE_ADMIN = "admin123"; 
-        const ADMIN_PASSWORD = "iguano2026";    
 
         let esAdmin = false;
         let carrito = [];
@@ -695,11 +807,82 @@
         let productos = [];
         let imagenTemporalBase64 = "";
 
-        document.addEventListener("DOMContentLoaded", () => {
+        document.addEventListener("DOMContentLoaded", async () => {
+            await verificarSesionAdmin();
             cargarProductosDesdeSupabase();
         });
 
-        // Alternar casillas de tallas según categoría elegida
+        // Autenticación Supabase Real
+        async function verificarSesionAdmin() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (user) {
+                esAdmin = true;
+                actualizarInterfazAdmin(true);
+            } else {
+                esAdmin = false;
+                actualizarInterfazAdmin(false);
+            }
+        }
+
+        function actualizarInterfazAdmin(estaAutenticado) {
+            const btnLogin = document.getElementById('btn-admin-login');
+            const btnAdd = document.getElementById('btn-admin-add');
+            const btnLogout = document.getElementById('btn-admin-logout');
+
+            if (estaAutenticado) {
+                btnLogin.style.display = 'none';
+                btnAdd.style.display = 'block';
+                btnLogout.style.display = 'block';
+            } else {
+                btnLogin.style.display = 'block';
+                btnAdd.style.display = 'none';
+                btnLogout.style.display = 'none';
+            }
+        }
+
+        async function iniciarSesionAdmin(event) {
+            event.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const btnSubmit = document.getElementById('btn-login-submit');
+
+            btnSubmit.disabled = true;
+            btnSubmit.textContent = "Verificando...";
+
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            btnSubmit.disabled = false;
+            btnSubmit.textContent = "Ingresar al Panel";
+
+            if (error) {
+                alert("Error al iniciar sesión: " + error.message);
+                return;
+            }
+
+            esAdmin = true;
+            actualizarInterfazAdmin(true);
+            cerrarModalLogin();
+            document.getElementById('form-login-admin').reset();
+            renderizarCatalogo(productos);
+            alert("¡Bienvenido al panel de administración!");
+        }
+
+        async function cerrarSesionAdmin() {
+            if (confirm("¿Deseas cerrar la sesión de administrador?")) {
+                await supabaseClient.auth.signOut();
+                esAdmin = false;
+                actualizarInterfazAdmin(false);
+                renderizarCatalogo(productos);
+                alert("Sesión cerrada.");
+            }
+        }
+
+        function abrirModalLogin() { document.getElementById('login-modal').classList.add('open'); }
+        function cerrarModalLogin() { document.getElementById('login-modal').classList.remove('open'); }
+
         function actualizarTallasFormulario() {
             const cat = document.getElementById('prod-categoria').value;
             const containerGorras = document.getElementById('group-tallas-gorras');
@@ -752,31 +935,56 @@
             }
 
             lista.forEach(prod => {
+                const estaDisponible = prod.disponible !== false;
                 const listaTallas = prod.tallas ? prod.tallas.split(',').map(t => t.trim()) : ['Ajustable'];
                 const opcionesTallaHTML = listaTallas.map(t => `<option value="${t}">${t}</option>`).join('');
 
                 const card = document.createElement('div');
-                card.className = 'product-card';
+                card.className = `product-card ${estaDisponible ? '' : 'out-of-stock'}`;
+                
                 card.innerHTML = `
-                    ${esAdmin ? `<button class="btn-delete-admin" style="display:block;" onclick="eliminarProducto(${prod.id})">&times;</button>` : ''}
+                    ${!estaDisponible ? `<div class="badge-out-of-stock">Agotado</div>` : ''}
+                    ${esAdmin ? `
+                        <button class="btn-toggle-stock-admin" style="display:block; background:${estaDisponible ? '#ef4444' : '#22c55e'}" onclick="cambiarEstadoStock(${prod.id}, ${!estaDisponible})">
+                            ${estaDisponible ? 'Marcar Agotado' : 'Marcar Disponible'}
+                        </button>
+                        <button class="btn-delete-admin" style="display:block;" onclick="eliminarProducto(${prod.id})">&times;</button>
+                    ` : ''}
                     <img src="${prod.img}" alt="${prod.nombre}" class="product-img" onclick="abrirVisorImagen('${prod.img}')" title="Haz clic para ampliar">
                     <div class="product-info">
                         <div class="product-title">${prod.nombre}</div>
                         <div class="product-price">$${prod.precio} MXN</div>
                         
                         <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:4px;">Talla:</label>
-                        <select class="product-size-select" id="size-select-${prod.id}">
+                        <select class="product-size-select" id="size-select-${prod.id}" ${!estaDisponible ? 'disabled' : ''}>
                             ${opcionesTallaHTML}
                         </select>
 
                         <div style="display: flex; flex-direction: column; gap: 6px;">
-                            <button class="btn-buy-now" onclick="comprarAhoraDirecto('${prod.nombre}', ${prod.precio}, ${prod.id})">⚡ Comprar ahora</button>
-                            <button class="btn-add" onclick="agregarAlCarrito('${prod.nombre}', ${prod.precio}, '${prod.img}', ${prod.id})">+ Agregar al carrito</button>
+                            ${estaDisponible ? `
+                                <button class="btn-buy-now" onclick="comprarAhoraDirecto('${prod.nombre}', ${prod.precio}, ${prod.id})">⚡ Comprar ahora</button>
+                                <button class="btn-add" onclick="agregarAlCarrito('${prod.nombre}', ${prod.precio}, '${prod.img}', ${prod.id})">+ Agregar al carrito</button>
+                            ` : `
+                                <button class="btn-disabled" disabled>Agotado</button>
+                            `}
                         </div>
                     </div>
                 `;
                 container.appendChild(card);
             });
+        }
+
+        async function cambiarEstadoStock(id, nuevoEstado) {
+            const { error } = await supabaseClient
+                .from('productos')
+                .update({ disponible: nuevoEstado })
+                .eq('id', id);
+
+            if (error) {
+                alert("Error al actualizar estado: " + error.message);
+            } else {
+                cargarProductosDesdeSupabase();
+            }
         }
 
         function comprarAhoraDirecto(nombre, precio, idProd) {
@@ -789,12 +997,6 @@
 
         function ejecutarBusqueda() {
             const query = document.getElementById('search-input').value.trim();
-
-            if (query.toLowerCase() === PALABRA_CLAVE_ADMIN.toLowerCase()) {
-                document.getElementById('search-input').value = '';
-                activarModoAdmin();
-                return;
-            }
 
             let filtrados = productos;
 
@@ -903,18 +1105,6 @@
             window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
 
-        function activarModoAdmin() {
-            const pass = prompt("Acceso Administrador 'El iguano'\nIngresa la contraseña:");
-            if (pass === ADMIN_PASSWORD) {
-                esAdmin = true;
-                alert("¡Modo Administrador activado!");
-                document.getElementById('btn-admin-add').style.display = "block";
-                renderizarCatalogo(productos);
-            } else if (pass !== null) {
-                alert("Contraseña incorrecta.");
-            }
-        }
-
         function abrirModalAdmin() { 
             document.getElementById('admin-modal').classList.add('open');
             actualizarTallasFormulario();
@@ -942,6 +1132,7 @@
             const nombre = document.getElementById('prod-nombre').value;
             const precio = parseFloat(document.getElementById('prod-precio').value);
             const categoria = document.getElementById('prod-categoria').value;
+            const disponible = document.getElementById('prod-disponible').value === 'true';
             const urlInput = document.getElementById('prod-img-url').value;
 
             let checkboxes;
@@ -963,7 +1154,7 @@
             const { data, error } = await supabaseClient
                 .from('productos')
                 .insert([
-                    { nombre, precio, categoria, tallas, img: imgFinal }
+                    { nombre, precio, categoria, tallas, disponible, img: imgFinal }
                 ]);
 
             btnSave.disabled = false;
