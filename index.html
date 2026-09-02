@@ -144,6 +144,40 @@
             visibility: visible;
             opacity: 1;
         }
+        /* Controles de Navegación del Visor de Imágenes */
+        .viewer-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+        .viewer-nav-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: translateY(-50%) scale(1.1);
+        }
+        .viewer-prev { left: -20px; }
+        .viewer-next { right: -20px; }
+        .viewer-counter {
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -196,13 +230,20 @@
     </div>
     <!-- Toast Notification -->
     <div id="toast-notification" class="toast-notification">¡Producto agregado al carrito!</div>
-    <!-- Visor Imagen -->
+    
+    <!-- Visor Imagen Ampliada con Flechas de Navegación -->
     <div class="modal" id="image-viewer-modal" style="align-items: center;" onclick="cerrarVisorImagen()">
-        <div style="position: relative; max-width: 90vw; max-height: 90vh;" onclick="event.stopPropagation()">
+        <div style="position: relative; max-width: 90vw; max-height: 90vh; display: flex; align-items: center; justify-content: center;" onclick="event.stopPropagation()">
             <button class="close-modal" onclick="cerrarVisorImagen()" style="position: absolute; top: -40px; right: 0; color: #fff; font-size: 2.5rem;">&times;</button>
+            
+            <button class="viewer-nav-btn viewer-prev" id="viewer-prev-btn" onclick="navegarImagenVisor(-1)">&#10094;</button>
             <img id="image-viewer-img" src="" style="max-width: 100%; max-height: 80vh; border-radius: 12px; object-fit: contain;">
+            <button class="viewer-nav-btn viewer-next" id="viewer-next-btn" onclick="navegarImagenVisor(1)">&#10095;</button>
+            
+            <div class="viewer-counter" id="viewer-counter-label">1 / 1</div>
         </div>
     </div>
+
     <!-- Modal Carrito -->
     <div class="modal" id="cart-modal">
         <div class="modal-content">
@@ -277,12 +318,12 @@
                     <div class="sizes-checkbox-container" id="sizes-checkbox-container"></div>
                 </div>
                 <div class="form-group">
-                    <label>Subir Fotografía (Almacenamiento en Supabase Storage):</label>
-                    <input type="file" id="prod-file" accept="image/*">
+                    <label>Subir Fotografías (Puedes seleccionar varias):</label>
+                    <input type="file" id="prod-file" accept="image/*" multiple>
                 </div>
                 <div class="form-group">
-                    <label>O Enlace URL:</label>
-                    <input type="text" id="prod-img-url" placeholder="https://...">
+                    <label>O Enlaces URL (Separados por comas):</label>
+                    <input type="text" id="prod-img-url" placeholder="https://..., https://...">
                 </div>
                 <button type="submit" class="btn-save-product" id="btn-save">Publicar Producto</button>
             </form>
@@ -340,6 +381,11 @@
         let hayMasProductos = true;
         let busquedaTimer;
         let toastTimer;
+
+        // Variables Globales para la galería ampliada
+        let visorImagenesActuales = [];
+        let visorIndiceActual = 0;
+
         document.addEventListener("DOMContentLoaded", async () => {
             await verificarSesionAdmin();
             await cargarCategoriasDesdeSupabase();
@@ -426,6 +472,20 @@
                 </label>
             `).join('');
         }
+        
+        // Helper para convertir cualquier formato de imágenes (Array o String) a un Arreglo de URLs
+        function obtenerArregloImagenes(campoImg) {
+            if (!campoImg) return ['https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano'];
+            if (Array.isArray(campoImg)) {
+                return campoImg.filter(url => url && url.trim() !== '' && url !== 'null');
+            }
+            if (typeof campoImg === 'string') {
+                const arr = campoImg.split(',').map(s => s.trim()).filter(url => url !== '' && url !== 'null');
+                return arr.length > 0 ? arr : ['https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano'];
+            }
+            return ['https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano'];
+        }
+
         // Carga de productos paginada desde Supabase (Versión Corregida)
         async function cargarProductosPaginados(esNuevaBusqueda = false) {
             const btnLoadMore = document.getElementById('btn-load-more');
@@ -466,7 +526,6 @@
             // FILTRO ANTI-DUPLICADOS:
             const idsExistentes = new Set(productos.map(p => p.id));
             const nuevosSinDuplicar = recibidos.filter(p => !idsExistentes.has(p.id));
-            const totalAntes = productos.length;
             productos = esNuevaBusqueda ? recibidos : [...productos, ...nuevosSinDuplicar];
             if (productos.length >= count || recibidos.length < PAGE_SIZE) {
                 hayMasProductos = false;
@@ -505,8 +564,10 @@
                 const codigoProd = prod.codigo || '';
                 const listaTallas = prod.tallas ? prod.tallas.split(',').map(t => t.trim()) : ['Única'];
                 const opcionesHTML = listaTallas.map(t => `<option value="${t}">${t}</option>`).join('');
-                const imgUrl = (prod.img && prod.img.trim() !== '' && prod.img !== 'null') ? prod.img : 'https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano';
                 
+                const imagenesArr = obtenerArregloImagenes(prod.img);
+                const portadaUrl = imagenesArr[0];
+
                 const card = document.createElement('div');
                 card.className = `product-card ${estaDisponible ? '' : 'out-of-stock'}`;
                 card.innerHTML = `
@@ -518,7 +579,7 @@
                         <button class="btn-edit-admin" style="display:flex;" onclick="abrirModalAdminEditar(${prod.id})">✏️</button>
                         <button class="btn-delete-admin" style="display:block;" onclick="eliminarProducto(${prod.id})">&times;</button>
                     ` : ''}
-                    <img src="${imgUrl}" alt="${prod.nombre}" class="product-img" onclick="abrirVisorImagen('${imgUrl}')">
+                    <img src="${portadaUrl}" alt="${prod.nombre}" class="product-img" onclick="abrirVisorGaleria(${prod.id})">
                     <div class="product-info">
                         ${codigoProd ? `<div class="product-code">[${codigoProd}]</div>` : ''}
                         <div class="product-title">${prod.nombre}</div>
@@ -528,7 +589,7 @@
                         <div style="display: flex; flex-direction: column; gap: 6px;">
                             ${estaDisponible ? `
                                 <button class="btn-buy-now" onclick="comprarAhoraDirecto('${prod.nombre}', '${codigoProd}', ${prod.precio}, ${prod.id})">⚡ Comprar ahora</button>
-                                <button class="btn-add" onclick="agregarAlCarrito('${prod.nombre}', '${codigoProd}', ${prod.precio}, '${imgUrl}', ${prod.id})">+ Al carrito</button>
+                                <button class="btn-add" onclick="agregarAlCarrito('${prod.nombre}', '${codigoProd}', ${prod.precio}, '${portadaUrl}', ${prod.id})">+ Al carrito</button>
                             ` : `<button class="btn-disabled" disabled>Agotado</button>`}
                         </div>
                     </div>
@@ -619,7 +680,10 @@
             document.getElementById('prod-precio').value = prod.precio;
             document.getElementById('prod-categoria').value = prod.categoria;
             document.getElementById('prod-disponible').value = prod.disponible !== false ? 'true' : 'false';
-            document.getElementById('prod-img-url').value = (prod.img && !prod.img.startsWith('data:')) ? prod.img : '';
+            
+            const arrImg = obtenerArregloImagenes(prod.img);
+            document.getElementById('prod-img-url').value = arrImg.join(', ');
+
             actualizarTallasFormulario();
             if (prod.tallas) {
                 const tallasArr = prod.tallas.split(',').map(t => t.trim());
@@ -632,21 +696,72 @@
         function cerrarModalAdmin() { document.getElementById('admin-modal').classList.remove('open'); }
         function abrirModalLogin() { document.getElementById('login-modal').classList.add('open'); }
         function cerrarModalLogin() { document.getElementById('login-modal').classList.remove('open'); }
-        function abrirVisorImagen(src) { document.getElementById('image-viewer-img').src = src; document.getElementById('image-viewer-modal').classList.add('open'); }
-        function cerrarVisorImagen() { document.getElementById('image-viewer-modal').classList.remove('open'); }
-        async function subirImagenASupabaseStorage(file) {
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
-            const filePath = `productos/${fileName}`;
-            const { data, error } = await supabaseClient.storage
-                .from('productos')
-                .upload(filePath, file, { cacheControl: '3600', upsert: false });
-            if (error) throw error;
-            const { data: publicUrlData } = supabaseClient.storage
-                .from('productos')
-                .getPublicUrl(filePath);
-            return publicUrlData.publicUrl;
+
+        // Funciones del Visor de Galería con Flechas
+        function abrirVisorGaleria(idProd) {
+            const prod = productos.find(p => p.id === idProd);
+            if (!prod) return;
+            visorImagenesActuales = obtenerArregloImagenes(prod.img);
+            visorIndiceActual = 0;
+            actualizarVisorImagen();
+            document.getElementById('image-viewer-modal').classList.add('open');
         }
+
+        function actualizarVisorImagen() {
+            const imgEl = document.getElementById('image-viewer-img');
+            const prevBtn = document.getElementById('viewer-prev-btn');
+            const nextBtn = document.getElementById('viewer-next-btn');
+            const counterEl = document.getElementById('viewer-counter-label');
+
+            imgEl.src = visorImagenesActuales[visorIndiceActual];
+
+            if (visorImagenesActuales.length > 1) {
+                prevBtn.style.display = 'flex';
+                nextBtn.style.display = 'flex';
+                counterEl.style.display = 'block';
+                counterEl.textContent = `${visorIndiceActual + 1} / ${visorImagenesActuales.length}`;
+            } else {
+                prevBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+                counterEl.style.display = 'none';
+            }
+        }
+
+        function navegarImagenVisor(direccion) {
+            visorIndiceActual += direccion;
+            if (visorIndiceActual < 0) {
+                visorIndiceActual = visorImagenesActuales.length - 1;
+            } else if (visorIndiceActual >= visorImagenesActuales.length) {
+                visorIndiceActual = 0;
+            }
+            actualizarVisorImagen();
+        }
+
+        function cerrarVisorImagen() { 
+            document.getElementById('image-viewer-modal').classList.remove('open'); 
+        }
+
+        async function subirImagenesASupabaseStorage(files) {
+            const urlsSubidas = [];
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}_${i}.${fileExt}`;
+                const filePath = `productos/${fileName}`;
+                
+                const { error } = await supabaseClient.storage
+                    .from('productos')
+                    .upload(filePath, file, { cacheControl: '3600', upsert: false });
+                if (error) throw error;
+                
+                const { data: publicUrlData } = supabaseClient.storage
+                    .from('productos')
+                    .getPublicUrl(filePath);
+                urlsSubidas.push(publicUrlData.publicUrl);
+            }
+            return urlsSubidas;
+        }
+
         async function guardarProducto(event) {
             event.preventDefault();
             const btnSave = document.getElementById('btn-save');
@@ -662,25 +777,33 @@
             const chks = document.querySelectorAll('.chk-talla:checked');
             let tallas = Array.from(chks).map(c => c.value).join(', ');
             if (!tallas) tallas = "Única";
-            let imgFinal = urlInput;
+            
+            let imagenesFinales = [];
+            if (urlInput !== '') {
+                imagenesFinales = urlInput.split(',').map(u => u.trim()).filter(u => u !== '');
+            }
+
             try {
                 btnSave.disabled = true;
                 btnSave.textContent = "Guardando...";
-                if (fileInput.files && fileInput.files[0]) {
-                    btnSave.textContent = "Subiendo imagen...";
-                    imgFinal = await subirImagenASupabaseStorage(fileInput.files[0]);
-                } else if (!imgFinal && esEdicion) {
+                if (fileInput.files && fileInput.files.length > 0) {
+                    btnSave.textContent = "Subiendo imágenes...";
+                    const urlsArchivos = await subirImagenesASupabaseStorage(fileInput.files);
+                    imagenesFinales = [...imagenesFinales, ...urlsArchivos];
+                } else if (imagenesFinales.length === 0 && esEdicion) {
                     const prodActual = productos.find(p => p.id === parseInt(prodId));
-                    if (prodActual) imgFinal = prodActual.img;
+                    if (prodActual) imagenesFinales = obtenerArregloImagenes(prodActual.img);
                 }
-                if (!imgFinal) {
-                    imgFinal = "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano";
+
+                if (imagenesFinales.length === 0) {
+                    imagenesFinales = ["https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano"];
                 }
+
                 let res;
                 if (esEdicion) {
-                    res = await supabaseClient.from('productos').update({ codigo, nombre, precio, categoria, tallas, disponible, img: imgFinal }).eq('id', prodId);
+                    res = await supabaseClient.from('productos').update({ codigo, nombre, precio, categoria, tallas, disponible, img: imagenesFinales }).eq('id', prodId);
                 } else {
-                    res = await supabaseClient.from('productos').insert([{ codigo, nombre, precio, categoria, tallas, disponible, img: imgFinal }]);
+                    res = await supabaseClient.from('productos').insert([{ codigo, nombre, precio, categoria, tallas, disponible, img: imagenesFinales }]);
                 }
                 if (res.error) {
                     alert("Error al guardar en la base de datos: " + res.error.message);
