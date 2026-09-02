@@ -29,7 +29,6 @@
         header.scrolled { padding: 10px 15px; }
         header.scrolled .header-text { opacity: 0; max-height: 0; margin-top: 0; pointer-events: none; }
         header.scrolled .brand-logo { width: 50px; height: 50px; }
-
         .search-container { padding: 12px 15px 5px 15px; background-color: var(--bg-color); }
         .search-input { width: 100%; padding: 12px 16px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 25px; color: var(--text-main); font-size: 0.9rem; outline: none; }
         .categories-wrapper { display: flex; align-items: center; background-color: var(--bg-color); border-bottom: 1px solid var(--border-color); position: sticky; top: 60px; z-index: 90; padding: 10px 15px; gap: 10px; }
@@ -93,6 +92,31 @@
         .btn-save-product:disabled { opacity: 0.5; cursor: not-allowed; }
         .cat-admin-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 8px; }
         .btn-cat-del { background-color: #ef4444; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
+
+        /* Notificación Toast */
+        .toast-notification {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #22c55e;
+            color: #ffffff;
+            text-align: center;
+            border-radius: 20px;
+            padding: 12px 20px;
+            position: fixed;
+            z-index: 300;
+            left: 50%;
+            bottom: 80px;
+            transform: translateX(-50%);
+            font-size: 0.9rem;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .toast-notification.show {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -134,6 +158,10 @@
         <span id="cart-count-label">🛒 Carrito (0 prendas)</span>
         <span id="cart-total-label">$0 MXN &rarr;</span>
     </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-notification" class="toast-notification">¡Producto agregado al carrito!</div>
+
     <!-- Visor Imagen -->
     <div class="modal" id="image-viewer-modal" style="align-items: center;" onclick="cerrarVisorImagen()">
         <div style="position: relative; max-width: 90vw; max-height: 90vh;" onclick="event.stopPropagation()">
@@ -255,7 +283,6 @@
                 header.classList.remove('scrolled');
             }
         });
-
         const SUPABASE_URL = "https://ywixgizcadytczxcbubg.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3aXhnaXpjYWR5dGN6eGNidWJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxMzkzNTIsImV4cCI6MjEwMzcxNTM1Mn0.ABIAb8426hAdnJw5nxvGhxorAL6s8RHvlhHkDsb06Ts";
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -272,6 +299,8 @@
         let paginaActual = 0;
         let hayMasProductos = true;
         let busquedaTimer;
+        let toastTimer;
+
         document.addEventListener("DOMContentLoaded", async () => {
             await verificarSesionAdmin();
             await cargarCategoriasDesdeSupabase();
@@ -632,6 +661,14 @@
                 cargarProductosPaginados(true);
             }
         }
+        function mostrarToast() {
+            const toast = document.getElementById('toast-notification');
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
         function agregarAlCarrito(nombre, precio, img, idProd) {
             const sizeSelect = document.getElementById(`size-select-${idProd}`);
             const talla = sizeSelect ? sizeSelect.value : 'Única';
@@ -639,6 +676,7 @@
             if (existe) existe.cantidad += 1;
             else carrito.push({ nombre, precio, img, talla, cantidad: 1 });
             actualizarCarritoUI();
+            mostrarToast();
         }
         function cambiarCantidad(index, cambio) {
             carrito[index].cantidad += cambio;
