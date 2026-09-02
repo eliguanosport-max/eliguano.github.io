@@ -770,7 +770,7 @@
             const sizeSelect = document.getElementById(`size-select-${idProd}`);
             const talla = sizeSelect ? sizeSelect.value : 'Única';
             const textoCodigo = codigo ? `[${codigo}] ` : '';
-            let mensaje = `Hola *El iguano*, me interesa comprar ahora mismo el siguiente producto:\n\n- ${textoCodigo}${nombre} (Talla: ${talla}): $${precio} MXN`;
+            let mensaje = `Hola *Iguano*, me interesa comprar ahora mismo el siguiente producto:\n\n- ${textoCodigo}${nombre} (Talla: ${talla}): $${precio} MXN`;
             window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
         function enviarPedidoWhatsApp() {
@@ -780,7 +780,7 @@
                 return `- ${textoCodigo}${i.nombre} (Talla: ${i.talla}) x${i.cantidad}: $${i.precio * i.cantidad} MXN`;
             }).join('\n');
             let totalDinero = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-            let mensaje = `Hola *El iguano*, me gustaría realizar el siguiente pedido:\n\n${lista}\n\n*Cuenta Total:* $${totalDinero} MXN`;
+            let mensaje = `Hola *Iguano*, me gustaría realizar el siguiente pedido:\n\n${lista}\n\n*Cuenta Total:* $${totalDinero} MXN`;
             window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
     </script>
