@@ -123,11 +123,9 @@
     <main class="catalog" id="catalog-container">
         <p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">Cargando catálogo...</p>
     </main>
-
     <div class="load-more-container" id="load-more-container" style="display: none;">
         <button class="btn-load-more" id="btn-load-more" onclick="cargarMasProductos()">Cargar más productos</button>
     </div>
-
     <div class="cart-bar" onclick="abrirCarrito()">
         <span id="cart-count-label">🛒 Carrito (0 prendas)</span>
         <span id="cart-total-label">$0 MXN &rarr;</span>
@@ -243,7 +241,6 @@
             <div id="lista-categorias-admin"></div>
         </div>
     </div>
-
     <script>
         const SUPABASE_URL = "https://ywixgizcadytczxcbubg.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3aXhnaXpjYWR5dGN6eGNidWJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxMzkzNTIsImV4cCI6MjEwMzcxNTM1Mn0.ABIAb8426hAdnJw5nxvGhxorAL6s8RHvlhHkDsb06Ts";
@@ -256,30 +253,25 @@
         let subcategoriaActual = 'Todas';
         let productos = [];
         let categoriasData = [];
-
         // Configuración de Paginación
         const PAGE_SIZE = 12;
         let paginaActual = 0;
         let hayMasProductos = true;
         let busquedaTimer;
-
         document.addEventListener("DOMContentLoaded", async () => {
             await verificarSesionAdmin();
             await cargarCategoriasDesdeSupabase();
             cargarProductosPaginados(true);
         });
-
         async function verificarSesionAdmin() {
             const { data: { user } } = await supabaseClient.auth.getUser();
             esAdmin = !!user;
             actualizarInterfazAdmin(esAdmin);
         }
-
         function manejarClicIconoAdmin() {
             if (esAdmin) abrirModalAdminCrear();
             else abrirModalLogin();
         }
-
         function actualizarInterfazAdmin(estaAutenticado) {
             const btnProfile = document.getElementById('admin-profile-btn');
             const btnAdd = document.getElementById('btn-admin-add');
@@ -297,7 +289,6 @@
                 btnLogout.style.display = 'none';
             }
         }
-
         async function iniciarSesionAdmin(event) {
             event.preventDefault();
             const email = document.getElementById('login-email').value;
@@ -309,7 +300,6 @@
             cerrarModalLogin();
             renderizarCatalogo(productos, false);
         }
-
         async function cerrarSesionAdmin() {
             if (confirm("¿Cerrar sesión?")) {
                 await supabaseClient.auth.signOut();
@@ -318,7 +308,6 @@
                 renderizarCatalogo(productos, false);
             }
         }
-
         async function cargarCategoriasDesdeSupabase() {
             const { data, error } = await supabaseClient.from('categorias').select('*').order('id', { ascending: true });
             if (error) return console.error("Error al cargar categorías:", error);
@@ -326,7 +315,6 @@
             renderizarBarraCategorias();
             renderizarSelectCategoriasModal();
         }
-
         function renderizarBarraCategorias() {
             const container = document.getElementById('categories-bar-container');
             let html = `<button class="category-btn ${categoriaActual === 'Todas' ? 'active' : ''}" onclick="filtrarCategoria('Todas', this)">Todas</button>`;
@@ -336,13 +324,11 @@
             });
             container.innerHTML = html;
         }
-
         function renderizarSelectCategoriasModal() {
             const select = document.getElementById('prod-categoria');
             select.innerHTML = categoriasData.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
             actualizarTallasFormulario();
         }
-
         function actualizarTallasFormulario() {
             const catNombre = document.getElementById('prod-categoria').value;
             const container = document.getElementById('sizes-checkbox-container');
@@ -358,31 +344,24 @@
                 </label>
             `).join('');
         }
-
-        // Carga de productos paginada desde Supabase
+        // Carga de productos paginada desde Supabase (Versión Corregida)
         async function cargarProductosPaginados(esNuevaBusqueda = false) {
             const btnLoadMore = document.getElementById('btn-load-more');
             const container = document.getElementById('catalog-container');
-
             if (esNuevaBusqueda) {
                 paginaActual = 0;
                 productos = [];
                 hayMasProductos = true;
                 container.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">Cargando catálogo...</p>';
             }
-
             if (!hayMasProductos) return;
-
             btnLoadMore.textContent = "Cargando...";
             btnLoadMore.disabled = true;
-
             const desde = paginaActual * PAGE_SIZE;
             const hasta = desde + PAGE_SIZE - 1;
-
             let queryBuilder = supabaseClient
                 .from('productos')
                 .select('*', { count: 'exact' });
-
             if (categoriaActual !== 'Todas') {
                 queryBuilder = queryBuilder.eq('categoria', categoriaActual);
             }
@@ -393,27 +372,28 @@
             if (queryText !== '') {
                 queryBuilder = queryBuilder.ilike('nombre', `%${queryText}%`);
             }
-
             queryBuilder = queryBuilder.order('id', { ascending: false }).range(desde, hasta);
-
             const { data, count, error } = await queryBuilder;
-
             if (error) {
                 console.error("Error al cargar productos:", error);
                 btnLoadMore.textContent = "Error al cargar";
                 return;
             }
+            const recibidos = data || [];
+            
+            // FILTRO ANTI-DUPLICADOS:
+            const idsExistentes = new Set(productos.map(p => p.id));
+            const nuevosSinDuplicar = recibidos.filter(p => !idsExistentes.has(p.id));
 
-            const nuevosProductos = data || [];
-            productos = esNuevaBusqueda ? nuevosProductos : [...productos, ...nuevosProductos];
+            const totalAntes = productos.length;
+            productos = esNuevaBusqueda ? recibidos : [...productos, ...nuevosSinDuplicar];
 
-            if (productos.length >= count || nuevosProductos.length < PAGE_SIZE) {
+            if (productos.length >= count || recibidos.length < PAGE_SIZE) {
                 hayMasProductos = false;
             }
-
-            renderizarCatalogo(productos, esNuevaBusqueda);
+            
+            renderizarCatalogo(productos, esNuevaBusqueda, nuevosSinDuplicar);
             paginaActual++;
-
             const loadMoreContainer = document.getElementById('load-more-container');
             if (hayMasProductos) {
                 loadMoreContainer.style.display = 'block';
@@ -423,29 +403,23 @@
                 loadMoreContainer.style.display = 'none';
             }
         }
-
         function cargarMasProductos() {
             cargarProductosPaginados(false);
         }
-
         function manejarCambioFiltros() {
             clearTimeout(busquedaTimer);
             busquedaTimer = setTimeout(() => {
                 cargarProductosPaginados(true);
             }, 300);
         }
-
-        function renderizarCatalogo(lista, reiniciar = true) {
+        function renderizarCatalogo(lista, reiniciar = true, itemsNuevos = []) {
             const container = document.getElementById('catalog-container');
             if (reiniciar) container.innerHTML = '';
-
             if (lista.length === 0) {
                 container.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">No hay productos disponibles.</p>';
                 return;
             }
-
-            const itemsARenderizar = reiniciar ? lista : lista.slice(-PAGE_SIZE);
-
+            const itemsARenderizar = reiniciar ? lista : itemsNuevos;
             itemsARenderizar.forEach(prod => {
                 const estaDisponible = prod.disponible !== false;
                 const listaTallas = prod.tallas ? prod.tallas.split(',').map(t => t.trim()) : ['Única'];
@@ -480,7 +454,6 @@
                 container.appendChild(card);
             });
         }
-
         function filtrarCategoria(categoria, btn) {
             document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
@@ -499,14 +472,12 @@
             }
             cargarProductosPaginados(true);
         }
-
         function filtrarSubcategoria(medida, btn) {
             document.querySelectorAll('.subcategory-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             subcategoriaActual = medida;
             cargarProductosPaginados(true);
         }
-
         async function guardarNuevaCategoria(event) {
             event.preventDefault();
             const nombre = document.getElementById('cat-nombre').value.trim();
@@ -520,7 +491,6 @@
             renderListaCategoriasAdmin();
             alert("Categoría guardada exitosamente");
         }
-
         function renderListaCategoriasAdmin() {
             const container = document.getElementById('lista-categorias-admin');
             container.innerHTML = categoriasData.map(c => `
@@ -533,7 +503,6 @@
                 </div>
             `).join('');
         }
-
         async function eliminarCategoria(id) {
             if (confirm("¿Eliminar esta categoría?")) {
                 const { error } = await supabaseClient.from('categorias').delete().eq('id', id);
@@ -544,13 +513,11 @@
                 }
             }
         }
-
         function abrirModalGestionCategorias() {
             renderListaCategoriasAdmin();
             document.getElementById('cat-modal').classList.add('open');
         }
         function cerrarModalGestionCategorias() { document.getElementById('cat-modal').classList.remove('open'); }
-
         function abrirModalAdminCrear() {
             document.getElementById('form-nuevo-producto').reset();
             document.getElementById('prod-id').value = '';
@@ -558,7 +525,6 @@
             renderizarSelectCategoriasModal();
             document.getElementById('admin-modal').classList.add('open');
         }
-
         function abrirModalAdminEditar(idProd) {
             const prod = productos.find(p => p.id === idProd);
             if (!prod) return;
@@ -579,31 +545,24 @@
             }
             document.getElementById('admin-modal').classList.add('open');
         }
-
         function cerrarModalAdmin() { document.getElementById('admin-modal').classList.remove('open'); }
         function abrirModalLogin() { document.getElementById('login-modal').classList.add('open'); }
         function cerrarModalLogin() { document.getElementById('login-modal').classList.remove('open'); }
         function abrirVisorImagen(src) { document.getElementById('image-viewer-img').src = src; document.getElementById('image-viewer-modal').classList.add('open'); }
         function cerrarVisorImagen() { document.getElementById('image-viewer-modal').classList.remove('open'); }
-
         async function subirImagenASupabaseStorage(file) {
             const fileExt = file.name.split('.').pop();
             const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
             const filePath = `productos/${fileName}`;
-
             const { data, error } = await supabaseClient.storage
                 .from('productos')
                 .upload(filePath, file, { cacheControl: '3600', upsert: false });
-
             if (error) throw error;
-
             const { data: publicUrlData } = supabaseClient.storage
                 .from('productos')
                 .getPublicUrl(filePath);
-
             return publicUrlData.publicUrl;
         }
-
         async function guardarProducto(event) {
             event.preventDefault();
             const btnSave = document.getElementById('btn-save');
@@ -615,17 +574,13 @@
             const disponible = document.getElementById('prod-disponible').value === 'true';
             const fileInput = document.getElementById('prod-file');
             const urlInput = document.getElementById('prod-img-url').value.trim();
-
             const chks = document.querySelectorAll('.chk-talla:checked');
             let tallas = Array.from(chks).map(c => c.value).join(', ');
             if (!tallas) tallas = "Única";
-
             let imgFinal = urlInput;
-
             try {
                 btnSave.disabled = true;
                 btnSave.textContent = "Guardando...";
-
                 if (fileInput.files && fileInput.files[0]) {
                     btnSave.textContent = "Subiendo imagen...";
                     imgFinal = await subirImagenASupabaseStorage(fileInput.files[0]);
@@ -633,18 +588,15 @@
                     const prodActual = productos.find(p => p.id === parseInt(prodId));
                     if (prodActual) imgFinal = prodActual.img;
                 }
-
                 if (!imgFinal) {
                     imgFinal = "https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano";
                 }
-
                 let res;
                 if (esEdicion) {
                     res = await supabaseClient.from('productos').update({ nombre, precio, categoria, tallas, disponible, img: imgFinal }).eq('id', prodId);
                 } else {
                     res = await supabaseClient.from('productos').insert([{ nombre, precio, categoria, tallas, disponible, img: imgFinal }]);
                 }
-
                 if (res.error) {
                     alert("Error al guardar en la base de datos: " + res.error.message);
                 } else {
@@ -658,19 +610,16 @@
                 btnSave.textContent = "Publicar Producto";
             }
         }
-
         async function cambiarEstadoStock(id, nuevoEstado) {
             await supabaseClient.from('productos').update({ disponible: nuevoEstado }).eq('id', id);
             cargarProductosPaginados(true);
         }
-
         async function eliminarProducto(id) {
             if (confirm("¿Eliminar producto?")) {
                 await supabaseClient.from('productos').delete().eq('id', id);
                 cargarProductosPaginados(true);
             }
         }
-
         function agregarAlCarrito(nombre, precio, img, idProd) {
             const sizeSelect = document.getElementById(`size-select-${idProd}`);
             const talla = sizeSelect ? sizeSelect.value : 'Única';
@@ -679,18 +628,15 @@
             else carrito.push({ nombre, precio, img, talla, cantidad: 1 });
             actualizarCarritoUI();
         }
-
         function cambiarCantidad(index, cambio) {
             carrito[index].cantidad += cambio;
             if (carrito[index].cantidad <= 0) carrito.splice(index, 1);
             actualizarCarritoUI();
         }
-
         function eliminarDelCarrito(index) {
             carrito.splice(index, 1);
             actualizarCarritoUI();
         }
-
         function actualizarCarritoUI() {
             const totalPrendas = carrito.reduce((sum, item) => sum + item.cantidad, 0);
             const totalDinero = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
@@ -723,17 +669,14 @@
                 `).join('');
             }
         }
-
         function abrirCarrito() { document.getElementById('cart-modal').classList.add('open'); }
         function cerrarCarrito() { document.getElementById('cart-modal').classList.remove('open'); }
-
         function comprarAhoraDirecto(nombre, precio, idProd) {
             const sizeSelect = document.getElementById(`size-select-${idProd}`);
             const talla = sizeSelect ? sizeSelect.value : 'Única';
             let mensaje = `Hola *El iguano*, me interesa comprar ahora mismo el siguiente producto:\n\n- ${nombre} (Talla: ${talla}): $${precio} MXN`;
             window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
-
         function enviarPedidoWhatsApp() {
             if (carrito.length === 0) return alert("El carrito está vacío.");
             let lista = carrito.map(i => `- ${i.nombre} (Talla: ${i.talla}) x${i.cantidad}: $${i.precio * i.cantidad} MXN`).join('\n');
