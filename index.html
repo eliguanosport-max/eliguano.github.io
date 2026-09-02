@@ -55,6 +55,9 @@
         .btn-delete-admin, .btn-edit-admin { display: none; position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.9); color: #fff; border: none; border-radius: 50%; width: 28px; height: 28px; font-weight: bold; cursor: pointer; z-index: 5; }
         .btn-edit-admin { right: 40px; background: rgba(59, 130, 246, 0.9); }
         .btn-toggle-stock-admin { display: none; position: absolute; top: 8px; left: 8px; background: rgba(34, 197, 94, 0.9); color: #fff; border: none; border-radius: 14px; padding: 0 8px; height: 28px; font-size: 0.75rem; font-weight: bold; cursor: pointer; z-index: 5; }
+        .load-more-container { text-align: center; padding: 20px 15px; }
+        .btn-load-more { background-color: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color); padding: 12px 24px; border-radius: 25px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; }
+        .btn-load-more:hover { background-color: var(--accent-color); color: #121212; }
         .cart-bar { position: fixed; bottom: 15px; left: 5%; width: 90%; background-color: var(--accent-color); color: #121212; padding: 14px 20px; border-radius: 30px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6); cursor: pointer; z-index: 101; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); z-index: 200; justify-content: center; align-items: flex-end; }
         .modal.open { display: flex; }
@@ -102,7 +105,7 @@
         </div>
     </header>
     <div class="search-container">
-        <input type="text" id="search-input" class="search-input" placeholder="🔍 Buscar producto..." oninput="ejecutarBusqueda()">
+        <input type="text" id="search-input" class="search-input" placeholder="🔍 Buscar producto..." oninput="manejarCambioFiltros()">
     </div>
     
     <div class="categories-wrapper">
@@ -116,9 +119,15 @@
         </div>
     </div>
     <div class="subcategories-container" id="subcategories-container"></div>
+    
     <main class="catalog" id="catalog-container">
         <p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">Cargando catálogo...</p>
     </main>
+
+    <div class="load-more-container" id="load-more-container" style="display: none;">
+        <button class="btn-load-more" id="btn-load-more" onclick="cargarMasProductos()">Cargar más productos</button>
+    </div>
+
     <div class="cart-bar" onclick="abrirCarrito()">
         <span id="cart-count-label">🛒 Carrito (0 prendas)</span>
         <span id="cart-total-label">$0 MXN &rarr;</span>
@@ -234,11 +243,13 @@
             <div id="lista-categorias-admin"></div>
         </div>
     </div>
+
     <script>
         const SUPABASE_URL = "https://ywixgizcadytczxcbubg.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3aXhnaXpjYWR5dGN6eGNidWJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxMzkzNTIsImV4cCI6MjEwMzcxNTM1Mn0.ABIAb8426hAdnJw5nxvGhxorAL6s8RHvlhHkDsb06Ts";
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const numeroTelefono = "524961228531";
+        
         let esAdmin = false;
         let carrito = [];
         let categoriaActual = 'Todas';
@@ -246,10 +257,16 @@
         let productos = [];
         let categoriasData = [];
 
+        // Configuración de Paginación
+        const PAGE_SIZE = 12;
+        let paginaActual = 0;
+        let hayMasProductos = true;
+        let busquedaTimer;
+
         document.addEventListener("DOMContentLoaded", async () => {
             await verificarSesionAdmin();
             await cargarCategoriasDesdeSupabase();
-            cargarProductosDesdeSupabase();
+            cargarProductosPaginados(true);
         });
 
         async function verificarSesionAdmin() {
@@ -290,7 +307,7 @@
             esAdmin = true;
             actualizarInterfazAdmin(true);
             cerrarModalLogin();
-            renderizarCatalogo(productos);
+            renderizarCatalogo(productos, false);
         }
 
         async function cerrarSesionAdmin() {
@@ -298,7 +315,7 @@
                 await supabaseClient.auth.signOut();
                 esAdmin = false;
                 actualizarInterfazAdmin(false);
-                renderizarCatalogo(productos);
+                renderizarCatalogo(productos, false);
             }
         }
 
@@ -342,26 +359,99 @@
             `).join('');
         }
 
-        async function cargarProductosDesdeSupabase() {
-            const { data, error } = await supabaseClient.from('productos').select('*').order('id', { ascending: false });
-            if (!error) {
-                productos = data || [];
-                ejecutarBusqueda();
+        // Carga de productos paginada desde Supabase
+        async function cargarProductosPaginados(esNuevaBusqueda = false) {
+            const btnLoadMore = document.getElementById('btn-load-more');
+            const container = document.getElementById('catalog-container');
+
+            if (esNuevaBusqueda) {
+                paginaActual = 0;
+                productos = [];
+                hayMasProductos = true;
+                container.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">Cargando catálogo...</p>';
+            }
+
+            if (!hayMasProductos) return;
+
+            btnLoadMore.textContent = "Cargando...";
+            btnLoadMore.disabled = true;
+
+            const desde = paginaActual * PAGE_SIZE;
+            const hasta = desde + PAGE_SIZE - 1;
+
+            let queryBuilder = supabaseClient
+                .from('productos')
+                .select('*', { count: 'exact' });
+
+            if (categoriaActual !== 'Todas') {
+                queryBuilder = queryBuilder.eq('categoria', categoriaActual);
+            }
+            if (subcategoriaActual !== 'Todas') {
+                queryBuilder = queryBuilder.ilike('tallas', `%${subcategoriaActual}%`);
+            }
+            const queryText = document.getElementById('search-input').value.trim();
+            if (queryText !== '') {
+                queryBuilder = queryBuilder.ilike('nombre', `%${queryText}%`);
+            }
+
+            queryBuilder = queryBuilder.order('id', { ascending: false }).range(desde, hasta);
+
+            const { data, count, error } = await queryBuilder;
+
+            if (error) {
+                console.error("Error al cargar productos:", error);
+                btnLoadMore.textContent = "Error al cargar";
+                return;
+            }
+
+            const nuevosProductos = data || [];
+            productos = esNuevaBusqueda ? nuevosProductos : [...productos, ...nuevosProductos];
+
+            if (productos.length >= count || nuevosProductos.length < PAGE_SIZE) {
+                hayMasProductos = false;
+            }
+
+            renderizarCatalogo(productos, esNuevaBusqueda);
+            paginaActual++;
+
+            const loadMoreContainer = document.getElementById('load-more-container');
+            if (hayMasProductos) {
+                loadMoreContainer.style.display = 'block';
+                btnLoadMore.textContent = "Cargar más productos";
+                btnLoadMore.disabled = false;
+            } else {
+                loadMoreContainer.style.display = 'none';
             }
         }
 
-        function renderizarCatalogo(lista) {
+        function cargarMasProductos() {
+            cargarProductosPaginados(false);
+        }
+
+        function manejarCambioFiltros() {
+            clearTimeout(busquedaTimer);
+            busquedaTimer = setTimeout(() => {
+                cargarProductosPaginados(true);
+            }, 300);
+        }
+
+        function renderizarCatalogo(lista, reiniciar = true) {
             const container = document.getElementById('catalog-container');
-            container.innerHTML = '';
+            if (reiniciar) container.innerHTML = '';
+
             if (lista.length === 0) {
                 container.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">No hay productos disponibles.</p>';
                 return;
             }
-            lista.forEach(prod => {
+
+            const itemsARenderizar = reiniciar ? lista : lista.slice(-PAGE_SIZE);
+
+            itemsARenderizar.forEach(prod => {
                 const estaDisponible = prod.disponible !== false;
                 const listaTallas = prod.tallas ? prod.tallas.split(',').map(t => t.trim()) : ['Única'];
                 const opcionesHTML = listaTallas.map(t => `<option value="${t}">${t}</option>`).join('');
                 const imgUrl = (prod.img && prod.img.trim() !== '' && prod.img !== 'null') ? prod.img : 'https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano';
+                
                 const card = document.createElement('div');
                 card.className = `product-card ${estaDisponible ? '' : 'out-of-stock'}`;
                 card.innerHTML = `
@@ -391,21 +481,6 @@
             });
         }
 
-        function ejecutarBusqueda() {
-            const query = document.getElementById('search-input').value.trim().toLowerCase();
-            let filtrados = productos;
-            if (categoriaActual !== 'Todas') {
-                filtrados = filtrados.filter(p => p.categoria === categoriaActual);
-            }
-            if (subcategoriaActual !== 'Todas') {
-                filtrados = filtrados.filter(p => p.tallas && p.tallas.split(',').map(t => t.trim()).includes(subcategoriaActual));
-            }
-            if (query !== '') {
-                filtrados = filtrados.filter(p => p.nombre.toLowerCase().includes(query));
-            }
-            renderizarCatalogo(filtrados);
-        }
-
         function filtrarCategoria(categoria, btn) {
             document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
@@ -422,14 +497,14 @@
                 subContainer.innerHTML = '';
                 subContainer.classList.remove('open');
             }
-            ejecutarBusqueda();
+            cargarProductosPaginados(true);
         }
 
         function filtrarSubcategoria(medida, btn) {
             document.querySelectorAll('.subcategory-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             subcategoriaActual = medida;
-            ejecutarBusqueda();
+            cargarProductosPaginados(true);
         }
 
         async function guardarNuevaCategoria(event) {
@@ -511,7 +586,6 @@
         function abrirVisorImagen(src) { document.getElementById('image-viewer-img').src = src; document.getElementById('image-viewer-modal').classList.add('open'); }
         function cerrarVisorImagen() { document.getElementById('image-viewer-modal').classList.remove('open'); }
 
-        // Función para subir archivos a Supabase Storage
         async function subirImagenASupabaseStorage(file) {
             const fileExt = file.name.split('.').pop();
             const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
@@ -521,9 +595,7 @@
                 .from('productos')
                 .upload(filePath, file, { cacheControl: '3600', upsert: false });
 
-            if (error) {
-                throw error;
-            }
+            if (error) throw error;
 
             const { data: publicUrlData } = supabaseClient.storage
                 .from('productos')
@@ -554,7 +626,6 @@
                 btnSave.disabled = true;
                 btnSave.textContent = "Guardando...";
 
-                // Si seleccionó un archivo local/celular, subirlo al Bucket de Storage
                 if (fileInput.files && fileInput.files[0]) {
                     btnSave.textContent = "Subiendo imagen...";
                     imgFinal = await subirImagenASupabaseStorage(fileInput.files[0]);
@@ -578,7 +649,7 @@
                     alert("Error al guardar en la base de datos: " + res.error.message);
                 } else {
                     cerrarModalAdmin();
-                    cargarProductosDesdeSupabase();
+                    cargarProductosPaginados(true);
                 }
             } catch (err) {
                 alert("Error al procesar la imagen en Storage: " + err.message);
@@ -590,13 +661,13 @@
 
         async function cambiarEstadoStock(id, nuevoEstado) {
             await supabaseClient.from('productos').update({ disponible: nuevoEstado }).eq('id', id);
-            cargarProductosDesdeSupabase();
+            cargarProductosPaginados(true);
         }
 
         async function eliminarProducto(id) {
             if (confirm("¿Eliminar producto?")) {
                 await supabaseClient.from('productos').delete().eq('id', id);
-                cargarProductosDesdeSupabase();
+                cargarProductosPaginados(true);
             }
         }
 
