@@ -243,6 +243,7 @@
             <div class="viewer-counter" id="viewer-counter-label">1 / 1</div>
         </div>
     </div>
+
     <!-- Modal Carrito -->
     <div class="modal" id="cart-modal">
         <div class="modal-content">
@@ -303,11 +304,7 @@
                 </div>
                 <div class="form-group">
                     <label>Categoría:</label>
-                    <select id="prod-categoria" onchange="actualizarSubcategoriasYMedidasFormulario()"></select>
-                </div>
-                <div class="form-group">
-                    <label>Subcategoría:</label>
-                    <select id="prod-subcategoria"></select>
+                    <select id="prod-categoria" onchange="actualizarTallasFormulario()"></select>
                 </div>
                 <div class="form-group">
                     <label>Estado inicial:</label>
@@ -343,10 +340,6 @@
                 <div class="form-group">
                     <label>Nombre de Categoría:</label>
                     <input type="text" id="cat-nombre" placeholder="Ej. Calzado" required>
-                </div>
-                <div class="form-group">
-                    <label>Subcategorías (Separadas por comas):</label>
-                    <input type="text" id="cat-subcategorias" placeholder="Ej. Tenis, Botas, Sandalias">
                 </div>
                 <div class="form-group">
                     <label>Medidas/Tallas (Separadas por comas):</label>
@@ -388,9 +381,11 @@
         let hayMasProductos = true;
         let busquedaTimer;
         let toastTimer;
+
         // Variables Globales para la galería ampliada
         let visorImagenesActuales = [];
         let visorIndiceActual = 0;
+
         document.addEventListener("DOMContentLoaded", async () => {
             await verificarSesionAdmin();
             await cargarCategoriasDesdeSupabase();
@@ -460,43 +455,18 @@
         function renderizarSelectCategoriasModal() {
             const select = document.getElementById('prod-categoria');
             select.innerHTML = categoriasData.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
-            actualizarSubcategoriasYMedidasFormulario();
+            actualizarTallasFormulario();
         }
-        function actualizarSubcategoriasYMedidasFormulario() {
+        function actualizarTallasFormulario() {
             const catNombre = document.getElementById('prod-categoria').value;
-            const selectSubcat = document.getElementById('prod-subcategoria');
-            const containerSizes = document.getElementById('sizes-checkbox-container');
+            const container = document.getElementById('sizes-checkbox-container');
             const catObj = categoriasData.find(c => c.nombre === catNombre);
-            
-            if (!catObj) {
-                selectSubcat.innerHTML = '<option value="">Sin subcategorías</option>';
-                containerSizes.innerHTML = '<p style="color:var(--text-muted); font-size:0.8rem;">Sin medidas configuradas.</p>';
-                return;
-            }
-
-            // Subcategorías
-            let subcats = [];
-            if (catObj.subcategorias) {
-                if (Array.isArray(catObj.subcategorias)) {
-                    subcats = catObj.subcategorias;
-                } else if (typeof catObj.subcategorias === 'string') {
-                    subcats = catObj.subcategorias.split(',').map(s => s.trim()).filter(s => s !== '');
-                }
-            }
-            
-            if (subcats.length > 0) {
-                selectSubcat.innerHTML = subcats.map(s => `<option value="${s}">${s}</option>`).join('');
-            } else {
-                selectSubcat.innerHTML = '<option value="">Sin subcategorías</option>';
-            }
-
-            // Medidas/Tallas
-            if (!catObj.medidas) {
-                containerSizes.innerHTML = '<p style="color:var(--text-muted); font-size:0.8rem;">Sin medidas configuradas.</p>';
+            if (!catObj || !catObj.medidas) {
+                container.innerHTML = '<p style="color:var(--text-muted); font-size:0.8rem;">Sin medidas configuradas.</p>';
                 return;
             }
             const medidasFiltradas = catObj.medidas.filter(m => m !== 'Todas');
-            containerSizes.innerHTML = medidasFiltradas.map(m => `
+            container.innerHTML = medidasFiltradas.map(m => `
                 <label class="size-checkbox-label">
                     <input type="checkbox" class="chk-talla" value="${m}"> ${m}
                 </label>
@@ -515,6 +485,7 @@
             }
             return ['https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano'];
         }
+
         // Carga de productos paginada desde Supabase (Versión Corregida)
         async function cargarProductosPaginados(esNuevaBusqueda = false) {
             const btnLoadMore = document.getElementById('btn-load-more');
@@ -537,7 +508,7 @@
                 queryBuilder = queryBuilder.eq('categoria', categoriaActual);
             }
             if (subcategoriaActual !== 'Todas') {
-                queryBuilder = queryBuilder.eq('subcategoria', subcategoriaActual);
+                queryBuilder = queryBuilder.ilike('tallas', `%${subcategoriaActual}%`);
             }
             const queryText = document.getElementById('search-input').value.trim();
             if (queryText !== '') {
@@ -596,6 +567,7 @@
                 
                 const imagenesArr = obtenerArregloImagenes(prod.img);
                 const portadaUrl = imagenesArr[0];
+
                 const card = document.createElement('div');
                 card.className = `product-card ${estaDisponible ? '' : 'out-of-stock'}`;
                 card.innerHTML = `
@@ -632,22 +604,10 @@
             subcategoriaActual = 'Todas';
             const subContainer = document.getElementById('subcategories-container');
             const catObj = categoriasData.find(c => c.nombre === categoria);
-            
-            let subcats = [];
-            if (catObj && catObj.subcategorias) {
-                if (Array.isArray(catObj.subcategorias)) {
-                    subcats = catObj.subcategorias;
-                } else if (typeof catObj.subcategorias === 'string') {
-                    subcats = catObj.subcategorias.split(',').map(s => s.trim()).filter(s => s !== '');
-                }
-            }
-
-            if (catObj && subcats.length > 0) {
-                let html = `<button class="subcategory-btn active" onclick="filtrarSubcategoria('Todas', this)">Todas</button>`;
-                subcats.forEach(sub => {
-                    html += `<button class="subcategory-btn" onclick="filtrarSubcategoria('${sub}', this)">${sub}</button>`;
-                });
-                subContainer.innerHTML = html;
+            if (catObj && catObj.medidas && catObj.medidas.length > 0) {
+                subContainer.innerHTML = catObj.medidas.map((medida, index) => `
+                    <button class="subcategory-btn ${index === 0 ? 'active' : ''}" onclick="filtrarSubcategoria('${medida}', this)">${medida}</button>
+                `).join('');
                 subContainer.classList.add('open');
             } else {
                 subContainer.innerHTML = '';
@@ -655,23 +615,19 @@
             }
             cargarProductosPaginados(true);
         }
-        function filtrarSubcategoria(subcat, btn) {
+        function filtrarSubcategoria(medida, btn) {
             document.querySelectorAll('.subcategory-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            subcategoriaActual = subcat;
+            subcategoriaActual = medida;
             cargarProductosPaginados(true);
         }
         async function guardarNuevaCategoria(event) {
             event.preventDefault();
             const nombre = document.getElementById('cat-nombre').value.trim();
-            const subcatsRaw = document.getElementById('cat-subcategorias').value;
             const medidasRaw = document.getElementById('cat-medidas').value;
-            
-            let subcategorias = subcatsRaw.split(',').map(s => s.trim()).filter(s => s !== '');
             let medidas = medidasRaw.split(',').map(m => m.trim()).filter(m => m !== '');
             if (!medidas.includes('Todas')) medidas.unshift('Todas');
-            
-            const { error } = await supabaseClient.from('categorias').insert([{ nombre, subcategorias, medidas }]);
+            const { error } = await supabaseClient.from('categorias').insert([{ nombre, medidas }]);
             if (error) return alert("Error: " + error.message);
             document.getElementById('form-nueva-categoria').reset();
             await cargarCategoriasDesdeSupabase();
@@ -680,19 +636,15 @@
         }
         function renderListaCategoriasAdmin() {
             const container = document.getElementById('lista-categorias-admin');
-            container.innerHTML = categoriasData.map(c => {
-                const subStr = Array.isArray(c.subcategorias) ? c.subcategorias.join(', ') : (c.subcategorias || 'Sin subcategorías');
-                const medStr = Array.isArray(c.medidas) ? c.medidas.join(', ') : (c.medidas || '');
-                return `
+            container.innerHTML = categoriasData.map(c => `
                 <div class="cat-admin-item">
                     <div>
                         <strong>${c.nombre}</strong><br>
-                        <small style="color:var(--text-muted);">Subcategorías: ${subStr}</small><br>
-                        <small style="color:var(--text-muted);">Medidas: ${medStr}</small>
+                        <small style="color:var(--text-muted);">${c.medidas.join(', ')}</small>
                     </div>
                     <button class="btn-cat-del" onclick="eliminarCategoria(${c.id})">Eliminar</button>
                 </div>
-            `}).join('');
+            `).join('');
         }
         async function eliminarCategoria(id) {
             if (confirm("¿Eliminar esta categoría?")) {
@@ -729,13 +681,10 @@
             document.getElementById('prod-categoria').value = prod.categoria;
             document.getElementById('prod-disponible').value = prod.disponible !== false ? 'true' : 'false';
             
-            actualizarSubcategoriasYMedidasFormulario();
-            if (prod.subcategoria) {
-                document.getElementById('prod-subcategoria').value = prod.subcategoria;
-            }
-
             const arrImg = obtenerArregloImagenes(prod.img);
             document.getElementById('prod-img-url').value = arrImg.join(', ');
+
+            actualizarTallasFormulario();
             if (prod.tallas) {
                 const tallasArr = prod.tallas.split(',').map(t => t.trim());
                 document.querySelectorAll('.chk-talla').forEach(cb => {
@@ -747,6 +696,7 @@
         function cerrarModalAdmin() { document.getElementById('admin-modal').classList.remove('open'); }
         function abrirModalLogin() { document.getElementById('login-modal').classList.add('open'); }
         function cerrarModalLogin() { document.getElementById('login-modal').classList.remove('open'); }
+
         // Funciones del Visor de Galería con Flechas
         function abrirVisorGaleria(idProd) {
             const prod = productos.find(p => p.id === idProd);
@@ -756,12 +706,15 @@
             actualizarVisorImagen();
             document.getElementById('image-viewer-modal').classList.add('open');
         }
+
         function actualizarVisorImagen() {
             const imgEl = document.getElementById('image-viewer-img');
             const prevBtn = document.getElementById('viewer-prev-btn');
             const nextBtn = document.getElementById('viewer-next-btn');
             const counterEl = document.getElementById('viewer-counter-label');
+
             imgEl.src = visorImagenesActuales[visorIndiceActual];
+
             if (visorImagenesActuales.length > 1) {
                 prevBtn.style.display = 'flex';
                 nextBtn.style.display = 'flex';
@@ -773,6 +726,7 @@
                 counterEl.style.display = 'none';
             }
         }
+
         function navegarImagenVisor(direccion) {
             visorIndiceActual += direccion;
             if (visorIndiceActual < 0) {
@@ -782,9 +736,11 @@
             }
             actualizarVisorImagen();
         }
+
         function cerrarVisorImagen() { 
             document.getElementById('image-viewer-modal').classList.remove('open'); 
         }
+
         async function subirImagenesASupabaseStorage(files) {
             const urlsSubidas = [];
             for (let i = 0; i < files.length; i++) {
@@ -805,6 +761,7 @@
             }
             return urlsSubidas;
         }
+
         async function guardarProducto(event) {
             event.preventDefault();
             const btnSave = document.getElementById('btn-save');
@@ -814,7 +771,6 @@
             const nombre = document.getElementById('prod-nombre').value;
             const precio = parseFloat(document.getElementById('prod-precio').value);
             const categoria = document.getElementById('prod-categoria').value;
-            const subcategoria = document.getElementById('prod-subcategoria').value;
             const disponible = document.getElementById('prod-disponible').value === 'true';
             const fileInput = document.getElementById('prod-file');
             const urlInput = document.getElementById('prod-img-url').value.trim();
@@ -826,6 +782,7 @@
             if (urlInput !== '') {
                 imagenesFinales = urlInput.split(',').map(u => u.trim()).filter(u => u !== '');
             }
+
             try {
                 btnSave.disabled = true;
                 btnSave.textContent = "Guardando...";
@@ -837,14 +794,16 @@
                     const prodActual = productos.find(p => p.id === parseInt(prodId));
                     if (prodActual) imagenesFinales = obtenerArregloImagenes(prodActual.img);
                 }
+
                 if (imagenesFinales.length === 0) {
                     imagenesFinales = ["https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano"];
                 }
+
                 let res;
                 if (esEdicion) {
-                    res = await supabaseClient.from('productos').update({ codigo, nombre, precio, categoria, subcategoria, tallas, disponible, img: imagenesFinales }).eq('id', prodId);
+                    res = await supabaseClient.from('productos').update({ codigo, nombre, precio, categoria, tallas, disponible, img: imagenesFinales }).eq('id', prodId);
                 } else {
-                    res = await supabaseClient.from('productos').insert([{ codigo, nombre, precio, categoria, subcategoria, tallas, disponible, img: imagenesFinales }]);
+                    res = await supabaseClient.from('productos').insert([{ codigo, nombre, precio, categoria, tallas, disponible, img: imagenesFinales }]);
                 }
                 if (res.error) {
                     alert("Error al guardar en la base de datos: " + res.error.message);
