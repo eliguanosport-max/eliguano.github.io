@@ -407,7 +407,6 @@
         
         let visorImagenesActuales = [];
         let visorIndiceActual = 0;
-
         function obtenerArregloColeccion(datos) {
             if (!datos) return [];
             if (Array.isArray(datos)) return datos;
@@ -420,7 +419,6 @@
             }
             return [];
         }
-
         document.addEventListener("DOMContentLoaded", async () => {
             await verificarSesionAdmin();
             await cargarCategoriasDesdeSupabase();
@@ -688,7 +686,6 @@
             } else {
                 selectSub.classList.remove('open');
             }
-
             if (catObj && catObj.medidas) {
                 const medidasArr = obtenerArregloColeccion(catObj.medidas);
                 if (medidasArr.length > 0) {
@@ -776,7 +773,6 @@
                 const medidasArr = obtenerArregloColeccion(c.medidas);
                 const subsStr = subsArr.length > 0 ? subsArr.join(', ') : 'Ninguna';
                 const medidasStr = medidasArr.length > 0 ? medidasArr.join(', ') : 'Ninguna';
-
                 return `
                 <div class="cat-admin-item">
                     <div>
