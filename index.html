@@ -45,9 +45,38 @@
             height: 24px;
             fill: currentColor;
         }
-        .admin-profile-btn { position: absolute; top: 0; right: 10px; background: none; border: 1px solid var(--border-color); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted); }
+
+        /* Contenedor derecho del header para perfil y botón Reordenar admin */
+        .header-right-controls {
+            position: absolute;
+            top: 0;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .admin-profile-btn { background: none; border: 1px solid var(--border-color); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted); }
         .admin-profile-btn.logged-in { border-color: #22c55e; color: #22c55e; background-color: rgba(34, 197, 94, 0.1); }
         .admin-profile-btn svg { width: 22px; height: 22px; fill: currentColor; }
+
+        /* Botón Reordenar de Admin en esquina superior derecha */
+        .btn-admin-shuffle {
+            display: none;
+            background-color: #8b5cf6;
+            color: #ffffff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            cursor: pointer;
+            white-space: nowrap;
+            align-items: center;
+            gap: 4px;
+        }
+
         .brand-logo { width: 70px; height: 70px; object-fit: contain; border-radius: 50%; transition: all 0.3s ease; }
         .header-text { margin-top: 8px; transition: opacity 0.3s ease, max-height 0.3s ease, margin-top 0.3s ease; opacity: 1; max-height: 100px; overflow: hidden; }
         
@@ -197,9 +226,14 @@
                     <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
                 </a>
             </div>
-            <button class="admin-profile-btn" id="admin-profile-btn" onclick="manejarClicIconoAdmin()" title="Mi Cuenta">
-                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-            </button>
+            
+            <div class="header-right-controls">
+                <button class="btn-admin-shuffle" id="btn-admin-shuffle" onclick="reordenarProductosAleatorios()" title="Revolver productos aleatoriamente">🎲 Reordenar</button>
+                <button class="admin-profile-btn" id="admin-profile-btn" onclick="manejarClicIconoAdmin()" title="Mi Cuenta">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                </button>
+            </div>
+
             <img src="Logo.jpeg" alt="El iguano Logo" class="brand-logo">
             <div class="header-text">
                 <h1>El iguano</h1>
@@ -438,16 +472,23 @@
             const btnAdd = document.getElementById('btn-admin-add');
             const btnCat = document.getElementById('btn-admin-cat');
             const btnLogout = document.getElementById('btn-admin-logout');
+            const btnShuffle = document.getElementById('btn-admin-shuffle');
+
             if (estaAutenticado) {
                 btnProfile.classList.add('logged-in');
                 btnAdd.style.display = 'block';
                 btnCat.style.display = 'block';
                 btnLogout.style.display = 'block';
+                // Mostrar botón reordenar solo si estamos en la categoría "Todas"
+                if (categoriaActual === 'Todas') {
+                    btnShuffle.style.display = 'flex';
+                }
             } else {
                 btnProfile.classList.remove('logged-in');
                 btnAdd.style.display = 'none';
                 btnCat.style.display = 'none';
                 btnLogout.style.display = 'none';
+                btnShuffle.style.display = 'none';
             }
         }
         async function iniciarSesionAdmin(event) {
@@ -617,6 +658,18 @@
                 cargarProductosPaginados(true);
             }, 300);
         }
+
+        // Función para revolver los productos cargados aleatoriamente (Solo en "Todas")
+        function reordenarProductosAleatorios() {
+            if (categoriaActual !== 'Todas') return;
+            // Algoritmo de Fisher-Yates para mezclar el arreglo localmente
+            for (let i = productos.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [productos[i], productos[j]] = [productos[j], productos[i]];
+            }
+            renderizarCatalogo(productos, true);
+        }
+
         function renderizarCatalogo(lista, reiniciar = true, itemsNuevos = []) {
             const container = document.getElementById('catalog-container');
             if (reiniciar) container.innerHTML = '';
@@ -668,6 +721,14 @@
             categoriaActual = categoria;
             subcategoriaDesplegableActual = 'Todas';
             medidaActual = 'Todas';
+
+            // Mostrar u ocultar el botón de reordenar de admin según si estamos en "Todas" y con sesión activa
+            const btnShuffle = document.getElementById('btn-admin-shuffle');
+            if (esAdmin && categoriaActual === 'Todas') {
+                btnShuffle.style.display = 'flex';
+            } else {
+                btnShuffle.style.display = 'none';
+            }
             
             const selectSub = document.getElementById('select-subcategoria-filter');
             const subContainer = document.getElementById('subcategories-container');
@@ -727,10 +788,8 @@
             
             let res;
             if (catId) {
-                // Actualizar
                 res = await supabaseClient.from('categorias').update({ nombre, subcategorias, medidas }).eq('id', catId);
             } else {
-                // Insertar nueva
                 res = await supabaseClient.from('categorias').insert([{ nombre, subcategorias, medidas }]);
             }
             
