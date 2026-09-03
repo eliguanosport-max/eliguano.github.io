@@ -57,87 +57,25 @@
         .search-container { padding: 12px 15px 5px 15px; background-color: var(--bg-color); }
         .search-input { width: 100%; padding: 12px 16px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 25px; color: var(--text-main); font-size: 0.9rem; outline: none; }
         
-        /* Sistema de Navegación con Desplegable (Dropdown) Estilo Menú Superior */
-        .categories-wrapper { 
-            display: flex; 
-            align-items: center; 
-            background-color: #181818; 
-            border-bottom: 1px solid var(--border-color); 
-            position: sticky; 
-            top: 60px; 
-            z-index: 90; 
-            padding: 0 15px;
-        }
-        .categories-nav { 
-            display: flex; 
-            gap: 2px; 
-            overflow-x: auto; 
-            flex-grow: 1; 
-            align-items: stretch; 
-        }
+        .categories-wrapper { display: flex; align-items: center; background-color: var(--bg-color); border-bottom: 1px solid var(--border-color); position: sticky; top: 60px; z-index: 90; padding: 10px 15px; gap: 10px; }
+        .categories { display: flex; gap: 10px; overflow-x: auto; flex-grow: 1; align-items: center; }
+        .category-btn { background-color: var(--card-bg); color: var(--text-muted); border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 25px; white-space: nowrap; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
+        .category-btn.active { background-color: var(--accent-color); color: #121212; border-color: var(--accent-color); }
         
-        /* Elemento de Categoría Principal */
-        .nav-item {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-        .category-btn { 
-            background-color: transparent; 
-            color: var(--text-muted); 
-            border: none;
-            padding: 14px 18px; 
-            cursor: pointer; 
-            font-weight: 600; 
-            font-size: 0.9rem; 
-            white-space: nowrap;
-            transition: background 0.2s ease, color 0.2s ease;
-        }
-        .nav-item:hover .category-btn, .category-btn.active { 
-            background-color: #252525; 
-            color: var(--accent-color); 
-        }
+        /* Desplegable de Subcategorías */
+        .select-subcategory { display: none; background-color: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color); padding: 7px 12px; border-radius: 20px; font-size: 0.82rem; font-weight: 600; outline: none; cursor: pointer; }
+        .select-subcategory.open { display: inline-block; }
 
-        /* Menú Desplegable Azul de Subcategorías */
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            min-width: 200px;
-            background-color: #222222;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.7);
-            z-index: 1000;
-            flex-direction: column;
-            border-radius: 0 0 6px 6px;
-        }
-        .nav-item:hover .dropdown-menu {
-            display: flex;
-        }
-        .subcategory-btn { 
-            background-color: transparent; 
-            color: var(--text-muted); 
-            border: none; 
-            border-bottom: 1px solid #2d2d2d;
-            padding: 10px 16px; 
-            text-align: left;
-            cursor: pointer; 
-            font-weight: 500; 
-            font-size: 0.85rem; 
-            transition: background 0.2s ease, color 0.2s ease;
-        }
-        .subcategory-btn:last-child { border-bottom: none; }
-        .subcategory-btn:hover, .subcategory-btn.active { 
-            background-color: #333333; 
-            color: #ffffff; 
-            font-weight: 700; 
-        }
-
-        .admin-controls { display: flex; gap: 8px; margin-left: 10px; align-items: center; }
+        .subcategories-container { display: none; gap: 8px; padding: 10px 15px; background-color: #181818; border-bottom: 1px solid var(--border-color); overflow-x: auto; align-items: center; }
+        .subcategories-container.open { display: flex; }
+        .subcategory-btn { background-color: #252525; color: var(--text-muted); border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 18px; white-space: nowrap; cursor: pointer; font-weight: 500; font-size: 0.78rem; }
+        .subcategory-btn.active { background-color: #ffffff; color: #000000; border-color: #ffffff; font-weight: 700; }
+        
+        .admin-controls { display: flex; gap: 8px; }
         .btn-admin-add, .btn-admin-cat { display: none; background-color: #22c55e; color: #ffffff; border: none; padding: 8px 14px; border-radius: 25px; font-weight: 700; font-size: 0.8rem; cursor: pointer; white-space: nowrap; }
         .btn-admin-cat { background-color: #3b82f6; }
         .btn-admin-logout { display: none; background-color: #ef4444; color: #ffffff; border: none; padding: 8px 12px; border-radius: 25px; font-weight: 600; font-size: 0.8rem; cursor: pointer; white-space: nowrap; }
+        
         .catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 15px; }
         .product-card { background-color: var(--card-bg); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--border-color); position: relative; }
         .product-card.out-of-stock .product-img { opacity: 0.4; filter: grayscale(80%); }
@@ -154,16 +92,19 @@
         .btn-delete-admin, .btn-edit-admin { display: none; position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.9); color: #fff; border: none; border-radius: 50%; width: 28px; height: 28px; font-weight: bold; cursor: pointer; z-index: 5; }
         .btn-edit-admin { right: 40px; background: rgba(59, 130, 246, 0.9); }
         .btn-toggle-stock-admin { display: none; position: absolute; top: 8px; left: 8px; background: rgba(34, 197, 94, 0.9); color: #fff; border: none; border-radius: 14px; padding: 0 8px; height: 28px; font-size: 0.75rem; font-weight: bold; cursor: pointer; z-index: 5; }
+        
         .load-more-container { text-align: center; padding: 20px 15px; }
         .btn-load-more { background-color: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color); padding: 12px 24px; border-radius: 25px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; }
         .btn-load-more:hover { background-color: var(--accent-color); color: #121212; }
         .cart-bar { position: fixed; bottom: 15px; left: 5%; width: 90%; background-color: var(--accent-color); color: #121212; padding: 14px 20px; border-radius: 30px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6); cursor: pointer; z-index: 101; }
+        
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); z-index: 200; justify-content: center; align-items: flex-end; }
         .modal.open { display: flex; }
         .modal-content { background-color: #181818; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px; max-height: 85vh; display: flex; flex-direction: column; border-top: 1px solid var(--border-color); overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 15px; }
         .modal-header h2 { font-size: 1.2rem; color: var(--accent-color); }
         .close-modal { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
+        
         .cart-items { overflow-y: auto; flex-grow: 1; margin-bottom: 15px; }
         .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-color); gap: 10px; }
         .cart-item-info { display: flex; align-items: center; gap: 12px; flex-grow: 1; }
@@ -180,6 +121,7 @@
         .cart-footer { border-top: 1px solid var(--border-color); padding-top: 15px; }
         .cart-total { display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; }
         .btn-send-whatsapp { width: 100%; background-color: #22c55e; color: #ffffff; border: none; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; text-transform: uppercase; }
+        
         .form-group { margin-bottom: 14px; }
         .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; }
         .form-group input[type="text"], .form-group input[type="email"], .form-group input[type="password"], .form-group input[type="number"], .form-group select { width: 100%; padding: 10px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-main); font-size: 0.9rem; }
@@ -232,7 +174,15 @@
         .viewer-nav-btn:hover { background: rgba(0, 0, 0, 0.9); transform: translateY(-50%) scale(1.1); }
         .viewer-prev { left: -20px; }
         .viewer-next { right: -20px; }
-        .viewer-counter { position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%); color: var(--text-muted); font-size: 0.85rem; font-weight: 600; }
+        .viewer-counter {
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -256,34 +206,43 @@
             </div>
         </div>
     </header>
+    
     <div class="search-container">
         <input type="text" id="search-input" class="search-input" placeholder="🔍 Buscar producto por nombre o código..." oninput="manejarCambioFiltros()">
     </div>
     
-    <!-- Menú Estilo Barra Superior con Dropdown -->
     <div class="categories-wrapper">
-        <nav class="categories-nav" id="categories-bar-container">
-            <!-- Carga dinámica -->
-        </nav>
+        <div class="categories" id="categories-bar-container"></div>
+        
+        <!-- Desplegable para filtrar por Subcategoría -->
+        <select id="select-subcategoria-filter" class="select-subcategory" onchange="filtrarPorDropdownSubcategoria(this.value)">
+            <option value="Todas">Todas las subcategorías</option>
+        </select>
+
         <div class="admin-controls">
             <button class="btn-admin-add" id="btn-admin-add" onclick="abrirModalAdminCrear()">➕ Producto</button>
             <button class="btn-admin-cat" id="btn-admin-cat" onclick="abrirModalGestionCategorias()">📂 Categorías</button>
             <button class="btn-admin-logout" id="btn-admin-logout" onclick="cerrarSesionAdmin()">Salir</button>
         </div>
     </div>
+    <div class="subcategories-container" id="subcategories-container"></div>
     
     <main class="catalog" id="catalog-container">
         <p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">Cargando catálogo...</p>
     </main>
+    
     <div class="load-more-container" id="load-more-container" style="display: none;">
         <button class="btn-load-more" id="btn-load-more" onclick="cargarMasProductos()">Cargar más productos</button>
     </div>
+    
     <div class="cart-bar" onclick="abrirCarrito()">
         <span id="cart-count-label">🛒 Carrito (0 prendas)</span>
         <span id="cart-total-label">$0 MXN &rarr;</span>
     </div>
+    
     <div id="toast-notification" class="toast-notification">¡Producto agregado al carrito!</div>
     
+    <!-- Visor Imagen Ampliada -->
     <div class="modal" id="image-viewer-modal" style="align-items: center;" onclick="cerrarVisorImagen()">
         <div style="position: relative; max-width: 90vw; max-height: 90vh; display: flex; align-items: center; justify-content: center;" onclick="event.stopPropagation()">
             <button class="close-modal" onclick="cerrarVisorImagen()" style="position: absolute; top: -40px; right: 0; color: #fff; font-size: 2.5rem;">&times;</button>
@@ -294,6 +253,7 @@
         </div>
     </div>
     
+    <!-- Modal Carrito -->
     <div class="modal" id="cart-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -311,6 +271,7 @@
         </div>
     </div>
     
+    <!-- Modal Login -->
     <div class="modal" id="login-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -331,6 +292,7 @@
         </div>
     </div>
     
+    <!-- Modal Formulario Producto Admin -->
     <div class="modal" id="admin-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -353,7 +315,11 @@
                 </div>
                 <div class="form-group">
                     <label>Categoría:</label>
-                    <select id="prod-categoria" onchange="actualizarTallasFormulario()"></select>
+                    <select id="prod-categoria" onchange="alCambiarCategoriaEnModal()"></select>
+                </div>
+                <div class="form-group">
+                    <label>Subcategoría:</label>
+                    <select id="prod-subcategoria"></select>
                 </div>
                 <div class="form-group">
                     <label>Estado inicial:</label>
@@ -379,6 +345,7 @@
         </div>
     </div>
     
+    <!-- Modal Gestión Categorías Admin -->
     <div class="modal" id="cat-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -392,7 +359,7 @@
                 </div>
                 <div class="form-group">
                     <label>Subcategorías (Separadas por comas):</label>
-                    <input type="text" id="cat-subcategorias" placeholder="Ej. Planas, Ajustables, Cerradas">
+                    <input type="text" id="cat-subcategorias" placeholder="Ej. Tenis, Botas, Sandalias">
                 </div>
                 <div class="form-group">
                     <label>Medidas/Tallas (Separadas por comas):</label>
@@ -419,19 +386,23 @@
         const SUPABASE_URL = "https://ywixgizcadytczxcbubg.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3aXhnaXpjYWR5dGN6eGNidWJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxMzkzNTIsImV4cCI6MjEwMzcxNTM1Mn0.ABIAb8426hAdnJw5nxvGhxorAL6s8RHvlhHkDsb06Ts";
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
         const numeroTelefono = "5214961228531";
-
+        
         let esAdmin = false;
         let carrito = [];
         let categoriaActual = 'Todas';
-        let subcategoriaActual = 'Todas';
+        let subcategoriaDesplegableActual = 'Todas';
+        let medidaActual = 'Todas';
         let productos = [];
         let categoriasData = [];
+        
         const PAGE_SIZE = 12;
         let paginaActual = 0;
         let hayMasProductos = true;
         let busquedaTimer;
         let toastTimer;
+        
         let visorImagenesActuales = [];
         let visorIndiceActual = 0;
 
@@ -499,58 +470,42 @@
             renderizarSelectCategoriasModal();
         }
 
-        /* Renderizar Categorías en Rojo y Subcategorías en Menú Desplegable Azul */
         function renderizarBarraCategorias() {
             const container = document.getElementById('categories-bar-container');
-            
-            let html = `
-                <div class="nav-item">
-                    <button class="category-btn ${categoriaActual === 'Todas' ? 'active' : ''}" onclick="seleccionarCategoria('Todas', 'Todas')">Todas</button>
-                </div>
-            `;
+            let html = `<button class="category-btn ${categoriaActual === 'Todas' ? 'active' : ''}" onclick="filtrarCategoria('Todas', this)">Todas</button>`;
             
             categoriasData.forEach(cat => {
-                let subcats = [];
-                if (Array.isArray(cat.subcategorias)) subcats = cat.subcategorias;
-                else if (typeof cat.subcategorias === 'string') subcats = cat.subcategorias.split(',').map(s => s.trim()).filter(s => s !== '');
-
-                let medidas = [];
-                if (Array.isArray(cat.medidas)) medidas = cat.medidas;
-                else if (typeof cat.medidas === 'string') medidas = cat.medidas.split(',').map(m => m.trim()).filter(m => m !== '');
-
-                const listaOpciones = subcats.length > 0 ? subcats : medidas;
-                const tieneSubmenu = listaOpciones.length > 0;
-
-                html += `
-                    <div class="nav-item">
-                        <button class="category-btn ${categoriaActual === cat.nombre ? 'active' : ''}" onclick="seleccionarCategoria('${cat.nombre}', 'Todas')">
-                            ${cat.nombre} ${tieneSubmenu ? '▾' : ''}
-                        </button>
-                        ${tieneSubmenu ? `
-                            <div class="dropdown-menu">
-                                <button class="subcategory-btn ${categoriaActual === cat.nombre && subcategoriaActual === 'Todas' ? 'active' : ''}" onclick="seleccionarCategoria('${cat.nombre}', 'Todas')">Ver todo en ${cat.nombre}</button>
-                                ${listaOpciones.map(sub => `
-                                    <button class="subcategory-btn ${categoriaActual === cat.nombre && subcategoriaActual === sub ? 'active' : ''}" onclick="seleccionarCategoria('${cat.nombre}', '${sub}')">${sub}</button>
-                                `).join('')}
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
+                html += `<button class="category-btn ${categoriaActual === cat.nombre ? 'active' : ''}" onclick="filtrarCategoria('${cat.nombre}', this)">${cat.nombre}</button>`;
             });
             container.innerHTML = html;
-        }
-
-        function seleccionarCategoria(cat, subcat) {
-            categoriaActual = cat;
-            subcategoriaActual = subcat;
-            renderizarBarraCategorias();
-            cargarProductosPaginados(true);
         }
 
         function renderizarSelectCategoriasModal() {
             const select = document.getElementById('prod-categoria');
             select.innerHTML = categoriasData.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
+            alCambiarCategoriaEnModal();
+        }
+
+        function alCambiarCategoriaEnModal() {
+            actualizarSubcategoriasModal();
             actualizarTallasFormulario();
+        }
+
+        function actualizarSubcategoriasModal() {
+            const catNombre = document.getElementById('prod-categoria').value;
+            const selectSub = document.getElementById('prod-subcategoria');
+            const catObj = categoriasData.find(c => c.nombre === catNombre);
+            
+            if (!catObj || !catObj.subcategorias || catObj.subcategorias.length === 0) {
+                selectSub.innerHTML = '<option value="">Ninguna</option>';
+                return;
+            }
+            
+            const subs = Array.isArray(catObj.subcategorias) 
+                ? catObj.subcategorias 
+                : catObj.subcategorias.split(',').map(s => s.trim());
+                
+            selectSub.innerHTML = subs.map(s => `<option value="${s}">${s}</option>`).join('');
         }
 
         function actualizarTallasFormulario() {
@@ -561,8 +516,7 @@
                 container.innerHTML = '<p style="color:var(--text-muted); font-size:0.8rem;">Sin medidas configuradas.</p>';
                 return;
             }
-            let medidasArr = Array.isArray(catObj.medidas) ? catObj.medidas : typeof catObj.medidas === 'string' ? catObj.medidas.split(',').map(m => m.trim()) : [];
-            const medidasFiltradas = medidasArr.filter(m => m !== 'Todas');
+            const medidasFiltradas = catObj.medidas.filter(m => m !== 'Todas');
             container.innerHTML = medidasFiltradas.map(m => `
                 <label class="size-checkbox-label">
                     <input type="checkbox" class="chk-talla" value="${m}"> ${m}
@@ -594,20 +548,29 @@
             if (!hayMasProductos) return;
             btnLoadMore.textContent = "Cargando...";
             btnLoadMore.disabled = true;
+            
             const desde = paginaActual * PAGE_SIZE;
             const hasta = desde + PAGE_SIZE - 1;
-            let queryBuilder = supabaseClient.from('productos').select('*', { count: 'exact' });
             
+            let queryBuilder = supabaseClient
+                .from('productos')
+                .select('*', { count: 'exact' });
+                
             if (categoriaActual !== 'Todas') {
                 queryBuilder = queryBuilder.eq('categoria', categoriaActual);
             }
-            if (subcategoriaActual !== 'Todas') {
-                queryBuilder = queryBuilder.ilike('tallas', `%${subcategoriaActual}%`);
+            if (subcategoriaDesplegableActual !== 'Todas') {
+                queryBuilder = queryBuilder.eq('subcategoria', subcategoriaDesplegableActual);
             }
+            if (medidaActual !== 'Todas') {
+                queryBuilder = queryBuilder.ilike('tallas', `%${medidaActual}%`);
+            }
+            
             const queryText = document.getElementById('search-input').value.trim();
             if (queryText !== '') {
                 queryBuilder = queryBuilder.or(`nombre.ilike.%${queryText}%,codigo.ilike.%${queryText}%`);
             }
+            
             queryBuilder = queryBuilder.order('id', { ascending: false }).range(desde, hasta);
             const { data, count, error } = await queryBuilder;
             if (error) {
@@ -616,12 +579,15 @@
                 return;
             }
             const recibidos = data || [];
+            
             const idsExistentes = new Set(productos.map(p => p.id));
             const nuevosSinDuplicar = recibidos.filter(p => !idsExistentes.has(p.id));
             productos = esNuevaBusqueda ? recibidos : [...productos, ...nuevosSinDuplicar];
+            
             if (productos.length >= count || recibidos.length < PAGE_SIZE) {
                 hayMasProductos = false;
             }
+            
             renderizarCatalogo(productos, esNuevaBusqueda, nuevosSinDuplicar);
             paginaActual++;
             const loadMoreContainer = document.getElementById('load-more-container');
@@ -634,11 +600,15 @@
             }
         }
 
-        function cargarMasProductos() { cargarProductosPaginados(false); }
+        function cargarMasProductos() {
+            cargarProductosPaginados(false);
+        }
 
         function manejarCambioFiltros() {
             clearTimeout(busquedaTimer);
-            busquedaTimer = setTimeout(() => { cargarProductosPaginados(true); }, 300);
+            busquedaTimer = setTimeout(() => {
+                cargarProductosPaginados(true);
+            }, 300);
         }
 
         function renderizarCatalogo(lista, reiniciar = true, itemsNuevos = []) {
@@ -654,6 +624,7 @@
                 const codigoProd = prod.codigo || '';
                 const listaTallas = prod.tallas ? prod.tallas.split(',').map(t => t.trim()) : ['Única'];
                 const opcionesHTML = listaTallas.map(t => `<option value="${t}">${t}</option>`).join('');
+                
                 const imagenesArr = obtenerArregloImagenes(prod.img);
                 const portadaUrl = imagenesArr[0];
                 const card = document.createElement('div');
@@ -686,16 +657,71 @@
             });
         }
 
+        function filtrarCategoria(categoria, btn) {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            categoriaActual = categoria;
+            subcategoriaDesplegableActual = 'Todas';
+            medidaActual = 'Todas';
+            
+            const selectSub = document.getElementById('select-subcategoria-filter');
+            const subContainer = document.getElementById('subcategories-container');
+            const catObj = categoriasData.find(c => c.nombre === categoria);
+            
+            if (catObj && catObj.subcategorias) {
+                const subs = Array.isArray(catObj.subcategorias) 
+                    ? catObj.subcategorias 
+                    : catObj.subcategorias.split(',').map(s => s.trim());
+                    
+                if (subs.length > 0) {
+                    selectSub.innerHTML = '<option value="Todas">Todas las subcategorías</option>' + 
+                        subs.map(s => `<option value="${s}">${s}</option>`).join('');
+                    selectSub.classList.add('open');
+                } else {
+                    selectSub.classList.remove('open');
+                }
+            } else {
+                selectSub.classList.remove('open');
+            }
+
+            if (catObj && catObj.medidas && catObj.medidas.length > 0) {
+                subContainer.innerHTML = catObj.medidas.map((medida, index) => `
+                    <button class="subcategory-btn ${index === 0 ? 'active' : ''}" onclick="filtrarSubcategoria('${medida}', this)">${medida}</button>
+                `).join('');
+                subContainer.classList.add('open');
+            } else {
+                subContainer.innerHTML = '';
+                subContainer.classList.remove('open');
+            }
+            
+            cargarProductosPaginados(true);
+        }
+
+        function filtrarPorDropdownSubcategoria(subcat) {
+            subcategoriaDesplegableActual = subcat;
+            cargarProductosPaginados(true);
+        }
+
+        function filtrarSubcategoria(medida, btn) {
+            document.querySelectorAll('.subcategory-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            medidaActual = medida;
+            cargarProductosPaginados(true);
+        }
+
         async function guardarNuevaCategoria(event) {
             event.preventDefault();
             const nombre = document.getElementById('cat-nombre').value.trim();
+            const subcatsRaw = document.getElementById('cat-subcategorias').value;
             const medidasRaw = document.getElementById('cat-medidas').value;
-            const subcatRaw = document.getElementById('cat-subcategorias').value;
+            
+            let subcategorias = subcatsRaw ? subcatsRaw.split(',').map(s => s.trim()).filter(s => s !== '') : [];
             let medidas = medidasRaw.split(',').map(m => m.trim()).filter(m => m !== '');
             if (!medidas.includes('Todas')) medidas.unshift('Todas');
-            let subcategorias = subcatRaw.split(',').map(s => s.trim()).filter(s => s !== '');
-            const { error } = await supabaseClient.from('categorias').insert([{ nombre, medidas, subcategorias }]);
+            
+            const { error } = await supabaseClient.from('categorias').insert([{ nombre, subcategorias, medidas }]);
             if (error) return alert("Error: " + error.message);
+            
             document.getElementById('form-nueva-categoria').reset();
             await cargarCategoriasDesdeSupabase();
             renderListaCategoriasAdmin();
@@ -704,28 +730,20 @@
 
         function renderListaCategoriasAdmin() {
             const container = document.getElementById('lista-categorias-admin');
-            if (!container) return;
-
-            if (!categoriasData || categoriasData.length === 0) {
-                container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No hay categorías registradas.</p>';
-                return;
-            }
-
             container.innerHTML = categoriasData.map(c => {
-                let subcats = Array.isArray(c.subcategorias) ? c.subcategorias : typeof c.subcategorias === 'string' ? c.subcategorias.split(',').map(s => s.trim()).filter(s => s !== '') : [];
-                let medidas = Array.isArray(c.medidas) ? c.medidas : typeof c.medidas === 'string' ? c.medidas.split(',').map(m => m.trim()).filter(m => m !== '') : [];
-
+                const subsStr = c.subcategorias 
+                    ? (Array.isArray(c.subcategorias) ? c.subcategorias.join(', ') : c.subcategorias) 
+                    : 'Ninguna';
                 return `
-                    <div class="cat-admin-item">
-                        <div>
-                            <strong>${c.nombre || 'Sin nombre'}</strong><br>
-                            ${subcats.length > 0 ? `<small style="color:var(--accent-color);">Subcats: ${subcats.join(', ')}</small><br>` : ''}
-                            <small style="color:var(--text-muted);">Medidas: ${medidas.length > 0 ? medidas.join(', ') : 'N/A'}</small>
-                        </div>
-                        <button class="btn-cat-del" onclick="eliminarCategoria(${c.id})">Eliminar</button>
+                <div class="cat-admin-item">
+                    <div>
+                        <strong>${c.nombre}</strong><br>
+                        <small style="color:var(--text-muted);">Subcats: ${subsStr}</small><br>
+                        <small style="color:var(--text-muted);">Medidas: ${c.medidas ? c.medidas.join(', ') : ''}</small>
                     </div>
-                `;
-            }).join('');
+                    <button class="btn-cat-del" onclick="eliminarCategoria(${c.id})">Eliminar</button>
+                </div>
+            `}).join('');
         }
 
         async function eliminarCategoria(id) {
@@ -764,11 +782,17 @@
             document.getElementById('prod-nombre').value = prod.nombre;
             document.getElementById('prod-precio').value = prod.precio;
             document.getElementById('prod-categoria').value = prod.categoria;
+            
+            alCambiarCategoriaEnModal();
+            if (prod.subcategoria) {
+                document.getElementById('prod-subcategoria').value = prod.subcategoria;
+            }
+            
             document.getElementById('prod-disponible').value = prod.disponible !== false ? 'true' : 'false';
             
             const arrImg = obtenerArregloImagenes(prod.img);
             document.getElementById('prod-img-url').value = arrImg.join(', ');
-            actualizarTallasFormulario();
+            
             if (prod.tallas) {
                 const tallasArr = prod.tallas.split(',').map(t => t.trim());
                 document.querySelectorAll('.chk-talla').forEach(cb => {
@@ -853,6 +877,7 @@
             const nombre = document.getElementById('prod-nombre').value;
             const precio = parseFloat(document.getElementById('prod-precio').value);
             const categoria = document.getElementById('prod-categoria').value;
+            const subcategoria = document.getElementById('prod-subcategoria').value;
             const disponible = document.getElementById('prod-disponible').value === 'true';
             const fileInput = document.getElementById('prod-file');
             const urlInput = document.getElementById('prod-img-url').value.trim();
@@ -880,9 +905,9 @@
                 }
                 let res;
                 if (esEdicion) {
-                    res = await supabaseClient.from('productos').update({ codigo, nombre, precio, categoria, tallas, disponible, img: imagenesFinales }).eq('id', prodId);
+                    res = await supabaseClient.from('productos').update({ codigo, nombre, precio, categoria, subcategoria, tallas, disponible, img: imagenesFinales }).eq('id', prodId);
                 } else {
-                    res = await supabaseClient.from('productos').insert([{ codigo, nombre, precio, categoria, tallas, disponible, img: imagenesFinales }]);
+                    res = await supabaseClient.from('productos').insert([{ codigo, nombre, precio, categoria, subcategoria, tallas, disponible, img: imagenesFinales }]);
                 }
                 if (res.error) {
                     alert("Error al guardar en la base de datos: " + res.error.message);
@@ -914,7 +939,9 @@
             const toast = document.getElementById('toast-notification');
             toast.classList.add('show');
             clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 2000);
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
         }
 
         function agregarAlCarrito(nombre, codigo, precio, img, idProd) {
