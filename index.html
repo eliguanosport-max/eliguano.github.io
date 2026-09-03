@@ -432,7 +432,6 @@
         let medidaActual = 'Todas';
         let productos = [];
         let categoriasData = [];
-        let ordenAleatorioActivo = true; // Activado por defecto para que al entrar (usuario o admin) aparezca desordenado en "Todas"
         
         const PAGE_SIZE = 12;
         let paginaActual = 0;
@@ -630,14 +629,6 @@
             }
             let recibidos = data || [];
             
-            // Si el orden aleatorio está activo y estamos en "Todas", mezclamos los productos recién cargados
-            if (ordenAleatorioActivo && categoriaActual === 'Todas') {
-                for (let i = recibidos.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [recibidos[i], recibidos[j]] = [recibidos[j], recibidos[i]];
-                }
-            }
-            
             const idsExistentes = new Set(productos.map(p => p.id));
             const nuevosSinDuplicar = recibidos.filter(p => !idsExistentes.has(p.id));
             productos = esNuevaBusqueda ? recibidos : [...productos, ...nuevosSinDuplicar];
@@ -667,10 +658,9 @@
             }, 300);
         }
 
-        // Función para revolver los productos cargados aleatoriamente (Solo en "Todas")
+        // Función para revolver los productos cargados aleatoriamente SOLO al presionar el botón
         function reordenarProductosAleatorios() {
             if (categoriaActual !== 'Todas') return;
-            ordenAleatorioActivo = true;
             
             for (let i = productos.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -730,12 +720,6 @@
             categoriaActual = categoria;
             subcategoriaDesplegableActual = 'Todas';
             medidaActual = 'Todas';
-            
-            if (categoriaActual === 'Todas') {
-                ordenAleatorioActivo = true; // Vuelve a activarse al regresar a "Todas"
-            } else {
-                ordenAleatorioActivo = false; // Se desactiva en otras categorías para mantener orden normal
-            }
 
             const btnShuffle = document.getElementById('btn-admin-shuffle');
             if (esAdmin && categoriaActual === 'Todas') {
