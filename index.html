@@ -466,7 +466,9 @@
                 container.innerHTML = '<p style="color:var(--text-muted); font-size:0.8rem;">Sin medidas configuradas.</p>';
                 return;
             }
-            const medidasFiltradas = catObj.medidas.filter(m => m !== 'Todas');
+            
+            let medidasArr = Array.isArray(catObj.medidas) ? catObj.medidas : typeof catObj.medidas === 'string' ? catObj.medidas.split(',').map(m => m.trim()) : [];
+            const medidasFiltradas = medidasArr.filter(m => m !== 'Todas');
             container.innerHTML = medidasFiltradas.map(m => `
                 <label class="size-checkbox-label">
                     <input type="checkbox" class="chk-talla" value="${m}"> ${m}
@@ -486,7 +488,7 @@
             }
             return ['https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano'];
         }
-        // Carga de productos paginada desde Supabase (Versión Corregida)
+        // Carga de productos paginada desde Supabase
         async function cargarProductosPaginados(esNuevaBusqueda = false) {
             const btnLoadMore = document.getElementById('btn-load-more');
             const container = document.getElementById('catalog-container');
@@ -604,15 +606,27 @@
             const subContainer = document.getElementById('subcategories-container');
             const catObj = categoriasData.find(c => c.nombre === categoria);
             
-            if (catObj && catObj.subcategorias && catObj.subcategorias.length > 0) {
+            let subcats = [];
+            if (catObj && catObj.subcategorias) {
+                if (Array.isArray(catObj.subcategorias)) subcats = catObj.subcategorias;
+                else if (typeof catObj.subcategorias === 'string') subcats = catObj.subcategorias.split(',').map(s => s.trim()).filter(s => s !== '');
+            }
+
+            let medidas = [];
+            if (catObj && catObj.medidas) {
+                if (Array.isArray(catObj.medidas)) medidas = catObj.medidas;
+                else if (typeof catObj.medidas === 'string') medidas = catObj.medidas.split(',').map(m => m.trim()).filter(m => m !== '');
+            }
+            
+            if (subcats.length > 0) {
                 let subHtml = `<button class="subcategory-btn active" onclick="filtrarSubcategoria('Todas', this)">Todas</button>`;
-                subHtml += catObj.subcategorias.map(sub => `
+                subHtml += subcats.map(sub => `
                     <button class="subcategory-btn" onclick="filtrarSubcategoria('${sub}', this)">${sub}</button>
                 `).join('');
                 subContainer.innerHTML = subHtml;
                 subContainer.classList.add('open');
-            } else if (catObj && catObj.medidas && catObj.medidas.length > 0) {
-                subContainer.innerHTML = catObj.medidas.map((medida, index) => `
+            } else if (medidas.length > 0) {
+                subContainer.innerHTML = medidas.map((medida, index) => `
                     <button class="subcategory-btn ${index === 0 ? 'active' : ''}" onclick="filtrarSubcategoria('${medida}', this)">${medida}</button>
                 `).join('');
                 subContainer.classList.add('open');
@@ -633,15 +647,11 @@
             const nombre = document.getElementById('cat-nombre').value.trim();
             const medidasRaw = document.getElementById('cat-medidas').value;
             const subcatRaw = document.getElementById('cat-subcategorias').value;
-
             let medidas = medidasRaw.split(',').map(m => m.trim()).filter(m => m !== '');
             if (!medidas.includes('Todas')) medidas.unshift('Todas');
-
             let subcategorias = subcatRaw.split(',').map(s => s.trim()).filter(s => s !== '');
-
             const { error } = await supabaseClient.from('categorias').insert([{ nombre, medidas, subcategorias }]);
             if (error) return alert("Error: " + error.message);
-
             document.getElementById('form-nueva-categoria').reset();
             await cargarCategoriasDesdeSupabase();
             renderListaCategoriasAdmin();
@@ -649,16 +659,39 @@
         }
         function renderListaCategoriasAdmin() {
             const container = document.getElementById('lista-categorias-admin');
-            container.innerHTML = categoriasData.map(c => `
-                <div class="cat-admin-item">
-                    <div>
-                        <strong>${c.nombre}</strong><br>
-                        ${c.subcategorias && c.subcategorias.length > 0 ? `<small style="color:var(--accent-color);">Subcats: ${c.subcategorias.join(', ')}</small><br>` : ''}
-                        <small style="color:var(--text-muted);">Medidas: ${c.medidas ? c.medidas.join(', ') : 'N/A'}</small>
+            if (!container) return;
+
+            if (!categoriasData || categoriasData.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No hay categorías registradas.</p>';
+                return;
+            }
+
+            container.innerHTML = categoriasData.map(c => {
+                let subcats = [];
+                if (Array.isArray(c.subcategorias)) {
+                    subcats = c.subcategorias;
+                } else if (typeof c.subcategorias === 'string') {
+                    subcats = c.subcategorias.split(',').map(s => s.trim()).filter(s => s !== '');
+                }
+
+                let medidas = [];
+                if (Array.isArray(c.medidas)) {
+                    medidas = c.medidas;
+                } else if (typeof c.medidas === 'string') {
+                    medidas = c.medidas.split(',').map(m => m.trim()).filter(m => m !== '');
+                }
+
+                return `
+                    <div class="cat-admin-item">
+                        <div>
+                            <strong>${c.nombre || 'Sin nombre'}</strong><br>
+                            ${subcats.length > 0 ? `<small style="color:var(--accent-color);">Subcats: ${subcats.join(', ')}</small><br>` : ''}
+                            <small style="color:var(--text-muted);">Medidas: ${medidas.length > 0 ? medidas.join(', ') : 'N/A'}</small>
+                        </div>
+                        <button class="btn-cat-del" onclick="eliminarCategoria(${c.id})">Eliminar</button>
                     </div>
-                    <button class="btn-cat-del" onclick="eliminarCategoria(${c.id})">Eliminar</button>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
         async function eliminarCategoria(id) {
             if (confirm("¿Eliminar esta categoría?")) {
