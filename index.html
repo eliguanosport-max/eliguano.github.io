@@ -51,21 +51,90 @@
         .brand-logo { width: 70px; height: 70px; object-fit: contain; border-radius: 50%; transition: all 0.3s ease; }
         .header-text { margin-top: 8px; transition: opacity 0.3s ease, max-height 0.3s ease, margin-top 0.3s ease; opacity: 1; max-height: 100px; overflow: hidden; }
         
-        /* Ocultar texto y ajustar espacio de la cabecera al hacer scroll */
         header.scrolled { padding: 10px 15px; }
         header.scrolled .header-text { opacity: 0; max-height: 0; margin-top: 0; pointer-events: none; }
         header.scrolled .brand-logo { width: 50px; height: 50px; }
         .search-container { padding: 12px 15px 5px 15px; background-color: var(--bg-color); }
         .search-input { width: 100%; padding: 12px 16px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 25px; color: var(--text-main); font-size: 0.9rem; outline: none; }
-        .categories-wrapper { display: flex; align-items: center; background-color: var(--bg-color); border-bottom: 1px solid var(--border-color); position: sticky; top: 60px; z-index: 90; padding: 10px 15px; gap: 10px; }
-        .categories { display: flex; gap: 10px; overflow-x: auto; flex-grow: 1; align-items: center; }
-        .category-btn { background-color: var(--card-bg); color: var(--text-muted); border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 25px; white-space: nowrap; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
-        .category-btn.active { background-color: var(--accent-color); color: #121212; border-color: var(--accent-color); }
-        .subcategories-container { display: none; gap: 8px; padding: 10px 15px; background-color: #181818; border-bottom: 1px solid var(--border-color); overflow-x: auto; align-items: center; }
-        .subcategories-container.open { display: flex; }
-        .subcategory-btn { background-color: #252525; color: var(--text-muted); border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 18px; white-space: nowrap; cursor: pointer; font-weight: 500; font-size: 0.78rem; }
-        .subcategory-btn.active { background-color: #ffffff; color: #000000; border-color: #ffffff; font-weight: 700; }
-        .admin-controls { display: flex; gap: 8px; }
+        
+        /* Sistema de Navegación con Desplegable (Dropdown) Estilo Menú Superior */
+        .categories-wrapper { 
+            display: flex; 
+            align-items: center; 
+            background-color: #181818; 
+            border-bottom: 1px solid var(--border-color); 
+            position: sticky; 
+            top: 60px; 
+            z-index: 90; 
+            padding: 0 15px;
+        }
+        .categories-nav { 
+            display: flex; 
+            gap: 2px; 
+            overflow-x: auto; 
+            flex-grow: 1; 
+            align-items: stretch; 
+        }
+        
+        /* Elemento de Categoría Principal */
+        .nav-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .category-btn { 
+            background-color: transparent; 
+            color: var(--text-muted); 
+            border: none;
+            padding: 14px 18px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 0.9rem; 
+            white-space: nowrap;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        .nav-item:hover .category-btn, .category-btn.active { 
+            background-color: #252525; 
+            color: var(--accent-color); 
+        }
+
+        /* Menú Desplegable Azul de Subcategorías */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 200px;
+            background-color: #222222;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+            z-index: 1000;
+            flex-direction: column;
+            border-radius: 0 0 6px 6px;
+        }
+        .nav-item:hover .dropdown-menu {
+            display: flex;
+        }
+        .subcategory-btn { 
+            background-color: transparent; 
+            color: var(--text-muted); 
+            border: none; 
+            border-bottom: 1px solid #2d2d2d;
+            padding: 10px 16px; 
+            text-align: left;
+            cursor: pointer; 
+            font-weight: 500; 
+            font-size: 0.85rem; 
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        .subcategory-btn:last-child { border-bottom: none; }
+        .subcategory-btn:hover, .subcategory-btn.active { 
+            background-color: #333333; 
+            color: #ffffff; 
+            font-weight: 700; 
+        }
+
+        .admin-controls { display: flex; gap: 8px; margin-left: 10px; align-items: center; }
         .btn-admin-add, .btn-admin-cat { display: none; background-color: #22c55e; color: #ffffff; border: none; padding: 8px 14px; border-radius: 25px; font-weight: 700; font-size: 0.8rem; cursor: pointer; white-space: nowrap; }
         .btn-admin-cat { background-color: #3b82f6; }
         .btn-admin-logout { display: none; background-color: #ef4444; color: #ffffff; border: none; padding: 8px 12px; border-radius: 25px; font-weight: 600; font-size: 0.8rem; cursor: pointer; white-space: nowrap; }
@@ -120,7 +189,7 @@
         .btn-save-product:disabled { opacity: 0.5; cursor: not-allowed; }
         .cat-admin-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 8px; }
         .btn-cat-del { background-color: #ef4444; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
-        /* Notificación Toast */
+        
         .toast-notification {
             visibility: hidden;
             min-width: 250px;
@@ -140,11 +209,8 @@
             opacity: 0;
             transition: opacity 0.3s ease, visibility 0.3s ease;
         }
-        .toast-notification.show {
-            visibility: visible;
-            opacity: 1;
-        }
-        /* Controles de Navegación del Visor de Imágenes */
+        .toast-notification.show { visibility: visible; opacity: 1; }
+        
         .viewer-nav-btn {
             position: absolute;
             top: 50%;
@@ -163,27 +229,15 @@
             z-index: 10;
             transition: background 0.2s ease, transform 0.2s ease;
         }
-        .viewer-nav-btn:hover {
-            background: rgba(0, 0, 0, 0.9);
-            transform: translateY(-50%) scale(1.1);
-        }
+        .viewer-nav-btn:hover { background: rgba(0, 0, 0, 0.9); transform: translateY(-50%) scale(1.1); }
         .viewer-prev { left: -20px; }
         .viewer-next { right: -20px; }
-        .viewer-counter {
-            position: absolute;
-            bottom: -35px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
+        .viewer-counter { position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%); color: var(--text-muted); font-size: 0.85rem; font-weight: 600; }
     </style>
 </head>
 <body>
     <header id="main-header">
         <div class="header-content">
-            <!-- Iconos de Redes Sociales (Esquina Superior Izquierda) -->
             <div class="social-header-links">
                 <a href="https://wa.me/5214961228531" target="_blank" rel="noopener noreferrer" title="WhatsApp">
                     <svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
@@ -206,17 +260,17 @@
         <input type="text" id="search-input" class="search-input" placeholder="🔍 Buscar producto por nombre o código..." oninput="manejarCambioFiltros()">
     </div>
     
+    <!-- Menú Estilo Barra Superior con Dropdown -->
     <div class="categories-wrapper">
-        <div class="categories" id="categories-bar-container">
+        <nav class="categories-nav" id="categories-bar-container">
             <!-- Carga dinámica -->
-        </div>
+        </nav>
         <div class="admin-controls">
             <button class="btn-admin-add" id="btn-admin-add" onclick="abrirModalAdminCrear()">➕ Producto</button>
             <button class="btn-admin-cat" id="btn-admin-cat" onclick="abrirModalGestionCategorias()">📂 Categorías</button>
             <button class="btn-admin-logout" id="btn-admin-logout" onclick="cerrarSesionAdmin()">Salir</button>
         </div>
     </div>
-    <div class="subcategories-container" id="subcategories-container"></div>
     
     <main class="catalog" id="catalog-container">
         <p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 20px;">Cargando catálogo...</p>
@@ -228,22 +282,18 @@
         <span id="cart-count-label">🛒 Carrito (0 prendas)</span>
         <span id="cart-total-label">$0 MXN &rarr;</span>
     </div>
-    <!-- Toast Notification -->
     <div id="toast-notification" class="toast-notification">¡Producto agregado al carrito!</div>
     
-    <!-- Visor Imagen Ampliada con Flechas de Navegación -->
     <div class="modal" id="image-viewer-modal" style="align-items: center;" onclick="cerrarVisorImagen()">
         <div style="position: relative; max-width: 90vw; max-height: 90vh; display: flex; align-items: center; justify-content: center;" onclick="event.stopPropagation()">
             <button class="close-modal" onclick="cerrarVisorImagen()" style="position: absolute; top: -40px; right: 0; color: #fff; font-size: 2.5rem;">&times;</button>
-            
             <button class="viewer-nav-btn viewer-prev" id="viewer-prev-btn" onclick="navegarImagenVisor(-1)">&#10094;</button>
             <img id="image-viewer-img" src="" style="max-width: 100%; max-height: 80vh; border-radius: 12px; object-fit: contain;">
             <button class="viewer-nav-btn viewer-next" id="viewer-next-btn" onclick="navegarImagenVisor(1)">&#10095;</button>
-            
             <div class="viewer-counter" id="viewer-counter-label">1 / 1</div>
         </div>
     </div>
-    <!-- Modal Carrito -->
+    
     <div class="modal" id="cart-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -260,7 +310,7 @@
             </div>
         </div>
     </div>
-    <!-- Modal Login -->
+    
     <div class="modal" id="login-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -280,7 +330,7 @@
             </form>
         </div>
     </div>
-    <!-- Modal Formulario Producto Admin -->
+    
     <div class="modal" id="admin-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -328,7 +378,7 @@
             </form>
         </div>
     </div>
-    <!-- Modal Gestión Categorías Admin -->
+    
     <div class="modal" id="cat-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -355,8 +405,8 @@
             <div id="lista-categorias-admin"></div>
         </div>
     </div>
+
     <script>
-        // Detección de scroll para ocultar las letras del logo
         window.addEventListener('scroll', function() {
             const header = document.getElementById('main-header');
             if (window.scrollY > 30) {
@@ -365,42 +415,43 @@
                 header.classList.remove('scrolled');
             }
         });
+
         const SUPABASE_URL = "https://ywixgizcadytczxcbubg.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3aXhnaXpjYWR5dGN6eGNidWJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxMzkzNTIsImV4cCI6MjEwMzcxNTM1Mn0.ABIAb8426hAdnJw5nxvGhxorAL6s8RHvlhHkDsb06Ts";
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        // Número formateado con la clave 521 para WhatsApp internacional en México
         const numeroTelefono = "5214961228531";
-        
+
         let esAdmin = false;
         let carrito = [];
         let categoriaActual = 'Todas';
         let subcategoriaActual = 'Todas';
         let productos = [];
         let categoriasData = [];
-        // Configuración de Paginación
         const PAGE_SIZE = 12;
         let paginaActual = 0;
         let hayMasProductos = true;
         let busquedaTimer;
         let toastTimer;
-        // Variables Globales para la galería ampliada
         let visorImagenesActuales = [];
         let visorIndiceActual = 0;
+
         document.addEventListener("DOMContentLoaded", async () => {
             await verificarSesionAdmin();
             await cargarCategoriasDesdeSupabase();
             cargarProductosPaginados(true);
         });
+
         async function verificarSesionAdmin() {
             const { data: { user } } = await supabaseClient.auth.getUser();
             esAdmin = !!user;
             actualizarInterfazAdmin(esAdmin);
         }
+
         function manejarClicIconoAdmin() {
             if (esAdmin) abrirModalAdminCrear();
             else abrirModalLogin();
         }
+
         function actualizarInterfazAdmin(estaAutenticado) {
             const btnProfile = document.getElementById('admin-profile-btn');
             const btnAdd = document.getElementById('btn-admin-add');
@@ -418,6 +469,7 @@
                 btnLogout.style.display = 'none';
             }
         }
+
         async function iniciarSesionAdmin(event) {
             event.preventDefault();
             const email = document.getElementById('login-email').value;
@@ -429,6 +481,7 @@
             cerrarModalLogin();
             renderizarCatalogo(productos, false);
         }
+
         async function cerrarSesionAdmin() {
             if (confirm("¿Cerrar sesión?")) {
                 await supabaseClient.auth.signOut();
@@ -437,6 +490,7 @@
                 renderizarCatalogo(productos, false);
             }
         }
+
         async function cargarCategoriasDesdeSupabase() {
             const { data, error } = await supabaseClient.from('categorias').select('*').order('id', { ascending: true });
             if (error) return console.error("Error al cargar categorías:", error);
@@ -444,20 +498,61 @@
             renderizarBarraCategorias();
             renderizarSelectCategoriasModal();
         }
+
+        /* Renderizar Categorías en Rojo y Subcategorías en Menú Desplegable Azul */
         function renderizarBarraCategorias() {
             const container = document.getElementById('categories-bar-container');
-            let html = `<button class="category-btn ${categoriaActual === 'Todas' ? 'active' : ''}" onclick="filtrarCategoria('Todas', this)">Todas</button>`;
+            
+            let html = `
+                <div class="nav-item">
+                    <button class="category-btn ${categoriaActual === 'Todas' ? 'active' : ''}" onclick="seleccionarCategoria('Todas', 'Todas')">Todas</button>
+                </div>
+            `;
             
             categoriasData.forEach(cat => {
-                html += `<button class="category-btn ${categoriaActual === cat.nombre ? 'active' : ''}" onclick="filtrarCategoria('${cat.nombre}', this)">${cat.nombre}</button>`;
+                let subcats = [];
+                if (Array.isArray(cat.subcategorias)) subcats = cat.subcategorias;
+                else if (typeof cat.subcategorias === 'string') subcats = cat.subcategorias.split(',').map(s => s.trim()).filter(s => s !== '');
+
+                let medidas = [];
+                if (Array.isArray(cat.medidas)) medidas = cat.medidas;
+                else if (typeof cat.medidas === 'string') medidas = cat.medidas.split(',').map(m => m.trim()).filter(m => m !== '');
+
+                const listaOpciones = subcats.length > 0 ? subcats : medidas;
+                const tieneSubmenu = listaOpciones.length > 0;
+
+                html += `
+                    <div class="nav-item">
+                        <button class="category-btn ${categoriaActual === cat.nombre ? 'active' : ''}" onclick="seleccionarCategoria('${cat.nombre}', 'Todas')">
+                            ${cat.nombre} ${tieneSubmenu ? '▾' : ''}
+                        </button>
+                        ${tieneSubmenu ? `
+                            <div class="dropdown-menu">
+                                <button class="subcategory-btn ${categoriaActual === cat.nombre && subcategoriaActual === 'Todas' ? 'active' : ''}" onclick="seleccionarCategoria('${cat.nombre}', 'Todas')">Ver todo en ${cat.nombre}</button>
+                                ${listaOpciones.map(sub => `
+                                    <button class="subcategory-btn ${categoriaActual === cat.nombre && subcategoriaActual === sub ? 'active' : ''}" onclick="seleccionarCategoria('${cat.nombre}', '${sub}')">${sub}</button>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
             });
             container.innerHTML = html;
         }
+
+        function seleccionarCategoria(cat, subcat) {
+            categoriaActual = cat;
+            subcategoriaActual = subcat;
+            renderizarBarraCategorias();
+            cargarProductosPaginados(true);
+        }
+
         function renderizarSelectCategoriasModal() {
             const select = document.getElementById('prod-categoria');
             select.innerHTML = categoriasData.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
             actualizarTallasFormulario();
         }
+
         function actualizarTallasFormulario() {
             const catNombre = document.getElementById('prod-categoria').value;
             const container = document.getElementById('sizes-checkbox-container');
@@ -466,7 +561,6 @@
                 container.innerHTML = '<p style="color:var(--text-muted); font-size:0.8rem;">Sin medidas configuradas.</p>';
                 return;
             }
-            
             let medidasArr = Array.isArray(catObj.medidas) ? catObj.medidas : typeof catObj.medidas === 'string' ? catObj.medidas.split(',').map(m => m.trim()) : [];
             const medidasFiltradas = medidasArr.filter(m => m !== 'Todas');
             container.innerHTML = medidasFiltradas.map(m => `
@@ -475,8 +569,7 @@
                 </label>
             `).join('');
         }
-        
-        // Helper para convertir cualquier formato de imágenes (Array o String) a un Arreglo de URLs
+
         function obtenerArregloImagenes(campoImg) {
             if (!campoImg) return ['https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano'];
             if (Array.isArray(campoImg)) {
@@ -488,7 +581,7 @@
             }
             return ['https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano'];
         }
-        // Carga de productos paginada desde Supabase
+
         async function cargarProductosPaginados(esNuevaBusqueda = false) {
             const btnLoadMore = document.getElementById('btn-load-more');
             const container = document.getElementById('catalog-container');
@@ -503,9 +596,8 @@
             btnLoadMore.disabled = true;
             const desde = paginaActual * PAGE_SIZE;
             const hasta = desde + PAGE_SIZE - 1;
-            let queryBuilder = supabaseClient
-                .from('productos')
-                .select('*', { count: 'exact' });
+            let queryBuilder = supabaseClient.from('productos').select('*', { count: 'exact' });
+            
             if (categoriaActual !== 'Todas') {
                 queryBuilder = queryBuilder.eq('categoria', categoriaActual);
             }
@@ -524,15 +616,12 @@
                 return;
             }
             const recibidos = data || [];
-            
-            // FILTRO ANTI-DUPLICADOS:
             const idsExistentes = new Set(productos.map(p => p.id));
             const nuevosSinDuplicar = recibidos.filter(p => !idsExistentes.has(p.id));
             productos = esNuevaBusqueda ? recibidos : [...productos, ...nuevosSinDuplicar];
             if (productos.length >= count || recibidos.length < PAGE_SIZE) {
                 hayMasProductos = false;
             }
-            
             renderizarCatalogo(productos, esNuevaBusqueda, nuevosSinDuplicar);
             paginaActual++;
             const loadMoreContainer = document.getElementById('load-more-container');
@@ -544,15 +633,14 @@
                 loadMoreContainer.style.display = 'none';
             }
         }
-        function cargarMasProductos() {
-            cargarProductosPaginados(false);
-        }
+
+        function cargarMasProductos() { cargarProductosPaginados(false); }
+
         function manejarCambioFiltros() {
             clearTimeout(busquedaTimer);
-            busquedaTimer = setTimeout(() => {
-                cargarProductosPaginados(true);
-            }, 300);
+            busquedaTimer = setTimeout(() => { cargarProductosPaginados(true); }, 300);
         }
+
         function renderizarCatalogo(lista, reiniciar = true, itemsNuevos = []) {
             const container = document.getElementById('catalog-container');
             if (reiniciar) container.innerHTML = '';
@@ -566,7 +654,6 @@
                 const codigoProd = prod.codigo || '';
                 const listaTallas = prod.tallas ? prod.tallas.split(',').map(t => t.trim()) : ['Única'];
                 const opcionesHTML = listaTallas.map(t => `<option value="${t}">${t}</option>`).join('');
-                
                 const imagenesArr = obtenerArregloImagenes(prod.img);
                 const portadaUrl = imagenesArr[0];
                 const card = document.createElement('div');
@@ -598,50 +685,7 @@
                 container.appendChild(card);
             });
         }
-        function filtrarCategoria(categoria, btn) {
-            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            categoriaActual = categoria;
-            subcategoriaActual = 'Todas';
-            const subContainer = document.getElementById('subcategories-container');
-            const catObj = categoriasData.find(c => c.nombre === categoria);
-            
-            let subcats = [];
-            if (catObj && catObj.subcategorias) {
-                if (Array.isArray(catObj.subcategorias)) subcats = catObj.subcategorias;
-                else if (typeof catObj.subcategorias === 'string') subcats = catObj.subcategorias.split(',').map(s => s.trim()).filter(s => s !== '');
-            }
 
-            let medidas = [];
-            if (catObj && catObj.medidas) {
-                if (Array.isArray(catObj.medidas)) medidas = catObj.medidas;
-                else if (typeof catObj.medidas === 'string') medidas = catObj.medidas.split(',').map(m => m.trim()).filter(m => m !== '');
-            }
-            
-            if (subcats.length > 0) {
-                let subHtml = `<button class="subcategory-btn active" onclick="filtrarSubcategoria('Todas', this)">Todas</button>`;
-                subHtml += subcats.map(sub => `
-                    <button class="subcategory-btn" onclick="filtrarSubcategoria('${sub}', this)">${sub}</button>
-                `).join('');
-                subContainer.innerHTML = subHtml;
-                subContainer.classList.add('open');
-            } else if (medidas.length > 0) {
-                subContainer.innerHTML = medidas.map((medida, index) => `
-                    <button class="subcategory-btn ${index === 0 ? 'active' : ''}" onclick="filtrarSubcategoria('${medida}', this)">${medida}</button>
-                `).join('');
-                subContainer.classList.add('open');
-            } else {
-                subContainer.innerHTML = '';
-                subContainer.classList.remove('open');
-            }
-            cargarProductosPaginados(true);
-        }
-        function filtrarSubcategoria(medida, btn) {
-            document.querySelectorAll('.subcategory-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            subcategoriaActual = medida;
-            cargarProductosPaginados(true);
-        }
         async function guardarNuevaCategoria(event) {
             event.preventDefault();
             const nombre = document.getElementById('cat-nombre').value.trim();
@@ -657,6 +701,7 @@
             renderListaCategoriasAdmin();
             alert("Categoría guardada exitosamente");
         }
+
         function renderListaCategoriasAdmin() {
             const container = document.getElementById('lista-categorias-admin');
             if (!container) return;
@@ -667,19 +712,8 @@
             }
 
             container.innerHTML = categoriasData.map(c => {
-                let subcats = [];
-                if (Array.isArray(c.subcategorias)) {
-                    subcats = c.subcategorias;
-                } else if (typeof c.subcategorias === 'string') {
-                    subcats = c.subcategorias.split(',').map(s => s.trim()).filter(s => s !== '');
-                }
-
-                let medidas = [];
-                if (Array.isArray(c.medidas)) {
-                    medidas = c.medidas;
-                } else if (typeof c.medidas === 'string') {
-                    medidas = c.medidas.split(',').map(m => m.trim()).filter(m => m !== '');
-                }
+                let subcats = Array.isArray(c.subcategorias) ? c.subcategorias : typeof c.subcategorias === 'string' ? c.subcategorias.split(',').map(s => s.trim()).filter(s => s !== '') : [];
+                let medidas = Array.isArray(c.medidas) ? c.medidas : typeof c.medidas === 'string' ? c.medidas.split(',').map(m => m.trim()).filter(m => m !== '') : [];
 
                 return `
                     <div class="cat-admin-item">
@@ -693,6 +727,7 @@
                 `;
             }).join('');
         }
+
         async function eliminarCategoria(id) {
             if (confirm("¿Eliminar esta categoría?")) {
                 const { error } = await supabaseClient.from('categorias').delete().eq('id', id);
@@ -703,11 +738,13 @@
                 }
             }
         }
+
         function abrirModalGestionCategorias() {
             renderListaCategoriasAdmin();
             document.getElementById('cat-modal').classList.add('open');
         }
         function cerrarModalGestionCategorias() { document.getElementById('cat-modal').classList.remove('open'); }
+
         function abrirModalAdminCrear() {
             document.getElementById('form-nuevo-producto').reset();
             document.getElementById('prod-id').value = '';
@@ -716,6 +753,7 @@
             renderizarSelectCategoriasModal();
             document.getElementById('admin-modal').classList.add('open');
         }
+
         function abrirModalAdminEditar(idProd) {
             const prod = productos.find(p => p.id === idProd);
             if (!prod) return;
@@ -739,10 +777,11 @@
             }
             document.getElementById('admin-modal').classList.add('open');
         }
+
         function cerrarModalAdmin() { document.getElementById('admin-modal').classList.remove('open'); }
         function abrirModalLogin() { document.getElementById('login-modal').classList.add('open'); }
         function cerrarModalLogin() { document.getElementById('login-modal').classList.remove('open'); }
-        // Funciones del Visor de Galería con Flechas
+
         function abrirVisorGaleria(idProd) {
             const prod = productos.find(p => p.id === idProd);
             if (!prod) return;
@@ -751,6 +790,7 @@
             actualizarVisorImagen();
             document.getElementById('image-viewer-modal').classList.add('open');
         }
+
         function actualizarVisorImagen() {
             const imgEl = document.getElementById('image-viewer-img');
             const prevBtn = document.getElementById('viewer-prev-btn');
@@ -768,6 +808,7 @@
                 counterEl.style.display = 'none';
             }
         }
+
         function navegarImagenVisor(direccion) {
             visorIndiceActual += direccion;
             if (visorIndiceActual < 0) {
@@ -777,9 +818,11 @@
             }
             actualizarVisorImagen();
         }
+
         function cerrarVisorImagen() { 
             document.getElementById('image-viewer-modal').classList.remove('open'); 
         }
+
         async function subirImagenesASupabaseStorage(files) {
             const urlsSubidas = [];
             for (let i = 0; i < files.length; i++) {
@@ -800,6 +843,7 @@
             }
             return urlsSubidas;
         }
+
         async function guardarProducto(event) {
             event.preventDefault();
             const btnSave = document.getElementById('btn-save');
@@ -853,24 +897,26 @@
                 btnSave.textContent = "Publicar Producto";
             }
         }
+
         async function cambiarEstadoStock(id, nuevoEstado) {
             await supabaseClient.from('productos').update({ disponible: nuevoEstado }).eq('id', id);
             cargarProductosPaginados(true);
         }
+
         async function eliminarProducto(id) {
             if (confirm("¿Eliminar producto?")) {
                 await supabaseClient.from('productos').delete().eq('id', id);
                 cargarProductosPaginados(true);
             }
         }
+
         function mostrarToast() {
             const toast = document.getElementById('toast-notification');
             toast.classList.add('show');
             clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => {
-                toast.classList.remove('show');
-            }, 2000);
+            toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 2000);
         }
+
         function agregarAlCarrito(nombre, codigo, precio, img, idProd) {
             const sizeSelect = document.getElementById(`size-select-${idProd}`);
             const talla = sizeSelect ? sizeSelect.value : 'Única';
@@ -880,15 +926,18 @@
             actualizarCarritoUI();
             mostrarToast();
         }
+
         function cambiarCantidad(index, cambio) {
             carrito[index].cantidad += cambio;
             if (carrito[index].cantidad <= 0) carrito.splice(index, 1);
             actualizarCarritoUI();
         }
+
         function eliminarDelCarrito(index) {
             carrito.splice(index, 1);
             actualizarCarritoUI();
         }
+
         function actualizarCarritoUI() {
             const totalPrendas = carrito.reduce((sum, item) => sum + item.cantidad, 0);
             const totalDinero = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
@@ -922,8 +971,10 @@
                 `).join('');
             }
         }
+
         function abrirCarrito() { document.getElementById('cart-modal').classList.add('open'); }
         function cerrarCarrito() { document.getElementById('cart-modal').classList.remove('open'); }
+
         function comprarAhoraDirecto(nombre, codigo, precio, idProd) {
             const sizeSelect = document.getElementById(`size-select-${idProd}`);
             const talla = sizeSelect ? sizeSelect.value : 'Única';
@@ -931,6 +982,7 @@
             let mensaje = `Hola *Iguano*, me interesa comprar ahora mismo el siguiente producto:\n\n- ${textoCodigo}${nombre} (Talla: ${talla}): $${precio} MXN`;
             window.open(`https://wa.me/${numeroTelefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
+
         function enviarPedidoWhatsApp() {
             if (carrito.length === 0) return alert("El carrito está vacío.");
             let lista = carrito.map(i => {
