@@ -243,7 +243,6 @@
             <div class="viewer-counter" id="viewer-counter-label">1 / 1</div>
         </div>
     </div>
-
     <!-- Modal Carrito -->
     <div class="modal" id="cart-modal">
         <div class="modal-content">
@@ -342,6 +341,10 @@
                     <input type="text" id="cat-nombre" placeholder="Ej. Calzado" required>
                 </div>
                 <div class="form-group">
+                    <label>Subcategorías (Separadas por comas):</label>
+                    <input type="text" id="cat-subcategorias" placeholder="Ej. Planas, Ajustables, Cerradas">
+                </div>
+                <div class="form-group">
                     <label>Medidas/Tallas (Separadas por comas):</label>
                     <input type="text" id="cat-medidas" placeholder="Ej. 25, 26, 27, 28" required>
                 </div>
@@ -381,11 +384,9 @@
         let hayMasProductos = true;
         let busquedaTimer;
         let toastTimer;
-
         // Variables Globales para la galería ampliada
         let visorImagenesActuales = [];
         let visorIndiceActual = 0;
-
         document.addEventListener("DOMContentLoaded", async () => {
             await verificarSesionAdmin();
             await cargarCategoriasDesdeSupabase();
@@ -485,7 +486,6 @@
             }
             return ['https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano'];
         }
-
         // Carga de productos paginada desde Supabase (Versión Corregida)
         async function cargarProductosPaginados(esNuevaBusqueda = false) {
             const btnLoadMore = document.getElementById('btn-load-more');
@@ -567,7 +567,6 @@
                 
                 const imagenesArr = obtenerArregloImagenes(prod.img);
                 const portadaUrl = imagenesArr[0];
-
                 const card = document.createElement('div');
                 card.className = `product-card ${estaDisponible ? '' : 'out-of-stock'}`;
                 card.innerHTML = `
@@ -604,7 +603,15 @@
             subcategoriaActual = 'Todas';
             const subContainer = document.getElementById('subcategories-container');
             const catObj = categoriasData.find(c => c.nombre === categoria);
-            if (catObj && catObj.medidas && catObj.medidas.length > 0) {
+            
+            if (catObj && catObj.subcategorias && catObj.subcategorias.length > 0) {
+                let subHtml = `<button class="subcategory-btn active" onclick="filtrarSubcategoria('Todas', this)">Todas</button>`;
+                subHtml += catObj.subcategorias.map(sub => `
+                    <button class="subcategory-btn" onclick="filtrarSubcategoria('${sub}', this)">${sub}</button>
+                `).join('');
+                subContainer.innerHTML = subHtml;
+                subContainer.classList.add('open');
+            } else if (catObj && catObj.medidas && catObj.medidas.length > 0) {
                 subContainer.innerHTML = catObj.medidas.map((medida, index) => `
                     <button class="subcategory-btn ${index === 0 ? 'active' : ''}" onclick="filtrarSubcategoria('${medida}', this)">${medida}</button>
                 `).join('');
@@ -625,10 +632,16 @@
             event.preventDefault();
             const nombre = document.getElementById('cat-nombre').value.trim();
             const medidasRaw = document.getElementById('cat-medidas').value;
+            const subcatRaw = document.getElementById('cat-subcategorias').value;
+
             let medidas = medidasRaw.split(',').map(m => m.trim()).filter(m => m !== '');
             if (!medidas.includes('Todas')) medidas.unshift('Todas');
-            const { error } = await supabaseClient.from('categorias').insert([{ nombre, medidas }]);
+
+            let subcategorias = subcatRaw.split(',').map(s => s.trim()).filter(s => s !== '');
+
+            const { error } = await supabaseClient.from('categorias').insert([{ nombre, medidas, subcategorias }]);
             if (error) return alert("Error: " + error.message);
+
             document.getElementById('form-nueva-categoria').reset();
             await cargarCategoriasDesdeSupabase();
             renderListaCategoriasAdmin();
@@ -640,7 +653,8 @@
                 <div class="cat-admin-item">
                     <div>
                         <strong>${c.nombre}</strong><br>
-                        <small style="color:var(--text-muted);">${c.medidas.join(', ')}</small>
+                        ${c.subcategorias && c.subcategorias.length > 0 ? `<small style="color:var(--accent-color);">Subcats: ${c.subcategorias.join(', ')}</small><br>` : ''}
+                        <small style="color:var(--text-muted);">Medidas: ${c.medidas ? c.medidas.join(', ') : 'N/A'}</small>
                     </div>
                     <button class="btn-cat-del" onclick="eliminarCategoria(${c.id})">Eliminar</button>
                 </div>
@@ -683,7 +697,6 @@
             
             const arrImg = obtenerArregloImagenes(prod.img);
             document.getElementById('prod-img-url').value = arrImg.join(', ');
-
             actualizarTallasFormulario();
             if (prod.tallas) {
                 const tallasArr = prod.tallas.split(',').map(t => t.trim());
@@ -696,7 +709,6 @@
         function cerrarModalAdmin() { document.getElementById('admin-modal').classList.remove('open'); }
         function abrirModalLogin() { document.getElementById('login-modal').classList.add('open'); }
         function cerrarModalLogin() { document.getElementById('login-modal').classList.remove('open'); }
-
         // Funciones del Visor de Galería con Flechas
         function abrirVisorGaleria(idProd) {
             const prod = productos.find(p => p.id === idProd);
@@ -706,15 +718,12 @@
             actualizarVisorImagen();
             document.getElementById('image-viewer-modal').classList.add('open');
         }
-
         function actualizarVisorImagen() {
             const imgEl = document.getElementById('image-viewer-img');
             const prevBtn = document.getElementById('viewer-prev-btn');
             const nextBtn = document.getElementById('viewer-next-btn');
             const counterEl = document.getElementById('viewer-counter-label');
-
             imgEl.src = visorImagenesActuales[visorIndiceActual];
-
             if (visorImagenesActuales.length > 1) {
                 prevBtn.style.display = 'flex';
                 nextBtn.style.display = 'flex';
@@ -726,7 +735,6 @@
                 counterEl.style.display = 'none';
             }
         }
-
         function navegarImagenVisor(direccion) {
             visorIndiceActual += direccion;
             if (visorIndiceActual < 0) {
@@ -736,11 +744,9 @@
             }
             actualizarVisorImagen();
         }
-
         function cerrarVisorImagen() { 
             document.getElementById('image-viewer-modal').classList.remove('open'); 
         }
-
         async function subirImagenesASupabaseStorage(files) {
             const urlsSubidas = [];
             for (let i = 0; i < files.length; i++) {
@@ -761,7 +767,6 @@
             }
             return urlsSubidas;
         }
-
         async function guardarProducto(event) {
             event.preventDefault();
             const btnSave = document.getElementById('btn-save');
@@ -782,7 +787,6 @@
             if (urlInput !== '') {
                 imagenesFinales = urlInput.split(',').map(u => u.trim()).filter(u => u !== '');
             }
-
             try {
                 btnSave.disabled = true;
                 btnSave.textContent = "Guardando...";
@@ -794,11 +798,9 @@
                     const prodActual = productos.find(p => p.id === parseInt(prodId));
                     if (prodActual) imagenesFinales = obtenerArregloImagenes(prodActual.img);
                 }
-
                 if (imagenesFinales.length === 0) {
                     imagenesFinales = ["https://via.placeholder.com/300x300/1e1e1e/f5f5f0?text=El+Iguano"];
                 }
-
                 let res;
                 if (esEdicion) {
                     res = await supabaseClient.from('productos').update({ codigo, nombre, precio, categoria, tallas, disponible, img: imagenesFinales }).eq('id', prodId);
